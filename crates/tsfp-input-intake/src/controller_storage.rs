@@ -53,8 +53,8 @@ mod tests {
     #[test]
     fn profile_location_requires_absolute_xdg_or_home() {
         assert_eq!(
-            profile_path(Some(Path::new("<private>")), Some(Path::new("relative"))).unwrap(),
-            Path::new("<private>")
+            profile_path(Some(Path::new("/home/p")), Some(Path::new("relative"))).unwrap(),
+            Path::new("/home/p/.local/share/tsfp/controller-profiles.toml")
         );
         assert_eq!(
             profile_path(None, Some(Path::new("/data"))).unwrap(),

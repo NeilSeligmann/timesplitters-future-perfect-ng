@@ -48,6 +48,86 @@
   {
    "va": "0x459d0",
    "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x18ea90",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x6a540",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x9b270",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x12b310",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0xa1dc0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x128fa0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x87800",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x4c3e0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x15bd00",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x1164c0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x94fe0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x948b0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x468a0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x156f00",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x12c1f0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0xd9760",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x331920",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x3319c0",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0x168720",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
+  },
+  {
+   "va": "0xb3560",
+   "waiver": "T4348 first-half batch: shadow-live selection; smoke --quick on origin/main and this half has the same level5/arcade route failures, with level6 passing."
   }
  ]
 }

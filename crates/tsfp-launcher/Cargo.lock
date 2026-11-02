@@ -4755,7 +4755,7 @@ dependencies = [
 
 [[package]]
 name = "tsfp-launcher"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "minisign-verify",
  "rfd",

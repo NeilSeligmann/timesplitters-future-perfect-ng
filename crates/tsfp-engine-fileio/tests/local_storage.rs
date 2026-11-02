@@ -18,16 +18,16 @@ fn scratch(name: &str) -> PathBuf {
 #[test]
 fn xdg_absolute_path_and_single_device_profile_reload() {
     assert_eq!(
-        standard_path(Some(Path::new("<private>")), None).unwrap(),
-        Path::new("<private>")
+        standard_path(Some(Path::new("/home/test")), None).unwrap(),
+        Path::new("/home/test/.local/share/tsfp/saves")
     );
     assert_eq!(
         standard_path(None, Some(Path::new("/data"))).unwrap(),
         Path::new("/data/tsfp/saves")
     );
     assert_eq!(
-        standard_path(Some(Path::new("<private>")), Some(Path::new("relative"))).unwrap(),
-        Path::new("<private>")
+        standard_path(Some(Path::new("/home/test")), Some(Path::new("relative"))).unwrap(),
+        Path::new("/home/test/.local/share/tsfp/saves")
     );
     assert!(standard_path(None, Some(Path::new("relative"))).is_err());
     let root = scratch("profile");

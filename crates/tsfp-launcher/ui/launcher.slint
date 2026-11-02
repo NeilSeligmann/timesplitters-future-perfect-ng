@@ -1,0 +1,822 @@
+// TSFP launcher UI (T4349). Pure view: every action is a callback handled by src/main.rs over the controller.
+import { Button, LineEdit, ComboBox, Switch, CheckBox, ScrollView } from "std-widgets.slint";
+
+export struct SettingRow {
+    header: bool,
+    id: string,
+    label: string,
+    kind: string,
+    checked: bool,
+    text: string,
+    options: [string],
+    selected: int,
+    note: string,
+}
+
+// state: 0 coming soon, 1 not installed, 2 installed
+export struct PackRow { id: string, title: string, description: string, state: int }
+
+// state: 0 waiting, 1 running, 2 done, 3 failed. progress: 0..1, negative when unknown.
+export struct InstallStepRow { label: string, detail: string, state: int, progress: float }
+
+export struct ModRow {
+    id: string,
+    name: string,
+    version: string,
+    description: string,
+    enabled: bool,
+    position: int,
+    gameplay: bool,
+}
+
+global Theme {
+    out property <color> bg: #0a101c;
+    out property <color> surface: #101a2c;
+    out property <color> surface-2: #17233a;
+    out property <color> border: #233452;
+    out property <color> text: #e7eefb;
+    out property <color> muted: #93a4c3;
+    out property <color> accent: #3fa9ff;
+    out property <color> accent-hover: #6cc0ff;
+    out property <color> accent-pressed: #1f8ae6;
+    out property <color> accent-soft: #3fa9ff1f;
+    out property <color> accent-text: #04121f;
+    out property <color> good: #22c55e;
+    out property <color> warn: #f59e0b;
+    out property <color> bad: #ef4444;
+    out property <length> radius: 10px;
+}
+
+component Card inherits Rectangle {
+    background: Theme.surface;
+    border-radius: Theme.radius;
+    border-width: 1px;
+    border-color: Theme.border;
+}
+
+component Title inherits Text {
+    color: Theme.text;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+component Body inherits Text {
+    color: Theme.text;
+    font-size: 14px;
+    wrap: word-wrap;
+}
+
+component Muted inherits Text {
+    color: Theme.muted;
+    font-size: 12px;
+    wrap: word-wrap;
+}
+
+// Coloured status pill. tone: 0 neutral, 1 good, 2 warning, 3 error.
+component Chip inherits Rectangle {
+    in property <string> label;
+    in property <int> tone;
+    height: 24px;
+    width: chip-text.preferred-width + 20px;
+    border-radius: 12px;
+    background: tone == 1 ? #22c55e26 : tone == 2 ? #f59e0b26 : tone == 3 ? #ef444426 : #ffffff14;
+    chip-text := Text {
+        text: root.label;
+        font-size: 12px;
+        font-weight: 600;
+        color: tone == 1 ? Theme.good : tone == 2 ? Theme.warn : tone == 3 ? Theme.bad : Theme.muted;
+    }
+}
+
+// Primary action in the launcher's accent colour (Fluent's primary button uses the system blue).
+component AccentButton inherits Rectangle {
+    in property <string> text;
+    in property <bool> enabled: true;
+    in property <length> min-button-width: 0px;
+    callback clicked;
+    height: 38px;
+    min-width: max(root.min-button-width, label.preferred-width + 36px);
+    horizontal-stretch: 0;
+    border-radius: 8px;
+    background: !enabled ? #3fa9ff40 : touch.pressed ? Theme.accent-pressed : touch.has-hover ? Theme.accent-hover : Theme.accent;
+    label := Text {
+        text: root.text;
+        color: enabled ? Theme.accent-text : #04121f99;
+        font-size: 14px;
+        font-weight: 700;
+    }
+    touch := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: root.enabled ? pointer : default;
+        clicked => { root.clicked(); }
+    }
+}
+
+// Busy indicator: one arc turning at a constant speed (the Fluent spinner also grows and shrinks the arc).
+component Loader inherits Rectangle {
+    in property <length> size: 18px;
+    in property <color> tint: Theme.accent;
+    width: size;
+    height: size;
+    Path {
+        width: 100%;
+        height: 100%;
+        viewbox-width: 24;
+        viewbox-height: 24;
+        commands: "M 12 2.5 A 9.5 9.5 0 1 1 2.5 12 A 9.5 9.5 0 0 1 12 2.5";
+        stroke: #ffffff1f;
+        stroke-width: 2.5px;
+    }
+    Path {
+        width: 100%;
+        height: 100%;
+        viewbox-width: 24;
+        viewbox-height: 24;
+        commands: "M 12 2.5 A 9.5 9.5 0 0 1 21.5 12";
+        stroke: root.tint;
+        stroke-width: 2.5px;
+        stroke-line-cap: round;
+        transform-origin: { x: self.width / 2, y: self.height / 2 };
+        transform-rotation: mod(animation-tick() / 1ms * 0.4, 360) * 1deg;
+    }
+}
+
+// Determinate progress bar in the accent colour.
+component Bar inherits Rectangle {
+    in property <float> value;
+    height: 6px;
+    border-radius: 3px;
+    background: Theme.surface-2;
+    Rectangle {
+        x: 0;
+        width: parent.width * clamp(root.value, 0, 1);
+        border-radius: 3px;
+        background: Theme.accent;
+        animate width { duration: 200ms; }
+    }
+}
+
+// Install step state: 0 waiting, 1 running, 2 done, 3 failed.
+component StepIcon inherits Rectangle {
+    in property <int> state;
+    width: 24px;
+    height: 24px;
+    if state == 1: Loader { size: 20px; }
+    if state != 1: Rectangle {
+        width: 22px;
+        height: 22px;
+        border-radius: 11px;
+        background: state == 2 ? Theme.good : state == 3 ? Theme.bad : transparent;
+        border-width: state == 0 ? 2px : 0px;
+        border-color: Theme.border;
+        Text {
+            text: state == 2 ? "✓" : state == 3 ? "✕" : "";
+            color: #0a101c;
+            font-size: 13px;
+            font-weight: 800;
+        }
+    }
+}
+
+component NavItem inherits Rectangle {
+    in property <string> label;
+    in property <string> glyph;
+    in property <bool> active;
+    callback clicked;
+    height: 40px;
+    border-radius: 8px;
+    background: active ? Theme.accent-soft : touch.has-hover ? #ffffff0d : transparent;
+    Rectangle {
+        x: 0;
+        width: 3px;
+        height: 20px;
+        border-radius: 2px;
+        background: active ? Theme.accent : transparent;
+    }
+    HorizontalLayout {
+        padding-left: 14px;
+        spacing: 12px;
+        Text {
+            text: root.glyph;
+            width: 18px;
+            color: active ? Theme.accent : Theme.muted;
+            font-size: 15px;
+            vertical-alignment: center;
+            horizontal-alignment: center;
+        }
+        Text {
+            text: root.label;
+            color: active ? Theme.text : Theme.muted;
+            font-size: 14px;
+            font-weight: active ? 600 : 400;
+            vertical-alignment: center;
+        }
+    }
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+        mouse-cursor: pointer;
+    }
+}
+
+// Numbered step header for the setup wizard. state: 0 pending, 1 current, 2 done.
+component StepHeader inherits HorizontalLayout {
+    in property <int> number;
+    in property <string> label;
+    in property <int> state;
+    spacing: 12px;
+    Rectangle {
+        width: 28px;
+        height: 28px;
+        border-radius: 14px;
+        background: state == 2 ? Theme.good : state == 1 ? Theme.accent : Theme.surface-2;
+        Text {
+            text: state == 2 ? "✓" : root.number;
+            color: state == 0 ? Theme.muted : Theme.accent-text;
+            font-weight: 700;
+        }
+    }
+    Text {
+        text: root.label;
+        color: Theme.text;
+        font-size: 16px;
+        font-weight: 600;
+        vertical-alignment: center;
+    }
+}
+
+export component AppWindow inherits Window {
+    title: "TimeSplitters: Future Perfect NG";
+    preferred-width: 1040px;
+    preferred-height: 700px;
+    min-width: 860px;
+    min-height: 560px;
+    background: Theme.bg;
+
+    in-out property <int> page: 0;
+    in property <string> version;
+    in property <string> notice;
+    in property <bool> busy;
+    // Logo decoded from the user's installed game data; text title until then.
+    in property <image> logo;
+    in property <bool> has-logo;
+
+    // Play
+    in property <bool> installed;
+    in property <bool> can-play;
+    in property <string> play-hint;
+    // Play card from the controller: button label, detail line, action (0 off, 1 play, 2 build, 3 setup, 4 cancel).
+    in property <string> play-label;
+    in property <string> play-detail;
+    in property <int> play-action;
+    in property <[string]> status-lines;
+    in property <string> update-version;
+
+    // Setup
+    in-out property <string> disc-path;
+    in property <string> identity-text;
+    in property <int> identity-tone;
+    in property <bool> identity-unknown;
+    in-out property <bool> allow-unknown;
+    in-out property <string> game-dir;
+    in property <bool> can-install;
+    in property <bool> installing;
+    in property <[InstallStepRow]> install-steps;
+    in property <float> install-overall;
+    in property <string> disc-note;
+    in property <bool> drag-hover;
+    in property <float> verify-fraction: -1;
+    in property <string> verify-detail;
+
+    // Settings
+    in property <int> channel-index;
+    in property <bool> check-updates;
+    in property <[SettingRow]> settings;
+
+    // Content and mods
+    in property <[PackRow]> packs;
+    in property <[ModRow]> mods;
+    in property <[string]> mod-notes;
+    in property <string> mods-folder;
+
+    callback navigate(int);
+    callback browse-disc();
+    callback disc-edited(string);
+    callback identify();
+    callback allow-unknown-changed(bool);
+    callback browse-game-dir();
+    callback game-dir-edited(string);
+    callback install();
+    callback verify();
+    callback play();
+    callback build-game();
+    callback cancel-build();
+    callback check-update();
+    callback apply-update();
+    callback channel-changed(int);
+    callback check-updates-changed(bool);
+    callback setting-bool(string, bool);
+    callback setting-choice(string, string);
+    callback setting-text(string, string);
+    callback save();
+    callback pack-install(string);
+    callback pack-remove(string);
+    callback install-mod();
+    callback mod-toggle(string, bool);
+    callback mod-move(string, int);
+    callback mod-remove(string);
+
+    HorizontalLayout {
+        // Sidebar
+        Rectangle {
+            width: 220px;
+            background: Theme.surface;
+            Rectangle {
+                x: parent.width - 1px;
+                width: 1px;
+                background: Theme.border;
+            }
+            VerticalLayout {
+                padding: 16px;
+                spacing: 4px;
+                if root.has-logo: Image {
+                    source: root.logo;
+                    height: 94px;
+                    image-fit: contain;
+                    horizontal-alignment: left;
+                }
+                if root.has-logo: Rectangle { height: 14px; }
+                if !root.has-logo: VerticalLayout {
+                    padding-bottom: 20px;
+                    spacing: 2px;
+                    Text {
+                        text: "TimeSplitters";
+                        color: Theme.accent;
+                        font-size: 20px;
+                        font-weight: 800;
+                    }
+                    Text {
+                        text: "Future Perfect NG";
+                        color: Theme.text;
+                        font-size: 13px;
+                        font-weight: 600;
+                    }
+                }
+                NavItem { label: "Play"; glyph: "▶"; active: root.page == 0; clicked => { root.navigate(0); } }
+                NavItem { label: "Setup"; glyph: "◎"; active: root.page == 1; clicked => { root.navigate(1); } }
+                NavItem { label: "Settings"; glyph: "⚙"; active: root.page == 2; clicked => { root.navigate(2); } }
+                NavItem { label: "Content"; glyph: "♫"; active: root.page == 3; clicked => { root.navigate(3); } }
+                NavItem { label: "Mods"; glyph: "✚"; active: root.page == 4; clicked => { root.navigate(4); } }
+                NavItem { label: "Verify"; glyph: "✓"; active: root.page == 5; clicked => { root.navigate(5); } }
+                Rectangle { vertical-stretch: 1; }
+                if root.update-version != "": Rectangle {
+                    height: 76px;
+                    border-radius: 8px;
+                    background: Theme.accent-soft;
+                    VerticalLayout {
+                        padding: 10px;
+                        spacing: 6px;
+                        Text {
+                            text: "Update " + root.update-version;
+                            color: Theme.accent;
+                            font-size: 12px;
+                            font-weight: 700;
+                        }
+                        AccentButton {
+                            text: "Install update";
+                            enabled: !root.busy;
+                            clicked => { root.apply-update(); }
+                        }
+                    }
+                }
+                Muted { text: "Launcher " + root.version; }
+            }
+        }
+
+        // Content
+        VerticalLayout {
+            horizontal-stretch: 1;
+            ScrollView {
+                vertical-stretch: 1;
+                VerticalLayout {
+                    padding: 28px;
+                    spacing: 18px;
+                    alignment: start;
+
+                    if root.page == 0: VerticalLayout {
+                        spacing: 18px;
+                        Rectangle {
+                            min-height: 230px;
+                            border-radius: 14px;
+                            background: @linear-gradient(120deg, #0d2a4d 0%, #102038 50%, #0a101c 100%);
+                            border-width: 1px;
+                            border-color: Theme.border;
+                            VerticalLayout {
+                                padding: 28px;
+                                spacing: 10px;
+                                alignment: center;
+                                Chip {
+                                    label: root.play-action == 1 ? "READY" : root.play-action == 2 ? "BUILD NEEDED" : root.play-action == 4 ? "BUILDING" : root.play-action == 3 ? "SETUP NEEDED" : "NOT AVAILABLE";
+                                    tone: root.play-action == 1 ? 1 : root.play-action == 0 ? 0 : 2;
+                                }
+                                if !root.has-logo: Text {
+                                    text: "TimeSplitters: Future Perfect";
+                                    color: Theme.text;
+                                    font-size: 30px;
+                                    font-weight: 800;
+                                }
+                                if root.has-logo: Image {
+                                    source: root.logo;
+                                    height: 96px;
+                                    image-fit: contain;
+                                    horizontal-alignment: left;
+                                }
+                                Muted { text: root.play-hint; font-size: 13px; }
+                                HorizontalLayout {
+                                    alignment: start;
+                                    spacing: 12px;
+                                    AccentButton {
+                                        text: root.play-label;
+                                        min-button-width: 180px;
+                                        height: 46px;
+                                        enabled: root.play-action != 0;
+                                        clicked => {
+                                            if (root.play-action == 1) { root.play(); }
+                                            else if (root.play-action == 2) { root.build-game(); }
+                                            else if (root.play-action == 3) { root.navigate(1); }
+                                            else if (root.play-action == 4) { root.cancel-build(); }
+                                        }
+                                    }
+                                    if root.play-action == 4: Loader { size: 22px; y: 12px; }
+                                }
+                                if root.play-detail != "": Text {
+                                    text: root.play-detail;
+                                    color: Theme.muted;
+                                    font-size: 11px;
+                                    overflow: elide;
+                                }
+                            }
+                        }
+                        Card {
+                            VerticalLayout {
+                                padding: 18px;
+                                spacing: 8px;
+                                Text { text: "Installed versions"; color: Theme.text; font-weight: 600; }
+                                for line in root.status-lines: Body { text: line; color: Theme.muted; }
+                            }
+                        }
+                    }
+
+                    if root.page == 1: VerticalLayout {
+                        spacing: 16px;
+                        Title { text: "Set up the game"; }
+                        Muted {
+                            text: "You need your own copy of the original Xbox game. Nothing is uploaded anywhere.";
+                            font-size: 13px;
+                        }
+                        Card {
+                            VerticalLayout {
+                                padding: 18px;
+                                spacing: 12px;
+                                StepHeader {
+                                    number: 1;
+                                    label: "Choose your disc image or extracted folder";
+                                    state: root.identity-tone == 1 || (root.identity-tone == 2 && root.allow-unknown) ? 2 : 1;
+                                }
+                                HorizontalLayout {
+                                    spacing: 8px;
+                                    LineEdit {
+                                        placeholder-text: "Path to an .iso / .xiso, or a folder containing default.xbe";
+                                        text <=> root.disc-path;
+                                        edited(t) => { root.disc-edited(t); }
+                                        accepted => { root.identify(); }
+                                    }
+                                    Button { text: "Browse…"; enabled: !root.busy; clicked => { root.browse-disc(); } }
+                                }
+                                Muted {
+                                    text: "Drop a disc image or folder anywhere on this window, paste a path, or browse.";
+                                }
+                                if root.identity-text != "": HorizontalLayout {
+                                    spacing: 10px;
+                                    alignment: start;
+                                    Chip {
+                                        label: root.identity-tone == 1 ? "Recognised" : root.identity-tone == 2 ? "Unknown dump" : "Not usable";
+                                        tone: root.identity-tone;
+                                    }
+                                    Body { text: root.identity-text; color: Theme.muted; font-size: 12px; }
+                                }
+                                if root.disc-note != "" && root.identity-tone != 3: Muted { text: root.disc-note; color: Theme.text; }
+                                if root.identity-unknown: CheckBox {
+                                    text: "Install anyway (this dump has not been tested)";
+                                    checked <=> root.allow-unknown;
+                                    toggled => { root.allow-unknown-changed(self.checked); }
+                                }
+                            }
+                        }
+                        Card {
+                            VerticalLayout {
+                                padding: 18px;
+                                spacing: 12px;
+                                StepHeader { number: 2; label: "Choose where to install"; state: root.installed ? 2 : 1; }
+                                HorizontalLayout {
+                                    spacing: 8px;
+                                    LineEdit {
+                                        text <=> root.game-dir;
+                                        edited(t) => { root.game-dir-edited(t); }
+                                    }
+                                    Button { text: "Browse…"; enabled: !root.busy; clicked => { root.browse-game-dir(); } }
+                                }
+                            }
+                        }
+                        Card {
+                            VerticalLayout {
+                                padding: 18px;
+                                spacing: 12px;
+                                StepHeader { number: 3; label: "Extract and verify"; state: root.installed ? 2 : root.can-install ? 1 : 0; }
+                                HorizontalLayout {
+                                    alignment: start;
+                                    spacing: 12px;
+                                    AccentButton {
+                                        text: root.installing ? "Installing…" : root.installed ? "Check and repair" : "Extract and verify";
+                                        enabled: root.can-install;
+                                        clicked => { root.install(); }
+                                    }
+                                }
+                                if root.install-steps.length > 0: VerticalLayout {
+                                    spacing: 12px;
+                                    HorizontalLayout {
+                                        spacing: 10px;
+                                        Bar { value: root.install-overall; horizontal-stretch: 1; y: (parent.height - self.height) / 2; }
+                                        Text {
+                                            text: round(root.install-overall * 100) + "%";
+                                            color: Theme.muted;
+                                            font-size: 12px;
+                                            width: 40px;
+                                            horizontal-alignment: right;
+                                        }
+                                    }
+                                    for step in root.install-steps: HorizontalLayout {
+                                        spacing: 12px;
+                                        StepIcon { state: step.state; y: 2px; }
+                                        VerticalLayout {
+                                            spacing: 4px;
+                                            horizontal-stretch: 1;
+                                            Text {
+                                                text: step.label;
+                                                color: step.state == 0 ? Theme.muted : Theme.text;
+                                                font-size: 14px;
+                                                font-weight: step.state == 1 ? 600 : 400;
+                                            }
+                                            if step.detail != "": Text {
+                                                text: step.detail;
+                                                color: step.state == 3 ? Theme.bad : Theme.muted;
+                                                font-size: 12px;
+                                                wrap: word-wrap;
+                                            }
+                                            if step.state == 1 && step.progress >= 0: Bar { value: step.progress; height: 4px; }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if root.page == 2: VerticalLayout {
+                        spacing: 16px;
+                        Title { text: "Settings"; }
+                        Card {
+                            VerticalLayout {
+                                padding: 18px;
+                                spacing: 12px;
+                                Text { text: "Launcher"; color: Theme.accent; font-weight: 700; font-size: 13px; }
+                                HorizontalLayout {
+                                    spacing: 12px;
+                                    Body { text: "Update channel"; vertical-alignment: center; horizontal-stretch: 1; }
+                                    ComboBox {
+                                        width: 200px;
+                                        model: ["Stable", "Nightly"];
+                                        current-index: root.channel-index;
+                                        selected => { root.channel-changed(self.current-index); }
+                                    }
+                                }
+                                HorizontalLayout {
+                                    spacing: 12px;
+                                    Body { text: "Check for updates on start"; vertical-alignment: center; horizontal-stretch: 1; }
+                                    Switch {
+                                        checked: root.check-updates;
+                                        toggled => { root.check-updates-changed(self.checked); }
+                                    }
+                                    Button { text: "Check now"; horizontal-stretch: 0; clicked => { root.check-update(); } }
+                                }
+                            }
+                        }
+                        Card {
+                            VerticalLayout {
+                                padding: 18px;
+                                spacing: 10px;
+                                Text { text: "Game"; color: Theme.accent; font-weight: 700; font-size: 13px; }
+                                Muted { text: "Shared with the in-game menu."; }
+                                for row in root.settings: VerticalLayout {
+                                    if row.header: Text {
+                                        text: row.label;
+                                        color: Theme.text;
+                                        font-size: 15px;
+                                        font-weight: 700;
+                                    }
+                                    if !row.header: HorizontalLayout {
+                                        spacing: 12px;
+                                        min-height: 36px;
+                                        VerticalLayout {
+                                            alignment: center;
+                                            horizontal-stretch: 1;
+                                            Body { text: row.label; }
+                                            if row.note != "": Muted { text: row.note; font-size: 11px; }
+                                        }
+                                        if row.kind == "bool": Switch {
+                                            checked: row.checked;
+                                            toggled => { root.setting-bool(row.id, self.checked); }
+                                        }
+                                        if row.kind == "enum": ComboBox {
+                                            width: 220px;
+                                            model: row.options;
+                                            current-index: row.selected;
+                                            selected(v) => { root.setting-choice(row.id, v); }
+                                        }
+                                        if row.kind == "text": LineEdit {
+                                            width: 220px;
+                                            text: row.text;
+                                            edited(t) => { root.setting-text(row.id, t); }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        HorizontalLayout {
+                            alignment: start;
+                            AccentButton { text: "Save settings"; clicked => { root.save(); } }
+                        }
+                    }
+
+                    if root.page == 3: VerticalLayout {
+                        spacing: 16px;
+                        Title { text: "Content"; }
+                        Muted {
+                            text: "Optional higher-quality packs. They replace original assets and are labelled as differing from the original game.";
+                            font-size: 13px;
+                        }
+                        for p in root.packs: Card {
+                            HorizontalLayout {
+                                padding: 18px;
+                                spacing: 16px;
+                                VerticalLayout {
+                                    horizontal-stretch: 1;
+                                    spacing: 6px;
+                                    HorizontalLayout {
+                                        spacing: 10px;
+                                        alignment: start;
+                                        Text { text: p.title; color: Theme.text; font-size: 16px; font-weight: 600; }
+                                        Chip {
+                                            label: p.state == 0 ? "Coming soon" : p.state == 1 ? "Available" : "Installed";
+                                            tone: p.state == 2 ? 1 : p.state == 1 ? 2 : 0;
+                                        }
+                                    }
+                                    Muted { text: p.description; font-size: 13px; }
+                                }
+                                if p.state == 1: AccentButton {
+                                    text: "Install";
+                                    enabled: !root.busy;
+                                    clicked => { root.pack-install(p.id); }
+                                }
+                                if p.state == 2: HorizontalLayout {
+                                    spacing: 8px;
+                                    Button { text: "Repair"; enabled: !root.busy; clicked => { root.pack-install(p.id); } }
+                                    Button { text: "Remove"; clicked => { root.pack-remove(p.id); } }
+                                }
+                            }
+                        }
+                    }
+
+                    if root.page == 4: VerticalLayout {
+                        spacing: 16px;
+                        HorizontalLayout {
+                            Title { text: "Mods"; horizontal-stretch: 1; }
+                            AccentButton { text: "Install mod…"; clicked => { root.install-mod(); } }
+                        }
+                        Muted {
+                            text: "Enabled mods load top to bottom; when two replace the same file, the lower one wins. Folder: " + root.mods-folder;
+                            font-size: 13px;
+                        }
+                        if root.mods.length == 0: Card {
+                            height: 120px;
+                            VerticalLayout {
+                                alignment: center;
+                                Text { text: "No mods installed yet"; color: Theme.text; horizontal-alignment: center; font-weight: 600; }
+                                Muted { text: "Install a mod from a .zip to get started."; horizontal-alignment: center; }
+                            }
+                        }
+                        for m in root.mods: Card {
+                            HorizontalLayout {
+                                padding: 14px;
+                                spacing: 12px;
+                                CheckBox {
+                                    checked: m.enabled;
+                                    toggled => { root.mod-toggle(m.id, self.checked); }
+                                }
+                                VerticalLayout {
+                                    horizontal-stretch: 1;
+                                    spacing: 4px;
+                                    HorizontalLayout {
+                                        spacing: 8px;
+                                        alignment: start;
+                                        if m.enabled: Chip { label: "#" + m.position; tone: 1; }
+                                        Text { text: m.name; color: Theme.text; font-size: 15px; font-weight: 600; vertical-alignment: center; }
+                                        Muted { text: m.version; vertical-alignment: center; }
+                                        if m.gameplay: Chip { label: "Changes gameplay"; tone: 2; }
+                                    }
+                                    Muted { text: m.description; }
+                                }
+                                Button { text: "↑"; enabled: m.enabled; clicked => { root.mod-move(m.id, -1); } }
+                                Button { text: "↓"; enabled: m.enabled; clicked => { root.mod-move(m.id, 1); } }
+                                Button { text: "Remove"; clicked => { root.mod-remove(m.id); } }
+                            }
+                        }
+                        for note in root.mod-notes: Muted { text: note; }
+                        HorizontalLayout {
+                            alignment: start;
+                            AccentButton { text: "Save mod list"; clicked => { root.save(); } }
+                        }
+                    }
+
+                    if root.page == 5: VerticalLayout {
+                        spacing: 16px;
+                        Title { text: "Verify"; }
+                        Muted { text: "Checks every installed file against its recorded SHA-256."; font-size: 13px; }
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 12px;
+                            AccentButton {
+                                text: root.busy ? "Checking…" : "Verify now";
+                                enabled: !root.busy;
+                                clicked => { root.verify(); }
+                            }
+                            if root.busy: Loader { size: 22px; y: 8px; }
+                        }
+                        if root.verify-fraction >= 0: VerticalLayout {
+                            spacing: 6px;
+                            Bar { value: root.verify-fraction; }
+                            Muted { text: root.verify-detail; }
+                        }
+                        Card {
+                            VerticalLayout {
+                                padding: 18px;
+                                spacing: 8px;
+                                for line in root.status-lines: Body { text: line; }
+                            }
+                        }
+                    }
+                }
+            }
+            // Status bar
+            if root.notice != "": Rectangle {
+                height: 34px;
+                background: Theme.surface;
+                Rectangle { y: 0; height: 1px; background: Theme.border; }
+                HorizontalLayout {
+                    padding-left: 28px;
+                    Muted { text: root.notice; vertical-alignment: center; font-size: 12px; }
+                }
+            }
+        }
+    }
+
+    // Shown while a file is dragged over the window.
+    if root.drag-hover: Rectangle {
+        background: #0a101ce6;
+        Rectangle {
+            x: 24px;
+            y: 24px;
+            width: parent.width - 48px;
+            height: parent.height - 48px;
+            border-radius: 16px;
+            border-width: 2px;
+            border-color: Theme.accent;
+            background: #3fa9ff12;
+            VerticalLayout {
+                alignment: center;
+                spacing: 8px;
+                Text {
+                    text: root.page == 4 ? "Drop a mod .zip to install it" : "Drop your disc image or folder";
+                    color: Theme.text;
+                    font-size: 24px;
+                    font-weight: 700;
+                    horizontal-alignment: center;
+                }
+                Text {
+                    text: root.page == 4 ? "It is added to your mods; enable it afterwards." : "It is identified right away; nothing is installed until you press Extract and verify.";
+                    color: Theme.muted;
+                    font-size: 13px;
+                    horizontal-alignment: center;
+                }
+            }
+        }
+    }
+}

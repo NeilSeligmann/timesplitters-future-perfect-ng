@@ -2222,7 +2222,7 @@ mod tests {
             name: b"tsfp".to_vec(),
             product: b"1.0".to_vec(),
             attributes: b"TCP:~1:1024\tUDP:~1:1024".to_vec(),
-            endpoint: b"<private>:1000".to_vec(),
+            endpoint: b"10.0.0.2:1000".to_vec(),
         };
         let wire = fesl::encode(&announce);
         assert_eq!(wire.len(), 384);

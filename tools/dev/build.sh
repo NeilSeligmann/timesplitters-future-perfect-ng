@@ -763,6 +763,8 @@
 # The host no longer accepts `--legacy-fileio`. The layer-2 C implementation
 # has been retired; all current play variants use native Rust file I/O. Archived
 # pre-removal gate receipts and their C-oracle identity remain historical evidence.
+#
+# Wave 3 roots use existing registered Rust ports. Build the host with `TSFP_BUILD_NAME=T4348 python3 -m tools.wt run -- sh tools/dev/build.sh` when a host build is needed.
 # <!-- run-notes:build end -->
 # Whole-build timeout (owner 2026-10-16): never wait forever on a hung build (e.g. a
 # cargo lock deadlock). Default 300 s (a normal rebuild takes about 2 min); 1200 s

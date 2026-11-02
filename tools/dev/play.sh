@@ -970,6 +970,8 @@
 # The host no longer accepts `--legacy-fileio`. The layer-2 C implementation
 # has been retired; all current play variants use native Rust file I/O. Archived
 # pre-removal gate receipts and their C-oracle identity remain historical evidence.
+#
+# The runtime-mapped wave 3 roots are included in the opt-in `all` set but remain excluded from the default play variant through `blocked_roots` until shadow-live evidence is clean and the smoke suite passes. An explicit per-VA `--rust-ports=0x...` selection remains available for shadow runs. `0xC1850` and `0xC15B0` are not currently in the runtime root map. The known divergent root `0x153270` remains excluded.
 # <!-- run-notes:play end -->
 # Paths are relative to the repository root, resolved from this script's own location.
 # CPU diagnostics: tools.t2333_trace retains dummy SDL PCM consumption without a GPU.
@@ -1193,7 +1195,7 @@ fi
 
 # --- the variant table proper ---
 # T3398 PLAYTEST BLOCKER MITIGATION (rule 25, docs/run-notes/T3398.md): root 0x153270 (objchar_wired4 matrix multiply) faults in Map Maker preview; lifted C serves it until fixed.
-blocked_roots="-0x153270,-0x153B40,-0x9B090,-0x4A210,-0x9B800,-0x277FE0,-0xA64D0,-0xA6290,-0x247A0,-0x2FC470,-0x2F8140,-0x16FC00,-0x91EC0,-0x57040,-0x1CEBA0,-0x9A060,-0xD9030,-0x16CA00,-0x3FAA0"
+blocked_roots="-0x153270,-0x153B40,-0x9B090,-0x4A210,-0x9B800,-0x277FE0,-0xA64D0,-0xA6290,-0x247A0,-0x2FC470,-0x2F8140,-0x16FC00,-0x91EC0,-0x57040,-0x1CEBA0,-0x9A060,-0xD9030,-0x16CA00,-0x3FAA0,-0xdc110,-0xdb4c0,-0xc45f0,-0x166260,-0x158cb0,-0x12e90,-0x2db010,-0xb1f50,-0x744f0,-0x9b200,-0x98380,-0x154f30,-0x715e0,-0x99c00,-0x3462a0,-0x9b900,-0xc4350,-0xa4330,-0xc54a0,-0x76150,-0xa3ae0"
 ports="--rust-ports=all,$blocked_roots"
 perf=0
 # T2229: default = shared GPU textures; T2227 readback ring remains the CPU control.

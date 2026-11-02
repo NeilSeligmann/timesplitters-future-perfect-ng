@@ -1185,12 +1185,12 @@ mod step_tests {
     #[test]
     fn pasted_paths_are_cleaned() {
         assert_eq!(
-            clean_path("  \"<private> Game.iso\"\n"),
-            "<private> Game.iso"
+            clean_path("  \"/home/p/My Game.iso\"\n"),
+            "/home/p/My Game.iso"
         );
         assert_eq!(
-            clean_path("file://<private>"),
-            "<private> Game.iso"
+            clean_path("file:///home/p/My%20Game.iso"),
+            "/home/p/My Game.iso"
         );
         assert_eq!(clean_path("'/a/b'"), "/a/b");
         assert_eq!(clean_path("file:///x%2"), "/x%2");
