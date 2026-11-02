@@ -849,6 +849,30 @@ mod no_work_tests {
     }
 
     #[test]
+    fn guarded_word_reads_at_mapped_region_end() {
+        struct Mapped([u8; 16]);
+        impl GuestMemory for Mapped {
+            fn read8(&self, address: u32) -> u8 {
+                self.0[(address - 0x10000) as usize]
+            }
+            fn read32(&self, address: u32) -> u32 {
+                let offset = (address - 0x10000) as usize;
+                u32::from_le_bytes(self.0[offset..offset + 4].try_into().unwrap())
+            }
+            fn write8(&mut self, _: u32, _: u8) {}
+        }
+        let mut mem = Mapped(core::array::from_fn(|i| i as u8));
+        let view = Guarded::new(&mut mem);
+        for offset in 8..=12 {
+            assert_eq!(
+                view.read32(0x10000 + offset),
+                u32::from_le_bytes(core::array::from_fn(|i| offset as u8 + i as u8))
+            );
+        }
+        assert!(!view.is_bad());
+    }
+
+    #[test]
     fn a_port_that_writes_nothing_where_the_original_wrote_is_no_work() {
         assert!(no_work(&[1, 2], &[1, 2], &[1, 3]));
     }

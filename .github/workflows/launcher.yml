@@ -3,11 +3,19 @@
 # .github/workflows/. Decision: docs/decisions/launcher.md.
 name: launcher
 
-# Builds only for release tags (owner 2026-11-02: no CI minutes on main pushes or PRs). Manual runs stay
-# available from the Actions tab for one-off checks.
+# Builds for release tags (owner 2026-11-02: no CI minutes on ordinary main pushes or PRs). Manual runs stay
+# available from the Actions tab.
+# Build cache: GitHub lets a run restore caches from its own ref or the default branch only, so a cache saved by one
+# tag is invisible to the next. The cache is therefore saved on main, and main runs only when the launcher's
+# dependencies, toolchain or this workflow change; tag runs restore it and only recompile the launcher crates.
 on:
   push:
     tags: ["v*"]
+    branches: [main]
+    paths:
+      - crates/tsfp-launcher/Cargo.lock
+      - rust-toolchain.toml
+      - .github/workflows/launcher.yml
   workflow_dispatch:
 
 permissions:
@@ -40,6 +48,11 @@ jobs:
         run: |
           rustup show active-toolchain || rustup toolchain install
           rustup target add ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/tsfp-launcher -> target
+          shared-key: launcher-${{ matrix.target }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Linux packages
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libwayland-dev
@@ -60,7 +73,19 @@ jobs:
           mkdir -p release
           cp crates/tsfp-launcher/target/${{ matrix.target }}/release/tsfp-launcher${{ runner.os == 'Windows' && '.exe' || '' }} \
             release/tsfp-launcher-${{ matrix.name }}${{ runner.os == 'Windows' && '.exe' || '' }}
+      - name: Installer formats
+        if: startsWith(github.ref, 'refs/tags/v') && runner.os != 'Windows'
+        shell: bash
+        run: |
+          bin=crates/tsfp-launcher/target/${{ matrix.target }}/release/tsfp-launcher
+          case "${{ matrix.name }}" in
+            linux-x64) sh tools/release/package/appimage.sh "$bin" x86_64 release/tsfp-launcher-linux-x64.AppImage ;;
+            linux-arm64) sh tools/release/package/appimage.sh "$bin" aarch64 release/tsfp-launcher-linux-arm64.AppImage ;;
+            macos-arm64) sh tools/release/package/macos_dmg.sh "$bin" "${GITHUB_REF_NAME#v}" release/tsfp-launcher-macos-arm64.dmg ;;
+          esac
       - uses: actions/upload-artifact@v7
+        # Cache-refresh runs on main produce nothing anyone downloads.
+        if: github.ref != 'refs/heads/main'
         with:
           name: tsfp-launcher-${{ matrix.name }}
           path: dist/
@@ -84,6 +109,12 @@ jobs:
           pattern: release-*
           merge-multiple: true
           path: release
+      - name: Checksums
+        # SHA256SUMS covers every asset; it is signed below with the binaries. Check: sha256sum -c SHA256SUMS
+        run: |
+          cd release
+          sha256sum -- * > SHA256SUMS
+          cat SHA256SUMS
       - name: Sign
         env:
           MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY }}
@@ -95,7 +126,11 @@ jobs:
           fi
           sudo apt-get update && sudo apt-get install -y minisign
           umask 077
-          printf '%s\n' "$MINISIGN_SECRET_KEY" > "$RUNNER_TEMP/minisign.key"
+          # minisign needs the comment line; accept a secret holding only the key line too.
+          case "$MINISIGN_SECRET_KEY" in
+            "untrusted comment:"*) printf '%s\n' "$MINISIGN_SECRET_KEY" > "$RUNNER_TEMP/minisign.key" ;;
+            *) printf 'untrusted comment: minisign secret key\n%s\n' "$MINISIGN_SECRET_KEY" > "$RUNNER_TEMP/minisign.key" ;;
+          esac
           for f in release/*; do
             minisign -S -s "$RUNNER_TEMP/minisign.key" -m "$f" -t "tsfp-launcher ${GITHUB_REF_NAME}"
           done

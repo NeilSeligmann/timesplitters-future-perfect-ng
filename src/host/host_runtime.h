@@ -37,9 +37,8 @@
  * call and `host_run_disarm` removes them only when the last armed thread leaves;
  * otherwise one thread finishing its run would silently remove the other thread's
  * only diagnostic path and a later fault would be a bare core dump. A fault on a
- * thread that never armed restores the default disposition and returns, so the
- * faulting instruction re-executes and kills the process for real rather than
- * being swallowed.
+ * thread that never armed emits a minimal fault line and restores the default
+ * disposition so the process still terminates with the original signal.
  */
 
 #ifndef TSFP_HOST_RUNTIME_H

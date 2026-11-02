@@ -2104,7 +2104,7 @@ int main(int argc, char **argv)
                     printf("audio playback continuous (T1248/T1250): below %u ms of ring the device plays slower (down to %u per mille of real time, "
                            "%s) instead of draining the ring and cutting every voice for a refill; --audio-min-rate 0 turns it off, "
                            "--audio-stretch resample|wsola picks the method\n",
-                           (unsigned)low_water_ms, (unsigned)opts.audio_min_rate_permille,
+                           (unsigned)(!audio_master && low_water_ms < 160u ? 160u : low_water_ms), (unsigned)opts.audio_min_rate_permille,
                            opts.audio_stretch_resample ? "the pitch follows" : "pitch preserving WSOLA stretch");
                 } else {
                     printf("audio playback continuous OFF: %s, so a dry ring pauses every voice until it has refilled "
@@ -2130,7 +2130,8 @@ int main(int argc, char **argv)
                     printf("present playback ON (T819, INFERRED timing): audio device clock is master, pictures presented at their "
                            "modelled time, rebuffer 400..1500 ms, ring 4 s\n");
                 else
-                    printf("audio cushion  ON: independent playback, initial refill 100 ms, ring 1 s; video retains its own pacing\n");
+                    printf("audio cushion  ON: independent playback, initial refill %u ms, ring 1 s; video retains its own pacing\n",
+                           opts.audio_min_rate_permille == 0u ? 100u : 200u);
             }
         }
     }

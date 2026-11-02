@@ -742,8 +742,12 @@ void present_audio_sink_set_stretch_hold(present_audio_sink *sink, uint32_t full
 void present_audio_sink_enable_cushion(present_audio_sink *sink, uint32_t low_water_ms, uint32_t min_rate_permille,
                                        bool legacy, bool resample, uint32_t hold_ms)
 {
-    present_audio_sink_enable_clock(sink, 100u, 100u, 1u);
+    /* A deeper startup cushion and earlier slowdown absorb sustained slow frames.
+     * The explicit off switch keeps the original 100 ms control configuration. */
+    const uint32_t prefill_ms = min_rate_permille == 0u ? 100u : 200u;
+    present_audio_sink_enable_clock(sink, prefill_ms, prefill_ms, 1u);
     if (min_rate_permille == 0u) return;
+    if (low_water_ms < 160u) low_water_ms = 160u;
     present_audio_sink_set_continuous_playback(sink, low_water_ms, min_rate_permille);
     if (legacy) {
         const present_audio_stretch_tuning tuning = {6667u, 1000u, 1000u, 0u, 1000u, 999u};
@@ -1253,7 +1257,7 @@ size_t present_audio_sink_pull(present_audio_sink *sink, int16_t *out, size_t fr
             for (uint16_t channel = 0u; channel < sink->channels; channel++) {
                 const int32_t a = sink->ring[first * sink->channels + channel];
                 const int32_t b = sink->ring[second * sink->channels + channel];
-                out[produced * sink->channels + channel] = (int16_t)(a + (((b - a) * (int32_t)fraction) >> 16));
+                out[produced * sink->channels + channel] = (int16_t)(a + (((int64_t)(b - a) * fraction) >> 16));
             }
             position += ratio_q16;
             produced++;

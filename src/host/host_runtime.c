@@ -64,6 +64,30 @@ static pthread_mutex_t install_lock = PTHREAD_MUTEX_INITIALIZER;
 static unsigned install_count;
 static struct sigaction previous[FAULT_SIGNAL_COUNT];
 
+/* Emit a single async-signal-safe line for threads without a guest jump target. */
+static void host_unarmed_fault(int sig, siginfo_t *info, void *context)
+{
+    char line[160];
+    size_t n = 0;
+    const char prefix[] = "HOST STOP: host-thread fault signal=0x";
+    for (size_t i = 0; i < sizeof prefix - 1; i++) line[n++] = prefix[i];
+    uintptr_t values[3] = {(uintptr_t)(unsigned)sig, info ? (uintptr_t)info->si_addr : 0u, 0u};
+#if defined(__linux__) && defined(__x86_64__)
+    if (context) values[2] = (uintptr_t)((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP];
+#else
+    (void)context;
+#endif
+    const char *labels[] = {" fault_address=0x", " instruction=0x", "\n"};
+    for (size_t v = 0; v < 3; v++) {
+        for (int shift = (int)(sizeof(uintptr_t) * 8u) - 4; shift >= 0; shift -= 4)
+            line[n++] = "0123456789abcdef"[(values[v] >> shift) & 15u];
+        for (const char *p = labels[v]; *p; p++) line[n++] = *p;
+    }
+    (void)write(STDERR_FILENO, line, n);
+    (void)signal(sig, SIG_DFL);
+    (void)raise(sig);
+}
+
 static uint64_t owner_token(void)
 {
     if(t_owner_token==0u) {
@@ -331,7 +355,7 @@ static void fault_handler(int signal_number, siginfo_t *info, void *context)
     }
 #endif
     if (!t_armed) {
-        (void)signal(signal_number, SIG_DFL);
+        host_unarmed_fault(signal_number, info, context);
         return;
     }
     const int saved_errno = errno;
@@ -498,4 +522,10 @@ void host_crash_report_install(host_crash_extra_fn extra)
     action.sa_flags = SA_SIGINFO | SA_ONSTACK | SA_NODEFER;
     sigemptyset(&action.sa_mask);
     (void)sigaction(SIGABRT, &action, NULL);
+    /* Dispositions are process-wide: cover SDL and worker threads even when no
+     * guest thread is armed; host_run_arm temporarily layers its handler on top. */
+    action.sa_sigaction = host_unarmed_fault;
+    action.sa_flags = SA_SIGINFO | SA_NODEFER;
+    for (size_t i = 0; i < FAULT_SIGNAL_COUNT; i++)
+        (void)sigaction(FAULT_SIGNALS[i], &action, NULL);
 }

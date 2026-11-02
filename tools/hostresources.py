@@ -53,6 +53,72 @@ def _copy(source: Path, destination: Path) -> None:
         destination.mkdir()
 
 
+SHARED_GPU_REL = "tmp/wt-cache/gpu-shared/modules"
+SHARED_GPU_MAX_BYTES = 512 * 1024 * 1024
+
+
+def shared_gpu_cache(base: Path) -> Path | None:
+    """The one translated-shader and pipeline-cache folder shared by every run and worktree.
+
+    It lives under the primary checkout's tmp/wt-cache (the git common dir's parent), so linked
+    worktrees and repeated play runs all warm each other. Before 2026-11-02 each run copied a
+    small seed and threw its translated modules and VkPipelineCache away, so every run began cold
+    (shader translation 148 ms each, `VkPipelineCache loaded 0 bytes`, the over-100 ms hitches)."""
+    override = os.environ.get("TSFP_GPU_SHARED_CACHE")
+    if override is not None:  # "" turns the shared cache off (tests, offline captures)
+        return Path(override) if override else None
+    result = subprocess.run(
+        ["git", "-C", str(base), "rev-parse", "--git-common-dir"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode:
+        return None
+    return (base / result.stdout.strip()).resolve().parent / SHARED_GPU_REL
+
+
+def _overlay(shared: Path, target: Path) -> None:
+    """Seed a private modules copy with every shared file it does not already have."""
+    for item in shared.rglob("*"):
+        if item.is_file():
+            destination = target / item.relative_to(shared)
+            if not destination.exists():
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                _copy_file(str(item), str(destination))
+
+
+def _publish(target: Path, shared: Path) -> None:
+    """Merge a finished run's new modules into the shared cache, atomically and size-bounded.
+
+    Module names embed a content hash, so a name is written once. Pipeline-cache blobs are
+    replaced only by a larger one (the driver validates the header, so a stale blob is harmless).
+    Every write is temp file + rename: concurrent runs cannot corrupt a file."""
+    try:
+        total = sum(f.stat().st_size for f in shared.rglob("*") if f.is_file())
+    except OSError:
+        total = 0
+    for item in sorted(target.rglob("*")):
+        if not item.is_file():
+            continue
+        relative = item.relative_to(target)
+        destination = shared / relative
+        is_blob = relative.parts[0] == "pipeline-cache"
+        try:
+            size = item.stat().st_size
+            if destination.exists() and not (is_blob and size > destination.stat().st_size):
+                continue
+            if total + size > SHARED_GPU_MAX_BYTES:
+                continue
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            staging = destination.with_name(f".{destination.name}.{os.getpid()}.tmp")
+            _copy_file(str(item), str(staging))
+            os.replace(staging, destination)
+            total += size
+        except OSError:
+            continue
+
+
 def prepare(
     command: list[str],
     env: dict[str, str],
@@ -115,6 +181,10 @@ def prepare(
                 continue
             target = root / (name if ordinal == 0 else f"{name}-{ordinal}")
             _copy(source, target)
+            if flag == "--gpu-replay" and (shared := shared_gpu_cache(base)) is not None:
+                shared.mkdir(parents=True, exist_ok=True)
+                _overlay(shared, target)
+                _scope.get().callback(_publish, target, shared)
             if inline:
                 result[index] = flag + "=" + str(target)
             else:
