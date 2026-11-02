@@ -1114,12 +1114,17 @@ impl Replayer {
             Event::Surface {
                 data,
                 size,
+                format,
                 depth,
                 flags,
                 ..
             } => {
                 if self.use_surfaces && !self.knob("legacy_fb") {
-                    let (width, height) = ((size & 0xFFF) + 1, ((size >> 12) & 0xFFF) + 1);
+                    let (width, height) = if *size == 0 {
+                        (1 << ((format >> 20) & 0xF), 1 << ((format >> 24) & 0xF))
+                    } else {
+                        ((size & 0xFFF) + 1, ((size >> 12) & 0xFFF) + 1)
+                    };
                     if (width, height) != (self.width, self.height) {
                         *self
                             .report

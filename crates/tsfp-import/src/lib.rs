@@ -7,7 +7,7 @@ pub mod audio;
 pub mod convert;
 pub mod inflate;
 pub mod json;
-mod ktx2;
+pub mod ktx2;
 pub mod manifest;
 pub mod names;
 pub mod png;

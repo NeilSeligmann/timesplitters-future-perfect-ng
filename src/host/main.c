@@ -1851,6 +1851,10 @@ int main(int argc, char **argv)
         usage(argv[0]);
         return 2;
     }
+    if (!host_rust_shadow_configure(opts.rust_ports_shadow, opts.shadow_promote)) {
+        fprintf(stderr, "--rust-ports-shadow requires supported isolated roots\n");
+        return 2;
+    }
     if (!host_rust_fileio_configure(opts.rust_fileio, opts.fileio_log)) {
         fprintf(stderr, "--rust-fileio requires a TSFP_RUST_FILEIO build; --fileio-log needs a writable path\n");
         return 2;

@@ -179,6 +179,97 @@ fn a_small_render_target_is_sampled_over_its_whole_extent() {
 }
 
 #[test]
+fn swizzled_render_target_uses_format_dimensions_when_sampled() {
+    // A zero size word encodes power-of-two dimensions in the format word.
+    let stream = small_surface_stream()
+        .replacen(
+            &set_surface(0x4100_0000, 0x2000, 160, 120, 0),
+            "call SetSurface 41000000 0 2000 8801229 0 400 0 0\n",
+            1,
+        )
+        .replacen(
+            &triangle(
+                0xFF00_FF00,
+                [(0.0, 0.0), (400.0, 0.0), (0.0, 400.0)],
+                [(0.0, 0.0); 3],
+            ),
+            &triangle(
+                0xFF00_FF00,
+                [(80.0, 0.0), (400.0, 0.0), (80.0, 320.0)],
+                [(0.0, 0.0); 3],
+            ),
+            1,
+        );
+    let Some(replayer) = replay_with(&stream, |_| {}) else {
+        return;
+    };
+    let pixel = replayer.frames[0].pixel(520, 110);
+    assert!(
+        pixel[1] > 200 && pixel[0] < 60,
+        "swizzled target sample: {pixel:?}"
+    );
+}
+
+#[test]
+fn terminal_format_surface_is_sampled_with_normalized_coordinates() {
+    let linear_record = hex(&[
+        0x0004_0001,
+        0x2000,
+        0,
+        (0x12 << 8) | 0x29,
+        size_word(160, 120),
+    ]);
+    let terminal_record = hex(&[
+        0x0004_0001,
+        0x2000,
+        0,
+        (8 << 24) | (8 << 20) | (1 << 16) | (6 << 8) | 0x29,
+        0,
+    ]);
+    let stream = small_surface_stream()
+        .replacen(
+            &set_surface(0x4100_0000, 0x2000, 160, 120, 0),
+            "call SetSurface 41000000 0 2000 8810629 0 400 0 0\n",
+            1,
+        )
+        .replacen(&linear_record, &terminal_record, 1)
+        .replacen(
+            &triangle(
+                0xFF00_FF00,
+                [(0.0, 0.0), (400.0, 0.0), (0.0, 400.0)],
+                [(0.0, 0.0); 3],
+            ),
+            &triangle(
+                0xFF00_FF00,
+                [(80.0, 0.0), (400.0, 0.0), (80.0, 320.0)],
+                [(0.0, 0.0); 3],
+            ),
+            1,
+        )
+        .replacen(
+            &triangle(
+                0xFF80_8080,
+                [(400.0, 100.0), (560.0, 100.0), (400.0, 220.0)],
+                [(0.0, 0.0), (160.0, 0.0), (0.0, 120.0)],
+            ),
+            &triangle(
+                0xFF80_8080,
+                [(400.0, 100.0), (560.0, 100.0), (400.0, 220.0)],
+                [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0)],
+            ),
+            1,
+        );
+    let Some(replayer) = replay_with(&stream, |_| {}) else {
+        return;
+    };
+    let pixel = replayer.frames[0].pixel(520, 110);
+    assert!(
+        pixel[1] > 200 && pixel[0] < 60,
+        "terminal-format target sample: {pixel:?}"
+    );
+}
+
+#[test]
 fn a_clear_with_colour_mask_zero_keeps_a_scratch_surface() {
     // Same scene, then the scratch surface gets a mask 0 clear with colour (the engine's frame start pattern). With the mask applied
     // (scratch surfaces) the green survives, with the switch the clear would be honoured for the display too.

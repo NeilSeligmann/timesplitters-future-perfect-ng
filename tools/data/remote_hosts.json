@@ -27,8 +27,8 @@
   "dispatch": {
     "_doc": "T4272 (tools/dispatch): cargo/pytest use available capped owner-PC capacity immediately through local_first_kinds. Automatic remote work needs allowed automatic_capabilities, exact passing command/environment evidence and remote_min_seconds of measured/explicitly estimated work; unknown estimates are zero. Deck general builds/tests are paused while explicit specialized execution remains available. Remote-only never spills locally. CPU/memory/slot/load/disk admission remains enforced. remote_busy_after_s and remote_down_after_s retain specialized-job spillover; short_pytest_max_files is a historical compatibility field superseded by the common local-first policy.",
     "owner_pc": {
-      "max_cores": 16,
-      "max_jobs": 6,
+      "max_cores": 31,
+      "max_jobs": 14,
       "max_load_per_core": 1.0,
       "remote_down_after_s": 60,
       "remote_busy_after_s": 60,

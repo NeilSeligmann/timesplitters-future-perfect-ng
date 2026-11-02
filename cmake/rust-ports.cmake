@@ -656,6 +656,20 @@ if(TSFP_RUST_PORTS)
   endif()
 endif()
 if(TSFP_RUST_PORTS)
+  target_sources(tsfp_host PRIVATE src/host/shadow_port_leaf.c src/host/shadow_port_stack.c
+    src/host/shadow_port_guard.c src/host/shadow_port_denylist.c)
+  add_executable(test_shadow_port_policy tests/c/test_shadow_port_policy.c src/host/shadow_port_denylist.c)
+  target_include_directories(test_shadow_port_policy PRIVATE src/host)
+  target_compile_definitions(test_shadow_port_policy PRIVATE _POSIX_C_SOURCE=200809L)
+  target_compile_options(test_shadow_port_policy PRIVATE -UNDEBUG)
+  add_test(NAME shadow_port_policy COMMAND test_shadow_port_policy)
+  add_executable(test_shadow_port_guard tests/c/test_shadow_port_guard.c
+    src/host/shadow_port_guard.c src/host/shadow_port_stack.c src/host/shadow_port_leaf.c src/host/host_runtime.c)
+  target_include_directories(test_shadow_port_guard PRIVATE src/host src/xbox)
+  target_compile_definitions(test_shadow_port_guard PRIVATE _POSIX_C_SOURCE=200809L)
+  target_compile_options(test_shadow_port_guard PRIVATE -UNDEBUG)
+  target_link_libraries(test_shadow_port_guard PRIVATE pthread)
+  add_test(NAME shadow_port_guard COMMAND test_shadow_port_guard)
   add_executable(test_rust_ports tests/c/test_rust_ports.c src/host/rust_ports.c
     src/game/object_state.c src/game/game_byte_swap_leaves.c src/host/rust_lane_call.c
     tests/c/rust_ports_test_stubs.c)
@@ -692,6 +706,17 @@ if(TSFP_RUST_PORTS)
   add_dependencies(test_rust_ports_originals tsfp_rust_archive)
   target_link_libraries(test_rust_ports_originals PRIVATE "${rust_archive}")
   add_test(NAME rust_ports_originals COMMAND test_rust_ports_originals)
+  add_executable(test_shadow_real_leaves tests/c/test_rust_ports.c src/host/rust_ports.c
+    src/game/object_state.c src/game/game_byte_swap_leaves.c src/host/rust_lane_call.c
+    tests/c/rust_ports_test_stubs.c "${rust_harness_originals}"
+    src/host/shadow_port_leaf.c src/host/shadow_port_guard.c src/host/shadow_port_stack.c
+    src/host/shadow_port_denylist.c src/host/host_runtime.c)
+  target_include_directories(test_shadow_real_leaves PRIVATE src/game src/host src/xbox src/input src/gpu "${TSFP_LIFTED_DIR}")
+  target_compile_definitions(test_shadow_real_leaves PRIVATE TSFP_RUST_PORTS=1 TSFP_TEST_REAL_ORIGINALS=1
+    TSFP_TEST_SHADOW_LEAF=1 _POSIX_C_SOURCE=200809L)
+  add_dependencies(test_shadow_real_leaves tsfp_rust_archive)
+  target_link_libraries(test_shadow_real_leaves PRIVATE "${rust_archive}" m pthread)
+  add_test(NAME shadow_real_leaves COMMAND test_shadow_real_leaves)
   add_test(NAME rust_ports_shadow_seeded_mismatch COMMAND test_rust_ports_originals)
   set_tests_properties(rust_ports_shadow_seeded_mismatch PROPERTIES
     ENVIRONMENT "TSFP_RUST_SHADOW_TEST_MODE=seeded")

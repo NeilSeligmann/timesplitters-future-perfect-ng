@@ -1,0 +1,15 @@
+{
+  "limits": {"physical_range_errors": 10, "frame_p99_ms": 250, "underrun_events": 100},
+  "quick": ["level6"],
+  "routes": [
+    {"id": "level3", "recording": "tmp/owner/crashes/level3-20261102/input.rec", "save_dir": "tmp/owner/crashes/level3-20261102/saves-start", "pak": "l_18_st.pak", "note": "Level 3 gameplay (lv18 per T3478); pak name inferred pending a scene-reaching replay."},
+    {"id": "level3-intro", "recording": "tmp/owner/crashes/level3-intro-20261102/input.rec", "save_dir": "tmp/owner/crashes/level3-intro-20261102/saves-start", "pak": "l_45_cs.pak", "note": "Level 3 intro cutscene (T3478); pak name inferred pending a scene-reaching replay."},
+    {"id": "level5", "recording": "tmp/owner/recordings/audio-final-20261102/input.rec", "pak": "pak/story/l_1_st.pak", "note": "Owner's level 5; internal pak index 1."},
+    {"id": "level6", "recording": "tmp/owner/recordings/audio-final-level6-200s-clean/input.rec", "pak": "pak/story/l_17_st.pak", "note": "200 second clean owner recording; internal pak index 17."},
+    {"id": "level7", "recording": "tmp/owner/crashes/level7-20261102/input.rec", "save_dir": "tmp/owner/crashes/level7-20261102/saves-start", "pak": "pak/story/l_6_st.pak", "note": "Crash route; T4324 reports the fix landed, so this route is required."},
+    {"id": "level8", "recording": "tmp/owner/recordings/audio-final-level8-411s-crash-late/input.rec", "pak": "pak/story/l_22_st.pak", "expected_fault_task": "T4343", "note": "411 second run; late door crash."},
+    {"id": "level8-door", "recording": "tmp/owner/crashes/level8-20261102/input.rec", "save_dir": "tmp/owner/crashes/level8-20261102/saves-start", "pak": "pak/story/l_22_st.pak", "expected_fault_task": "T4343", "note": "Owner's door crash recording."},
+    {"id": "terminal", "recording": "tmp/owner/recordings/computer-screen-mark-20261102/input.rec", "pak": "pak/story/l_17_st.pak", "note": "Owner marked the computer terminal; level 6 pak."},
+    {"id": "arcade", "recording": "tmp/owner/recordings/arcade-20261018.rec", "pak": "pak/arcade/l_49_ar.pak", "note": "Adopted arcade gameplay."}
+  ]
+}

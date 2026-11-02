@@ -5,8 +5,9 @@ use crate::manifest::{Output, StageAFile};
 use crate::png::{self, Color, unswizzle};
 use crate::source::{FileEntry, Source, safe};
 use crate::{audio, inflate, manifest, names, sha256, structured};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Converter names carry a version so changed output invalidates the incremental cache.
 pub const BS_JSON: (&str, u32) = ("bs-json", 1);
@@ -712,11 +713,31 @@ impl Sink<'_> {
 }
 
 /// Stage A: write every file loose and return the manifest rows.
+/// Progress callback for long importer steps: `(done, total)` work items.
+pub type Progress<'a> = &'a mut dyn FnMut(usize, usize);
+
 pub fn stage_a(src: &dyn Source, root: &Path, only: &str) -> Result<Vec<StageAFile>> {
+    stage_a_progress(src, root, only, &mut |_, _| {})
+}
+
+/// `stage_a`, reporting one item per extracted file.
+pub fn stage_a_progress(
+    src: &dyn Source,
+    root: &Path,
+    only: &str,
+    progress: Progress,
+) -> Result<Vec<StageAFile>> {
     let id = &src.descriptor().id;
     let base = source_dir(root, id)?;
     let mut rows = Vec::new();
-    for e in src.list()?.iter().filter(|e| e.path.contains(only)) {
+    let entries: Vec<FileEntry> = src
+        .list()?
+        .into_iter()
+        .filter(|e| e.path.contains(only))
+        .collect();
+    let total = entries.len();
+    for (i, e) in entries.iter().enumerate() {
+        progress(i, total);
         let data = src.read(e)?;
         let dest = base.join(safe(&e.path)?);
         std::fs::create_dir_all(dest.parent().unwrap()).map_err(|x| x.to_string())?;
@@ -727,6 +748,7 @@ pub fn stage_a(src: &dyn Source, root: &Path, only: &str) -> Result<Vec<StageAFi
             sha256: sha256::hex(&data),
         });
     }
+    progress(total, total);
     write_manifest(
         root,
         id,
@@ -901,6 +923,17 @@ pub fn stage_b_report(
     only: &str,
     names: &[String],
 ) -> Result<(Vec<Output>, Report)> {
+    stage_b_report_progress(src, root, only, names, &mut |_, _| {})
+}
+
+/// `stage_b_report`, reporting one item per source file considered for conversion.
+pub fn stage_b_report_progress(
+    src: &dyn Source,
+    root: &Path,
+    only: &str,
+    names: &[String],
+    progress: Progress,
+) -> Result<(Vec<Output>, Report)> {
     let id = src.descriptor().id.clone();
     let version = version_dir(root, &id)?;
     std::fs::create_dir_all(&version).map_err(|e| e.to_string())?;
@@ -946,7 +979,9 @@ pub fn stage_b_report(
         id: &id,
         outputs: Vec::new(),
     };
-    for e in &files {
+    let total = files.len();
+    for (i, e) in files.iter().enumerate() {
+        progress(i, total);
         let lower = e.path.to_ascii_lowercase();
         if !(lower.ends_with(".pak")
             || lower.ends_with(".bs")
@@ -1182,6 +1217,11 @@ fn prune(root: &Path, id: &str, outputs: &[Output]) -> Result<()> {
 
 /// Verify stage A and B files against their manifests. Returns the number of files checked.
 pub fn verify(root: &Path, id: &str) -> Result<usize> {
+    verify_progress(root, id, &mut |_, _| {})
+}
+
+/// `verify`, reporting one item per checked source file and per checked output.
+pub fn verify_progress(root: &Path, id: &str, progress: Progress) -> Result<usize> {
     let version = version_dir(root, id)?;
     let manifest_path = version.join("manifest.json");
     let manifest_text =
@@ -1212,77 +1252,67 @@ pub fn verify(root: &Path, id: &str) -> Result<usize> {
             manifest_path.display()
         ));
     }
-    let mut count = 0;
-    for row in manifest::parse_rows(&stage_a_text)? {
-        let path = source_dir(root, id)?.join(safe(&row["path"])?);
+    let a_rows = manifest::parse_rows(&stage_a_text)?;
+    let outputs = match &stage_b_text {
+        Some(t) => manifest::parse_rows(t)?,
+        None => Vec::new(),
+    };
+    let total = a_rows.len() + outputs.len();
+    let source = source_dir(root, id)?;
+
+    // Source files: one work item each, hashed in parallel.
+    run_parallel(&a_rows, 0, total, progress, |row, done| {
+        let path = source.join(safe(&row["path"])?);
         let bytes = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
         if sha256::hex(&bytes) != row["sha256"] || bytes.len().to_string() != row["size"] {
             return Err(format!("source hash/size mismatch: {}", path.display()));
         }
-        count += 1;
+        done.fetch_add(1, Ordering::Relaxed);
+        Ok(())
+    })?;
+    if stage_b_text.is_none() {
+        return Ok(a_rows.len());
     }
 
-    let Some(stage_b_text) = stage_b_text else {
-        return Ok(count);
-    };
-    let outputs = manifest::parse_rows(&stage_b_text)?;
-    let mut raw_sources = std::collections::HashSet::new();
-    for row in &outputs {
+    // Outputs grouped by source archive: each archive is read, hashed and parsed once (T4350), and whole groups
+    // run in parallel (T4351), largest first so one big archive does not finish alone at the end.
+    let archive_of = |row: &BTreeMap<String, String>| -> String {
         let source_path = &row["source_path"];
-        let path = version.join(safe(&row["logical_id"])?);
-        let bytes = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-        if sha256::hex(&bytes) != row["sha256"] || bytes.len().to_string() != row["size"] {
-            return Err(format!("output hash/size mismatch: {}", path.display()));
-        }
-        let original = original_member(root, id, source_path)?;
-        let archive_name = source_path.split('#').next().unwrap_or(source_path);
-        let archive = std::fs::read(source_dir(root, id)?.join(safe(archive_name)?))
-            .map_err(|e| format!("source {archive_name}: {e}"))?;
-        if sha256::hex(&archive) != row["source_sha256"] {
-            return Err(format!("source hash mismatch for {source_path}"));
-        }
-
-        let converter = row["converter"].as_str();
-        if converter == RAW_MEMBER.0 || converter == XMV_RAW.0 {
-            if bytes != original {
-                return Err(format!("raw output differs from source: {source_path}"));
-            }
-            if converter == RAW_MEMBER.0 {
-                raw_sources.insert(source_path.clone());
-            }
-        } else if row["lossless"] == "true" {
-            let expected = match converter {
-                value if value == PAK_MEMBER.0 || value == PLAIN_TEXT.0 => original.clone(),
-                value if value == BS_JSON.0 || value == BS_SNIFF.0 => {
-                    let doc = BsDoc::parse(&original)?;
-                    if doc.to_bytes() != original {
-                        return Err(format!(
-                            "text bank does not re-encode exactly: {source_path}"
-                        ));
-                    }
-                    doc.to_json().into_bytes()
-                }
-                value if value == XBT_KTX2.0 || value == XBT_PNG.0 => {
-                    let (ext, conv, converted, note) = xbt_convert(&original)?;
-                    let exact = ext == "ktx2" || note.contains(" 1 mips in source");
-                    if !exact || conv.0 != converter {
-                        return Err(format!("texture conversion is not lossless: {source_path}"));
-                    }
-                    converted
-                }
-                value if structured::converter_known(value) => {
-                    structured::rebuild(value, &original)?
-                }
-                _ => return Err(format!("no lossless verifier for converter {converter}")),
-            };
-            if bytes != expected {
-                return Err(format!(
-                    "conversion output differs from source decode: {source_path}"
-                ));
-            }
-        }
-        count += 1;
+        source_path
+            .split('#')
+            .next()
+            .unwrap_or(source_path)
+            .to_string()
+    };
+    let mut groups: BTreeMap<String, Vec<&BTreeMap<String, String>>> = BTreeMap::new();
+    for row in &outputs {
+        groups.entry(archive_of(row)).or_default().push(row);
     }
+    let mut groups: Vec<(String, Vec<&BTreeMap<String, String>>)> = groups.into_iter().collect();
+    groups.sort_by(|a, b| b.1.len().cmp(&a.1.len()).then_with(|| a.0.cmp(&b.0)));
+    let raw_sources = std::sync::Mutex::new(std::collections::HashSet::new());
+    run_parallel(
+        &groups,
+        a_rows.len(),
+        total,
+        progress,
+        |(name, rows), done| {
+            let archive = SourceArchive::load(root, id, name)?;
+            for row in rows {
+                if check_output(&version, row, &archive)? {
+                    raw_sources
+                        .lock()
+                        .map_err(|_| "verify worker panicked")?
+                        .insert(row["source_path"].clone());
+                }
+                done.fetch_add(1, Ordering::Relaxed);
+            }
+            Ok(())
+        },
+    )?;
+    let raw_sources = raw_sources
+        .into_inner()
+        .map_err(|_| "verify worker panicked")?;
     for row in &outputs {
         if row["lossless"] == "false" && !raw_sources.contains(&row["source_path"]) {
             return Err(format!(
@@ -1291,33 +1321,204 @@ pub fn verify(root: &Path, id: &str) -> Result<usize> {
             ));
         }
     }
-    Ok(count)
+    progress(total, total);
+    Ok(total)
 }
 
-fn original_member(root: &Path, id: &str, source_path: &str) -> Result<Vec<u8>> {
-    let base = source_dir(root, id)?;
-    if let Some((archive_path, key)) = source_path.split_once('#')
-        && key.len() == 8
-        && u32::from_str_radix(key, 16).is_ok()
-    {
-        let path = base.join(safe(archive_path)?);
-        let archive = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-        let pak = tsfp_format_pak::Pak::parse(&archive)?;
+/// Check one converted output against its source member. Returns true when it is a raw copy of the member.
+fn check_output(
+    version: &Path,
+    row: &BTreeMap<String, String>,
+    archive: &SourceArchive,
+) -> Result<bool> {
+    let source_path = &row["source_path"];
+    let path = version.join(safe(&row["logical_id"])?);
+    let bytes = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+    if sha256::hex(&bytes) != row["sha256"] || bytes.len().to_string() != row["size"] {
+        return Err(format!("output hash/size mismatch: {}", path.display()));
+    }
+    if archive.sha256 != row["source_sha256"] {
+        return Err(format!("source hash mismatch for {source_path}"));
+    }
+    let original = archive.member(source_path)?;
+    let converter = row["converter"].as_str();
+    if converter == RAW_MEMBER.0 || converter == XMV_RAW.0 {
+        if bytes != original {
+            return Err(format!("raw output differs from source: {source_path}"));
+        }
+        return Ok(converter == RAW_MEMBER.0);
+    }
+    if row["lossless"] == "true" {
+        let expected = match converter {
+            value if value == PAK_MEMBER.0 || value == PLAIN_TEXT.0 => original,
+            value if value == BS_JSON.0 || value == BS_SNIFF.0 => {
+                let doc = BsDoc::parse(&original)?;
+                if doc.to_bytes() != original {
+                    return Err(format!(
+                        "text bank does not re-encode exactly: {source_path}"
+                    ));
+                }
+                doc.to_json().into_bytes()
+            }
+            value if value == XBT_KTX2.0 || value == XBT_PNG.0 => {
+                let (ext, conv, converted, note) = xbt_convert(&original)?;
+                let exact = ext == "ktx2" || note.contains(" 1 mips in source");
+                if !exact || conv.0 != converter {
+                    return Err(format!("texture conversion is not lossless: {source_path}"));
+                }
+                converted
+            }
+            value if structured::converter_known(value) => structured::rebuild(value, &original)?,
+            _ => return Err(format!("no lossless verifier for converter {converter}")),
+        };
+        if bytes != expected {
+            return Err(format!(
+                "conversion output differs from source decode: {source_path}"
+            ));
+        }
+    }
+    Ok(false)
+}
+
+/// Run `work` over `items` on up to 8 threads (bounded so several large archives in memory stay affordable).
+/// `work` counts finished units in `done`; the calling thread reports `(base + done, total)` every 50 ms.
+/// The first error stops the remaining items and is returned.
+fn run_parallel<T: Sync>(
+    items: &[T],
+    base: usize,
+    total: usize,
+    progress: Progress,
+    work: impl Fn(&T, &AtomicUsize) -> Result<()> + Sync,
+) -> Result<()> {
+    if items.is_empty() {
+        return Ok(());
+    }
+    let workers = std::thread::available_parallelism()
+        .map_or(4, |n| n.get())
+        .clamp(1, 8)
+        .min(items.len());
+    let next = AtomicUsize::new(0);
+    let done = AtomicUsize::new(0);
+    let failed = AtomicBool::new(false);
+    let error = std::sync::Mutex::new(None::<String>);
+    std::thread::scope(|scope| {
+        let handles: Vec<_> = (0..workers)
+            .map(|_| {
+                scope.spawn(|| {
+                    while !failed.load(Ordering::Relaxed) {
+                        let Some(item) = items.get(next.fetch_add(1, Ordering::Relaxed)) else {
+                            break;
+                        };
+                        if let Err(e) = work(item, &done) {
+                            if !failed.swap(true, Ordering::Relaxed)
+                                && let Ok(mut slot) = error.lock()
+                            {
+                                *slot = Some(e);
+                            }
+                            break;
+                        }
+                    }
+                })
+            })
+            .collect();
+        while handles.iter().any(|h| !h.is_finished()) {
+            progress(base + done.load(Ordering::Relaxed), total);
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+        progress(base + done.load(Ordering::Relaxed), total);
+    });
+    match error.into_inner() {
+        Ok(Some(e)) => Err(e),
+        Ok(None) if failed.load(Ordering::Relaxed) => Err("verify worker failed".into()),
+        Ok(None) => Ok(()),
+        Err(_) => Err("verify worker panicked".into()),
+    }
+}
+
+/// One source file kept by stage A, loaded once for verifying all outputs taken from it.
+struct SourceArchive {
+    sha256: String,
+    raw: Vec<u8>,
+    pak: Option<(tsfp_format_pak::Pak, HashMap<u32, usize>)>,
+}
+
+impl SourceArchive {
+    fn load(root: &Path, id: &str, name: &str) -> Result<Self> {
+        let path = source_dir(root, id)?.join(safe(name)?);
+        let raw = std::fs::read(&path).map_err(|e| format!("source {name}: {e}"))?;
+        let sha256 = sha256::hex(&raw);
+        let pak = tsfp_format_pak::Pak::parse(&raw).ok().map(|pak| {
+            let index = pak
+                .entries
+                .iter()
+                .enumerate()
+                .map(|(i, e)| (e.key, i))
+                .collect();
+            (pak, index)
+        });
+        Ok(SourceArchive { sha256, raw, pak })
+    }
+
+    /// Same bytes as `original_member` for a source path inside this archive.
+    fn member(&self, source_path: &str) -> Result<Vec<u8>> {
+        let Some((archive_path, key)) = source_path
+            .split_once('#')
+            .filter(|(_, k)| k.len() == 8 && u32::from_str_radix(k, 16).is_ok())
+        else {
+            return Ok(self.raw.clone());
+        };
+        let (pak, index) = self
+            .pak
+            .as_ref()
+            .ok_or_else(|| format!("{archive_path}: not a PAK archive"))?;
         let key = u32::from_str_radix(key, 16).map_err(|e| e.to_string())?;
-        let index = pak
-            .entries
-            .iter()
-            .position(|entry| entry.key == key)
+        let i = *index
+            .get(&key)
             .ok_or_else(|| format!("PAK member {key:08x} is missing from {archive_path}"))?;
-        let entry = &pak.entries[index];
-        let stored = pak.stored(index)?;
+        let entry = &pak.entries[i];
+        let stored = pak.stored(i)?;
         if entry.stored_size != 0 {
             inflate::gunzip(stored, entry.decoded_size as usize)
         } else {
             Ok(stored.to_vec())
         }
-    } else {
-        let path = base.join(safe(source_path)?);
-        std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))
+    }
+}
+
+#[cfg(test)]
+mod parallel_tests {
+    use super::*;
+
+    #[test]
+    fn run_parallel_does_every_item_once_and_reports_progress() {
+        let items: Vec<usize> = (0..1000).collect();
+        let sum = AtomicUsize::new(0);
+        let mut last = (0, 0);
+        run_parallel(&items, 5, 1005, &mut |d, t| last = (d, t), |i, done| {
+            sum.fetch_add(*i, Ordering::Relaxed);
+            done.fetch_add(1, Ordering::Relaxed);
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(sum.load(Ordering::Relaxed), 999 * 1000 / 2);
+        assert_eq!(last, (1005, 1005));
+    }
+
+    #[test]
+    fn run_parallel_returns_the_first_error_and_stops() {
+        let items: Vec<usize> = (0..10_000).collect();
+        let ran = AtomicUsize::new(0);
+        let err = run_parallel(&items, 0, items.len(), &mut |_, _| {}, |i, _| {
+            ran.fetch_add(1, Ordering::Relaxed);
+            if *i == 3 {
+                Err("item 3 is damaged".into())
+            } else {
+                Ok(())
+            }
+        })
+        .unwrap_err();
+        assert_eq!(err, "item 3 is damaged");
+        assert!(ran.load(Ordering::Relaxed) < items.len());
+        assert!(run_parallel::<u8>(&[], 0, 0, &mut |_, _| {}, |_, _| Ok(())).is_ok());
     }
 }

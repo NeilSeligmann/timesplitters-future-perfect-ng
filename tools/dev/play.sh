@@ -1193,7 +1193,7 @@ fi
 
 # --- the variant table proper ---
 # T3398 PLAYTEST BLOCKER MITIGATION (rule 25, docs/run-notes/T3398.md): root 0x153270 (objchar_wired4 matrix multiply) faults in Map Maker preview; lifted C serves it until fixed.
-blocked_roots="-0x153270"
+blocked_roots="-0x153270,-0x3FAA0,-0x47560,-0x8C020,-0x153B40,-0x9B090,-0x4A210,-0x9B800,-0x277FE0,-0xA64D0,-0xA6290,-0x247A0,-0x2FC470,-0x2F8140,-0x16FC00,-0x91EC0,-0x57040,-0x1CEBA0,-0x9A060,-0xD9030,-0x16CA00"
 ports="--rust-ports=all,$blocked_roots"
 perf=0
 # T2229: default = shared GPU textures; T2227 readback ring remains the CPU control.

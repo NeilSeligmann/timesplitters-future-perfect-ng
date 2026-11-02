@@ -55,6 +55,24 @@ static bool append_rea_ai_enabled(options *out, const char *text)
     return append_rea_ai_list(out->rust_rea_ai_enabled, &out->rust_rea_ai_enabled_count, text);
 }
 
+static bool valid_shadow_spec(const char *text)
+{
+    if (strcmp(text, "all") == 0) return true;
+    const char *cursor = text;
+    for (;;) {
+        if (cursor[0] == '0' && (cursor[1] == 'x' || cursor[1] == 'X')) cursor += 2;
+        unsigned digits = 0;
+        while ((*cursor >= '0' && *cursor <= '9') || (*cursor >= 'a' && *cursor <= 'f') ||
+               (*cursor >= 'A' && *cursor <= 'F')) {
+            if (++digits > 8) return false;
+            ++cursor;
+        }
+        if (digits == 0) return false;
+        if (*cursor == '\0') return true;
+        if (*cursor++ != ',') return false;
+    }
+}
+
 /* WxH:RRGGBBAA or WxH:checker for --gpu-replay-standin-texture. Plain decimal edges of 1..GPU_REPLAY_MAX_EDGE and exactly eight hex
  * digits, nothing before, between or after (strtol would take a sign, a space or a 0x prefix, so the digits are read by hand). */
 static bool parse_standin(const char *text, options *out)
@@ -268,6 +286,8 @@ bool parse_options(int argc, char **argv, options *out)
     out->vblank_poll_blank = false;
     /* T2385 REA-AI needs its Rust call root even when callers use the defaults. */
     out->rust_ports = "0x266250";
+    out->rust_ports_shadow = NULL;
+    out->shadow_promote = 2000u;
     out->rust_weapon_hands = false;
     out->rust_contact_delivery = false;
     out->rust_rea_ai = true;
@@ -531,6 +551,17 @@ bool parse_options(int argc, char **argv, options *out)
         } else if (strcmp(arg, "--rust-ports") == 0) {
             if (++i >= argc || argv[i][0] == '\0') return false;
             out->rust_ports = argv[i];
+        } else if (strcmp(arg, "--rust-ports-shadow") == 0) {
+            out->rust_ports_shadow = "all";
+        } else if (strncmp(arg, "--rust-ports-shadow=", 20u) == 0) {
+            if (!valid_shadow_spec(arg + 20)) return false;
+            out->rust_ports_shadow = arg + 20;
+        } else if (strcmp(arg, "--shadow-promote") == 0 ||
+                   strncmp(arg, "--shadow-promote=", 17u) == 0) {
+            const char *value = arg[16] == '=' ? arg + 17 : (++i < argc ? argv[i] : NULL);
+            unsigned long long count;
+            if (!parse_bounded(value, 10, 1, UINT32_MAX, &count)) return false;
+            out->shadow_promote = (uint32_t)count;
         } else if (strcmp(arg, "--rust-weapon-hands") == 0) {
             out->rust_weapon_hands = true;
         } else if (strcmp(arg, "--rust-contact-delivery") == 0) {

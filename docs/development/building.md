@@ -2,7 +2,8 @@
 
 ## Launcher
 
-Needs a recent stable [Rust](https://rustup.rs/) toolchain. On Linux, also `libxkbcommon-dev` and `libwayland-dev`.
+Needs a recent stable [Rust](https://rustup.rs/) toolchain. On Linux, also `libxkbcommon-dev`, `libwayland-dev` and
+`libfontconfig1-dev`.
 
 ```sh
 cargo run --release --manifest-path crates/tsfp-launcher/Cargo.toml   # build and run
@@ -10,7 +11,8 @@ cargo test --manifest-path crates/tsfp-launcher/Cargo.toml            # launcher
 cargo test -p tsfp-launcher-core                                      # core logic tests
 ```
 
-The launcher is a thin [iced](https://iced.rs/) view over `crates/tsfp-launcher-core`, which holds disc
+The launcher UI is written in [Slint](https://slint.dev/) (`crates/tsfp-launcher/ui/launcher.slint`, Fluent dark
+style) over a toolkit-independent controller and `crates/tsfp-launcher-core`, which holds disc
 identification, install, verify, settings, mods, packs and update selection. Intel Mac users build the launcher this
 way; it runs natively but does not auto-update.
 
@@ -29,3 +31,13 @@ Nothing derived from your disc leaves your machine or belongs in a commit.
 Pushing a `vX.Y.Z` tag (matching `crates/tsfp-launcher/Cargo.toml`) builds the launcher for Linux x64/arm64,
 macOS Apple Silicon and Windows x64/arm64, adds AppImage and `.dmg` installers, `SHA256SUMS` and minisign
 signatures, and publishes a GitHub Release. See `.github/workflows/launcher.yml`.
+
+### When a platform is missing from a release
+
+Each platform publishes on its own, so a release can go out without one of them; GitHub's macOS arm64 runners in
+particular sometimes cannot start ("capacity constraints", "not acquired by Runner"). To add the missing platform
+later, open the tag's run under **Actions** and choose **Re-run failed jobs**. Only the missing platform builds; it
+attaches its files to the same release, and the `checksums` job runs again so `SHA256SUMS` includes them.
+
+macOS releases are built on GitHub's Mac runners only: building them on Linux would need Apple's SDK, which Apple
+licenses for Apple hardware only.

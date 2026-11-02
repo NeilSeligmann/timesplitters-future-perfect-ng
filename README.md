@@ -37,12 +37,12 @@ with a launcher that sets everything up from your own copy of the game.
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/assets/launcher-setup.png" alt="Setup: choose your disc image and a game folder, then extract and verify"></td>
-    <td width="50%"><img src="docs/assets/launcher-mods.png" alt="Mods: install from a zip, enable, set load order and see conflicts"></td>
+    <td width="50%"><img src="docs/assets/launcher-play.png" alt="Play: builds your own copy of the game when needed, then starts it"></td>
+    <td width="50%"><img src="docs/assets/launcher-setup.png" alt="Setup: drop or paste your disc image, choose a game folder, then extract and verify with per-step progress"></td>
   </tr>
   <tr>
     <td width="50%"><img src="docs/assets/launcher-settings.png" alt="Settings: launcher updates and every game setting, shared with the in-game menu"></td>
-    <td width="50%"><img src="docs/assets/launcher-content.png" alt="Content: optional high-quality music and texture packs"></td>
+    <td width="50%"><img src="docs/assets/launcher-mods.png" alt="Mods: install from a zip, enable, set load order and see conflicts"></td>
   </tr>
 </table>
 

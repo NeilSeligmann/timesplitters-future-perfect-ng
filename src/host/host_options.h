@@ -188,6 +188,8 @@ typedef struct {
     bool vblank_poll_blank;
     /* Execute retained original CPU shader compiler code; default off. */
     const char *rust_ports; /* off (default), all, or comma-separated supported VAs */
+    const char *rust_ports_shadow; /* NULL disables shadow dispatch */
+    uint32_t shadow_promote;
     bool rust_weapon_hands; /* --rust-weapon-hands: T2376 typed reload/unload owner, default off */
     bool rust_contact_delivery; /* --rust-contact-delivery: T3396 typed contact queue/callback seam, default off */
     bool rust_rea_ai; /* T2385: adopt Tiered readable REA AI owners, default on */

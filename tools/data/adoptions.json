@@ -1,4 +1,45 @@
 {
-  "_doc": "T3840 (rule 24): adoption citations for roots that join the default-on set (tools/data/default_on_roots.json) or whose default-on dispatch changes. Each entry: va (hex), task, receipt (gate receipt id in the main root's gate receipt store), verdict (EQUAL), optional run_receipt (the 180 s fault-free run when it is a separate receipt). tools.agents.default_on_guard checks every landing.",
-  "adoptions": []
+ "_doc": "T3840 (rule 24): adoption citations for roots that join the default-on set (tools/data/default_on_roots.json) or whose default-on dispatch changes. Each entry: va (hex), task, receipt (gate receipt id in the main root's gate receipt store), verdict (EQUAL), optional run_receipt (the 180 s fault-free run when it is a separate receipt). tools.agents.default_on_guard checks every landing.",
+ "adoptions": [
+  {
+   "va": "0x1c720",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x21440",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x21450",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x214c0",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x21740",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x22560",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x22790",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x22be0",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x2a310",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  },
+  {
+   "va": "0x459d0",
+   "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
+  }
+ ]
 }

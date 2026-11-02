@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 bool host_rust_ports_configure(const char *spec);
+bool host_rust_shadow_configure(const char *spec, uint32_t promote);
+bool host_rust_shadow_stats(uint32_t va, uint64_t *clean, uint64_t *diff, bool *promoted,
+                            uint64_t *calls, uint64_t *unavailable);
 bool host_rust_weapon_hands_configure(bool enabled);
 bool host_rust_rea_ai_configure(bool enabled);
 bool host_rust_rea_ai_configure_function(uint32_t va, bool enabled);

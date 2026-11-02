@@ -1,12 +1,13 @@
 //! `tsfp-import list|extract|convert|verify`. Use only on your own copy of the game.
 use std::path::PathBuf;
-use tsfp_import::{Result, convert, source};
+use tsfp_import::{Result, convert, ktx2, png, source};
 
 const USAGE: &str = "usage:
   tsfp-import list    --source PATH --platform xbox|ps2|gamecube [--id ID]
   tsfp-import extract --source PATH --platform P --id VERSION --out GAME_DIR [--only SUBSTR]      (stage A)
   tsfp-import convert --source PATH --platform P --id VERSION --out GAME_DIR [--only SUBSTR] [--names FILE]
-  tsfp-import verify  --out GAME_DIR --id VERSION";
+  tsfp-import verify  --out GAME_DIR --id VERSION
+  tsfp-import decode  --in TEXTURE.ktx2 --png OUT.png   (BC1/BC2/BC3 level 0 to RGBA PNG)";
 
 fn arg(a: &[String], k: &str) -> Option<String> {
     a.iter()
@@ -21,6 +22,16 @@ fn run() -> Result<()> {
     let id = arg(&a, "--id").unwrap_or_else(|| "default".into());
     let out = arg(&a, "--out").map(PathBuf::from);
     let only = arg(&a, "--only").unwrap_or_default();
+    if cmd == "decode" {
+        let input = arg(&a, "--in").ok_or(USAGE)?;
+        let output = arg(&a, "--png").ok_or(USAGE)?;
+        let bytes = std::fs::read(&input).map_err(|e| format!("{input}: {e}"))?;
+        let (w, h, rgba) = ktx2::decode_rgba(&bytes)?;
+        let encoded = png::encode(w as usize, h as usize, png::Color::Rgba, &rgba);
+        std::fs::write(&output, encoded).map_err(|e| format!("{output}: {e}"))?;
+        println!("{w}x{h} -> {output}");
+        return Ok(());
+    }
     if cmd == "verify" {
         let n = convert::verify(&out.ok_or(USAGE)?, &id)?;
         println!("verified {n} files");

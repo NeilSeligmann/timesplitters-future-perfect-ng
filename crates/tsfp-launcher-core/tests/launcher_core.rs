@@ -67,9 +67,48 @@ fn install_then_verify_then_detect_damage() {
     let game = d.join("game");
     let mut steps = Vec::new();
     install::install(&fake_disc(&d), &game, true, &mut |s| steps.push(s.clone())).unwrap();
-    assert_eq!(steps.len(), 4);
-    assert_eq!(steps[1], install::Step::Extracted(2));
-    assert!(matches!(steps[3], install::Step::Verified(n) if n > 0));
+    // Final events in order; progress events in between. A folder source is not copied.
+    let finals: Vec<_> = steps
+        .iter()
+        .filter(|s| {
+            !matches!(
+                s,
+                install::Step::Extracting { .. }
+                    | install::Step::Converting { .. }
+                    | install::Step::Verifying { .. }
+            )
+        })
+        .cloned()
+        .collect();
+    assert_eq!(finals.len(), 5);
+    assert_eq!(
+        finals[1],
+        install::Step::Checked {
+            existing: false,
+            ok: false,
+            files: 0
+        }
+    );
+    assert_eq!(finals[2], install::Step::Extracted(2));
+    assert!(matches!(finals[4], install::Step::Verified(n) if n > 0));
+    assert!(steps.contains(&install::Step::Extracting { done: 2, total: 2 }));
+    assert!(
+        !steps
+            .iter()
+            .any(|s| matches!(s, install::Step::Copied { .. }))
+    );
+    // Installing the same disc again verifies the existing install and skips extraction.
+    let mut again = Vec::new();
+    install::install(&fake_disc(&d), &game, true, &mut |s| again.push(s.clone())).unwrap();
+    assert!(matches!(
+        again.last(),
+        Some(install::Step::Checked { existing: true, ok: true, files }) if *files > 0
+    ));
+    assert!(
+        !again
+            .iter()
+            .any(|s| matches!(s, install::Step::Extracted(_)))
+    );
     let st = install::status(&game);
     assert!(matches!(&st[..], [install::Status::Installed { id, .. }] if id == "xbox-unknown"));
     let manifest = install::version_path(&game, "xbox-unknown").join("manifest.json");
@@ -91,6 +130,7 @@ fn config_round_trips_and_defaults() {
     let mut c = missing.clone();
     c.channel = config::Channel::Nightly;
     c.enabled_mods = vec!["a".into(), "b".into()];
+    c.last_disc = Some("/discs/tsfp.iso".into());
     c.save(&path).unwrap();
     assert_eq!(config::Config::load(&path, PathBuf::new()).unwrap(), c);
     assert!(config::Config::from_json(r#"{"channel":"beta"}"#, PathBuf::new()).is_err());
@@ -362,4 +402,204 @@ fn pack_install_verify_and_repair_only_changed_files() {
     packs::uninstall(&d, "hq-music").unwrap();
     assert_eq!(packs::installed(&d, "hq-music"), None);
     assert!(packs::uninstall(&d, "../x").is_err());
+}
+
+#[test]
+fn disc_copy_is_verified_recorded_reused_and_repaired() {
+    let d = scratch("disccopy");
+    let image = d.join("My Game.ISO");
+    let data: Vec<u8> = (0..20_000u32).map(|i| (i % 251) as u8).collect();
+    write(&image, &data);
+    let game = d.join("game");
+    let mut last = (0, 0);
+    let (copy, reused) =
+        install::ensure_disc_copy(&image, &game, "xbox-usa", "abc", &mut |a, b| last = (a, b))
+            .unwrap();
+    assert!(!reused);
+    assert_eq!(copy, install::disc_dir(&game).join("xbox-usa.iso"));
+    assert_eq!(std::fs::read(&copy).unwrap(), data);
+    assert_eq!(last, (2 * data.len() as u64, 2 * data.len() as u64));
+    let record: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(install::disc_dir(&game).join("xbox-usa.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(record["sha256"], tsfp_import::sha256::hex(&data));
+    assert_eq!(record["original_name"], "My Game.ISO");
+    assert!(!install::disc_dir(&game).join("xbox-usa.part").exists());
+    assert_eq!(install::disc_copy(&game, "xbox-usa"), Some(copy.clone()));
+    assert_eq!(install::disc_copy(&game, "other"), None);
+
+    let (_, reused) =
+        install::ensure_disc_copy(&image, &game, "xbox-usa", "abc", &mut |_, _| {}).unwrap();
+    assert!(reused);
+
+    let mut bad = data.clone();
+    bad[100] ^= 1;
+    std::fs::write(&copy, &bad).unwrap();
+    let (_, reused) =
+        install::ensure_disc_copy(&image, &game, "xbox-usa", "abc", &mut |_, _| {}).unwrap();
+    assert!(!reused);
+    assert_eq!(std::fs::read(&copy).unwrap(), data);
+}
+
+#[test]
+fn hash_file_streams_the_same_hash() {
+    let d = scratch("hashfile");
+    let data = vec![7u8; 9 << 20];
+    write(&d.join("f"), &data);
+    let mut calls = 0;
+    let h = install::hash_file(&d.join("f"), &mut |_, _| calls += 1).unwrap();
+    assert_eq!(h, tsfp_import::sha256::hex(&data));
+    assert!(calls >= 2);
+}
+
+#[test]
+fn damaged_install_is_re_extracted_not_skipped() {
+    let d = scratch("repair");
+    let game = d.join("game");
+    install::install(&fake_disc(&d), &game, true, &mut |_| {}).unwrap();
+    let extracted = install::version_path(&game, "xbox-unknown").join(".source/data/readme.txt");
+    std::fs::write(&extracted, b"tampered").unwrap();
+    let mut steps = Vec::new();
+    install::install(&fake_disc(&d), &game, true, &mut |s| steps.push(s.clone())).unwrap();
+    assert!(steps.contains(&install::Step::Checked {
+        existing: true,
+        ok: false,
+        files: 0
+    }));
+    assert!(steps.contains(&install::Step::Extracted(2)));
+    assert_eq!(std::fs::read(&extracted).unwrap(), b"hello");
+}
+
+#[test]
+fn logo_is_read_from_the_installed_game_only() {
+    use tsfp_launcher_core::branding;
+    let d = scratch("logo");
+    assert_eq!(branding::logo(&d), None);
+    let version = install::version_path(&d, "xbox-usa");
+    write(&version.join("manifest.json"), b"{}");
+    // 256x128 BC1, every block opaque red.
+    let block = [0x00u8, 0xF8, 0x00, 0xF8, 0, 0, 0, 0];
+    let level: Vec<u8> = block.iter().copied().cycle().take(64 * 32 * 8).collect();
+    let ktx = tsfp_import::ktx2::encode_bc(256, 128, 131, 128, 8, &[&level]).unwrap();
+    write(
+        &version.join("textures/pak/arcade/l_103/3edb3999.ktx2"),
+        &ktx,
+    );
+    let logo = branding::logo(&d).unwrap();
+    assert_eq!(
+        (logo.width, logo.height, &logo.rgba[..4]),
+        (256, 128, &[255u8, 0, 0, 255][..])
+    );
+    // A texture with the wrong shape is not taken for the logo.
+    let square = tsfp_import::ktx2::encode_bc(4, 4, 131, 128, 8, &[&block]).unwrap();
+    write(
+        &version.join("textures/pak/arcade/l_103/3edb3999.ktx2"),
+        &square,
+    );
+    assert_eq!(branding::logo(&d), None);
+}
+
+#[cfg(unix)]
+mod game_runtime {
+    use super::*;
+    use tsfp_launcher_core::game::{self, GameState};
+
+    fn fake_repo(name: &str, play_rc: i32) -> PathBuf {
+        let d = scratch(name);
+        write(&d.join("tools/dev/play.sh"), format!("echo \"$@ disc=$TSFP_DISC\" > args.txt\necho 'play.sh: last words' >&2\nexit {play_rc}\n").as_bytes());
+        write(
+            &d.join("tools/dev/build.sh"),
+            b"echo building \"$@\"\necho done\n",
+        );
+        d
+    }
+
+    #[test]
+    fn repo_is_found_from_a_nested_path_only() {
+        let d = fake_repo("gamefind", 0);
+        let nested = d.join("crates/tsfp-launcher/target/release/tsfp-launcher");
+        assert_eq!(game::find_repo(&[nested]).map(|r| r.root), Some(d.clone()));
+        assert_eq!(
+            game::find_repo(&[PathBuf::from("/nonexistent-tsfp-launcher/x")]),
+            None
+        );
+    }
+
+    #[test]
+    fn probe_maps_every_play_sh_exit_code() {
+        for (rc, want) in [(0, GameState::Ready), (4, GameState::NoDisc)] {
+            let repo = game::Repo {
+                root: fake_repo(&format!("probe{rc}"), rc),
+            };
+            assert_eq!(game::probe(&repo, Some(Path::new("/d.iso"))), want);
+        }
+        let repo = game::Repo {
+            root: fake_repo("probe10", 10),
+        };
+        assert!(
+            matches!(game::probe(&repo, None), GameState::NeedsBuild { args, .. } if args == ["--relift"])
+        );
+        let repo = game::Repo {
+            root: fake_repo("probe99", 99),
+        };
+        assert_eq!(
+            game::probe(&repo, None),
+            GameState::Error("play.sh: last words".into())
+        );
+        assert!(
+            matches!(game::state_from_exit(Some(3), ""), GameState::NeedsBuild { args, .. } if args.is_empty())
+        );
+        assert!(
+            matches!(game::state_from_exit(Some(7), ""), GameState::NeedsBuild { args, .. } if args == ["--reconfigure"])
+        );
+    }
+
+    #[test]
+    fn play_and_build_pass_disc_and_args_and_log_output() {
+        let root = fake_repo("gamerun", 0);
+        let repo = game::Repo { root: root.clone() };
+        let log = root.join("logs/play.log");
+        assert!(
+            game::play(&repo, Some(Path::new("/x/disc.iso")), &log)
+                .unwrap()
+                .wait()
+                .unwrap()
+                .success()
+        );
+        assert_eq!(
+            std::fs::read_to_string(root.join("args.txt"))
+                .unwrap()
+                .trim(),
+            "default disc=/x/disc.iso"
+        );
+        assert_eq!(game::last_line(&log), "play.sh: last words");
+        let blog = root.join("logs/build.log");
+        let status = game::build(&repo, &["--relift".into()], &blog)
+            .unwrap()
+            .wait()
+            .unwrap();
+        assert!(status.success());
+        assert!(
+            std::fs::read_to_string(&blog)
+                .unwrap()
+                .contains("building --relift")
+        );
+        assert_eq!(game::last_line(&blog), "done");
+    }
+
+    #[test]
+    fn stopping_a_build_ends_it_and_its_children() {
+        let root = scratch("gamestop");
+        write(&root.join("tools/dev/play.sh"), b"exit 0\n");
+        write(&root.join("tools/dev/build.sh"), b"sleep 30 &\nsleep 30\n");
+        let repo = game::Repo { root: root.clone() };
+        let mut child = game::build(&repo, &[], &root.join("b.log")).unwrap();
+        std::thread::sleep(std::time::Duration::from_millis(200));
+        let started = std::time::Instant::now();
+        game::stop(child.id());
+        let status = child.wait().unwrap();
+        assert!(!status.success());
+        assert!(started.elapsed() < std::time::Duration::from_secs(5));
+    }
 }

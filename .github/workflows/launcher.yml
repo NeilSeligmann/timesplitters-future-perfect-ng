@@ -35,6 +35,10 @@ jobs:
           - { name: windows-arm64, os: windows-11-arm, target: aarch64-pc-windows-msvc }
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
+    # A job that hangs once started is cut off; queue time does not count (GitHub drops jobs queued for 24 h).
+    # GitHub's macOS arm64 pool often has capacity problems: other platforms publish regardless, and "Re-run failed
+    # jobs" later builds macOS alone, attaches it to the same release and re-runs `checksums` (owner 2026-11-02).
+    timeout-minutes: 45
     permissions:
       contents: write
     steps:
@@ -57,7 +61,7 @@ jobs:
           save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Linux packages
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libwayland-dev
+        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libwayland-dev libfontconfig1-dev
       - name: Test core
         run: cargo test -p tsfp-launcher-core --locked
       - name: Test launcher
@@ -117,6 +121,7 @@ jobs:
     if: always() && startsWith(github.ref, 'refs/tags/v')
     needs: build
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:

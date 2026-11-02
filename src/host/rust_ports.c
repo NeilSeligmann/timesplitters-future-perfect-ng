@@ -5,6 +5,8 @@
 #include "host_runtime.h"
 #include "tsfp_input_host_wiring.h"
 #include "kernel_thread.h"
+#include "shadow_port_leaf.h"
+#include "shadow_port_denylist.h"
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -170,6 +172,90 @@ extern bool kernel_guest_read_bytes(uint32_t address, void *out, size_t length) 
 static bool native_animation_read(uint32_t address, unsigned char *out, size_t length)
 {
     return kernel_guest_read_bytes != NULL && kernel_guest_read_bytes(address, out, length);
+}
+extern shadow_leaf_result shadow_leaf_execute(shadow_port_policy *, shadow_leaf_regs *, uint32_t,
+                                             shadow_leaf_rust_fn, shadow_leaf_lifted_fn, void *) __attribute__((weak));
+extern int shadow_denylist_contains(const char *, uint32_t) __attribute__((weak));
+extern bool shadow_denylist_add(const char *, uint32_t) __attribute__((weak));
+extern void tsfp_port_003bd2b0(shadow_leaf_regs *, uintptr_t);
+extern void tsfp_port_003bd2d0(shadow_leaf_regs *, uintptr_t);
+extern void tsfp_port_00151090(shadow_leaf_regs *, uintptr_t);
+extern void tsfp_lane_0001e8d0(rust_lane_cpu *, uintptr_t);
+static void shadow_vertex_size(shadow_leaf_regs *regs, uintptr_t offset)
+{
+    rust_lane_cpu cpu = {regs->eax, regs->ecx, regs->edx, regs->ebx,
+                         regs->esi, regs->edi, regs->ebp, regs->esp};
+    tsfp_lane_0001e8d0(&cpu, offset);
+    regs->eax = cpu.eax; regs->ecx = cpu.ecx; regs->edx = cpu.edx; regs->esp = cpu.esp;
+    regs->ebx = cpu.ebx; regs->esi = cpu.esi; regs->edi = cpu.edi; regs->ebp = cpu.ebp;
+}
+typedef struct {
+    uint32_t va;
+    shadow_leaf_rust_fn rust;
+    shadow_port_policy policy;
+    bool enabled;
+    uint64_t calls, unavailable;
+} shadow_root;
+static shadow_root shadow_roots[] = {
+    {0x3bd2b0u, tsfp_port_003bd2b0, SHADOW_PORT_POLICY_INIT(2000), false, 0, 0},
+    {0x3bd2d0u, tsfp_port_003bd2d0, SHADOW_PORT_POLICY_INIT(2000), false, 0, 0},
+    {0x151090u, tsfp_port_00151090, SHADOW_PORT_POLICY_INIT(2000), false, 0, 0},
+    {0x1e8d0u, shadow_vertex_size, SHADOW_PORT_POLICY_INIT(2000), false, 0, 0},
+};
+static const char shadow_denylist_path[] = "tmp/port-denylist.txt";
+static shadow_root *shadow_find(uint32_t va)
+{
+    for (size_t i = 0; i < sizeof shadow_roots / sizeof shadow_roots[0]; ++i)
+        if (shadow_roots[i].enabled && shadow_roots[i].va == va) return &shadow_roots[i];
+    return NULL;
+}
+typedef struct { void (*lifted)(void); } shadow_lifted_context;
+static void shadow_lifted_leaf(shadow_leaf_regs *regs, void *context)
+{
+    shadow_lifted_context *call = context;
+    g_eax = regs->eax; g_ecx = regs->ecx; g_edx = regs->edx; g_esp = regs->esp;
+    g_ebx = regs->ebx; g_esi = regs->esi; g_edi = regs->edi; g_ebp = regs->ebp;
+    call->lifted();
+    if (g_esp != regs->esp + 4u)
+        tsfp_bridge_fail(HOST_STOP_BRIDGE_CONTRACT, 0, regs->esp, g_esp, "shadow leaf original left an unexpected ESP");
+    regs->eax = g_eax; regs->ecx = g_ecx; regs->edx = g_edx;
+    regs->ebx = g_ebx; regs->esi = g_esi; regs->edi = g_edi; regs->ebp = g_ebp;
+    g_esp = regs->esp;
+}
+static int shadow_try_leaf(shadow_root *root, void (*lifted)(void), int *rust_path)
+{
+    uint32_t argument;
+    shadow_leaf_regs regs = {g_eax, g_ecx, g_edx, g_esp, g_ebx, g_esi, g_edi, g_ebp};
+    shadow_lifted_context context = {lifted};
+    const uint64_t ordinal = __atomic_fetch_add(&root->calls, 1u, __ATOMIC_RELAXED);
+    shadow_policy_lock(&root->policy);
+    const bool comparing = !root->policy.promoted && !root->policy.disabled;
+    shadow_policy_unlock(&root->policy);
+    /* These are frequently called integer leaves. Sample comparisons until
+     * promotion; afterwards every call uses the primary port or fallback. */
+    if (comparing && (ordinal & 63u) != 0u) {
+        shadow_lifted_leaf(&regs, &context);
+        *rust_path = 0;
+        return 1;
+    }
+    if (g_esp > UINT32_MAX - 7u || !native_animation_read(g_esp + 4u, (unsigned char *)&argument, sizeof argument)) {
+        __atomic_fetch_add(&root->unavailable, 1u, __ATOMIC_RELAXED);
+        shadow_lifted_leaf(&regs, &context);
+        *rust_path = 0;
+        return 1;
+    }
+    shadow_leaf_result result = shadow_leaf_execute(&root->policy, &regs, argument, root->rust, shadow_lifted_leaf, &context);
+    if (result.unavailable) __atomic_fetch_add(&root->unavailable, 1u, __ATOMIC_RELAXED);
+    g_eax = regs.eax; g_ecx = regs.ecx; g_edx = regs.edx; g_esp = regs.esp;
+    g_ebx = regs.ebx; g_esi = regs.esi; g_edi = regs.edi; g_ebp = regs.ebp;
+    *rust_path = result.primary;
+    if (result.fault || result.mismatch) {
+        fprintf(stderr, "shadow port 0x%08X %s register=%u lifted=%08x rust=%08x\n", root->va,
+                result.fault ? "fault" : "difference", result.first_register, result.lifted_value, result.rust_value);
+        if (!shadow_denylist_add(shadow_denylist_path, root->va))
+            fprintf(stderr, "shadow port 0x%08X could not update denylist\n", root->va);
+    }
+    return 1;
 }
 extern void tsfp_player_interaction_trace_reference(const uint32_t *words,
                                                     uint32_t word_count) __attribute__((weak));
@@ -770,6 +856,12 @@ static bool tsfp_memory_try(uint32_t va, rust_registers *registers, uintptr_t of
 }
 static int game_rust_try_body(uint32_t va, int *rust_path)
 {
+    shadow_root *shadowed_root = shadow_find(va);
+    if (shadowed_root != NULL) {
+        void (*body)(void) = original(va);
+        if (body == NULL) return 0;
+        return shadow_try_leaf(shadowed_root, body, rust_path);
+    }
     if (is_ext_root(va)) {
         const int taken = rust_ext_try != NULL && rust_ext_try(va);
         /* I-T3398-20: an ext root that is also a lane root (0x1C8540 since the T3398 math roots) has an abort-only lifted
@@ -1257,6 +1349,55 @@ static bool capture_targets_lifted(const char *pilot)
     return ok;
 }
 #endif
+bool host_rust_shadow_configure(const char *spec, uint32_t promote)
+{
+    if (spec == NULL) return true;
+#ifdef TSFP_RUST_PORTS
+    if (promote == 0u || shadow_leaf_execute == NULL || shadow_denylist_contains == NULL ||
+        shadow_denylist_add == NULL || strcmp(spec, "all") == 0) return false;
+    const char *cursor = spec;
+    while (*cursor != '\0') {
+        char *end;
+        unsigned long va = strtoul(cursor, &end, 16);
+        if (end == cursor || va > UINT32_MAX || (*end != '\0' && *end != ',')) return false;
+        shadow_root *root = NULL;
+        for (size_t i = 0; i < sizeof shadow_roots / sizeof shadow_roots[0]; ++i)
+            if (shadow_roots[i].va == (uint32_t)va) root = &shadow_roots[i];
+        if (root == NULL || root->enabled) return false;
+        int denied = shadow_denylist_contains(shadow_denylist_path, root->va);
+        if (denied < 0) return false;
+        root->policy.promote_at = promote;
+        root->enabled = true;
+        if (denied) shadow_policy_disable(&root->policy);
+        if (*end == '\0') return true;
+        cursor = end + 1;
+        if (*cursor == '\0') return false;
+    }
+    return false;
+#else
+    (void)promote;
+    return false;
+#endif
+}
+bool host_rust_shadow_stats(uint32_t va, uint64_t *clean, uint64_t *diff, bool *promoted,
+                            uint64_t *calls, uint64_t *unavailable)
+{
+#ifdef TSFP_RUST_PORTS
+    shadow_root *root = shadow_find(va);
+    if (root == NULL || clean == NULL || diff == NULL || promoted == NULL || calls == NULL || unavailable == NULL) return false;
+    shadow_policy_lock(&root->policy);
+    *clean = root->policy.clean;
+    *diff = root->policy.diff;
+    *promoted = root->policy.promoted && !root->policy.disabled;
+    shadow_policy_unlock(&root->policy);
+    *calls = __atomic_load_n(&root->calls, __ATOMIC_RELAXED);
+    *unavailable = __atomic_load_n(&root->unavailable, __ATOMIC_RELAXED);
+    return true;
+#else
+    (void)va; (void)clean; (void)diff; (void)promoted; (void)calls; (void)unavailable;
+    return false;
+#endif
+}
 bool host_rust_ports_configure(const char *spec)
 {
 #ifdef TSFP_RUST_PORTS
@@ -1434,6 +1575,18 @@ extern bool tsfp_raw_look_reachable(void);
 void host_rust_ports_report(void)
 {
 #ifdef TSFP_RUST_PORTS
+    for (size_t i = 0; i < sizeof shadow_roots / sizeof shadow_roots[0]; ++i) {
+        shadow_root *root = &shadow_roots[i];
+        if (!root->enabled) continue;
+        shadow_policy_lock(&root->policy);
+        uint64_t clean = root->policy.clean, diff = root->policy.diff;
+        shadow_policy_unlock(&root->policy);
+        printf("shadow port 0x%08X clean=%llu diff=%llu\n", root->va,
+               (unsigned long long)clean, (unsigned long long)diff);
+        printf("shadow detail 0x%08X calls=%llu unavailable=%llu\n", root->va,
+               (unsigned long long)__atomic_load_n(&root->calls, __ATOMIC_RELAXED),
+               (unsigned long long)__atomic_load_n(&root->unavailable, __ATOMIC_RELAXED));
+    }
     printf("raw look       player look root in Rust: %s (--rust-ports=all alone leaves it out, use all,player)\n",
            tsfp_raw_look_reachable() ? "yes" : "no");
 #ifdef TSFP_HAVE_WEAPON_ROOTS

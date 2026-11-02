@@ -1,9 +1,7 @@
-//! Game settings tab, generated from `tsfp_settings::SCHEMA` so it always matches the in-game menu.
+//! Game settings model, generated from `tsfp_settings::SCHEMA` so the launcher always matches the in-game menu.
 //! Placeholder settings are editable and saved but labelled with the system they are waiting for.
-use iced::widget::{column, pick_list, row, text, text_input, toggler};
-use iced::{Element, Length};
 use serde_json::{Value, json};
-use tsfp_settings::{Group, Kind, SCHEMA, Setting, Settings, Status};
+use tsfp_settings::{Group, Kind, SCHEMA, Settings, Status};
 
 #[derive(Clone, Debug)]
 pub enum Edit {
@@ -39,7 +37,7 @@ pub fn apply(settings: &mut Settings, drafts: &mut Vec<(&'static str, String)>, 
     }
 }
 
-fn shown(settings: &Settings, drafts: &[(&'static str, String)], id: &'static str) -> String {
+pub fn shown(settings: &Settings, drafts: &[(&'static str, String)], id: &'static str) -> String {
     if let Some((_, raw)) = drafts.iter().find(|(d, _)| *d == id) {
         return raw.clone();
     }
@@ -48,40 +46,6 @@ fn shown(settings: &Settings, drafts: &[(&'static str, String)], id: &'static st
         Some(Value::Number(n)) => n.as_f64().map_or_else(|| n.to_string(), |f| format!("{f}")),
         Some(v) => v.to_string(),
         None => String::new(),
-    }
-}
-
-fn control<'a, M: Clone + 'a>(
-    s: &'static Setting,
-    settings: &Settings,
-    drafts: &[(&'static str, String)],
-    on: impl Fn(Edit) -> M + Clone + 'a,
-) -> Element<'a, M> {
-    let id = s.id;
-    match s.kind {
-        Kind::Bool => {
-            let on = on.clone();
-            toggler(settings.get(id).and_then(Value::as_bool).unwrap_or(false))
-                .on_toggle(move |v| on(Edit::Bool(id, v)))
-                .into()
-        }
-        Kind::Enum(options) => {
-            let on = on.clone();
-            let selected = settings.get(id).and_then(Value::as_str).map(String::from);
-            pick_list(
-                options.iter().map(|o| o.to_string()).collect::<Vec<_>>(),
-                selected,
-                move |v| on(Edit::Choice(id, v)),
-            )
-            .into()
-        }
-        Kind::Range { .. } | Kind::List => {
-            let on = on.clone();
-            text_input(s.default, &shown(settings, drafts, id))
-                .on_input(move |v| on(Edit::Text(id, v)))
-                .width(Length::Fixed(220.0))
-                .into()
-        }
     }
 }
 
@@ -95,35 +59,76 @@ pub fn group_name(g: Group) -> &'static str {
     }
 }
 
-pub fn view<'a, M: Clone + 'a>(
-    settings: &Settings,
-    drafts: &[(&'static str, String)],
-    on: impl Fn(Edit) -> M + Clone + 'a,
-) -> Element<'a, M> {
-    let mut col = column![].spacing(6);
+/// One row of the settings page. `header` rows start a group and carry only `label`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Row {
+    pub header: bool,
+    pub id: &'static str,
+    pub label: String,
+    /// `bool`, `enum` or `text`.
+    pub kind: &'static str,
+    pub checked: bool,
+    pub text: String,
+    pub options: Vec<String>,
+    pub selected: i32,
+    pub note: String,
+}
+
+pub fn rows(settings: &Settings, drafts: &[(&'static str, String)]) -> Vec<Row> {
+    let mut out = Vec::new();
     let mut last = None;
     for s in SCHEMA {
         if last != Some(s.group) {
-            col = col.push(text(group_name(s.group)).size(20));
+            out.push(Row {
+                header: true,
+                id: "",
+                label: group_name(s.group).into(),
+                kind: "",
+                checked: false,
+                text: String::new(),
+                options: Vec::new(),
+                selected: -1,
+                note: String::new(),
+            });
             last = Some(s.group);
         }
-        let note = match s.status {
-            Status::Active => String::new(),
-            Status::Placeholder(needs) => {
-                format!("  (takes effect once the {needs} system is native)")
-            }
+        let (kind, options) = match s.kind {
+            Kind::Bool => ("bool", Vec::new()),
+            Kind::Enum(o) => ("enum", o.iter().map(|x| x.to_string()).collect()),
+            Kind::Range { .. } | Kind::List => ("text", Vec::new()),
         };
-        col = col.push(
-            row![
-                text(s.label.replace('_', " ")).width(Length::Fixed(240.0)),
-                control(s, settings, drafts, on.clone()),
-                text(note).size(12),
-            ]
-            .spacing(12)
-            .align_y(iced::Alignment::Center),
-        );
+        let current = settings
+            .get(s.id)
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        out.push(Row {
+            header: false,
+            id: s.id,
+            label: capitalise(&s.label.replace('_', " ")),
+            kind,
+            checked: settings.get(s.id).and_then(Value::as_bool).unwrap_or(false),
+            text: shown(settings, drafts, s.id),
+            selected: options
+                .iter()
+                .position(|o| o == current)
+                .map_or(-1, |i| i as i32),
+            options,
+            note: match s.status {
+                Status::Active => String::new(),
+                Status::Placeholder(needs) => {
+                    format!("Takes effect once the {needs} system is native")
+                }
+            },
+        });
     }
-    col.into()
+    out
+}
+
+fn capitalise(s: &str) -> String {
+    let mut c = s.chars();
+    c.next().map_or_else(String::new, |f| {
+        f.to_uppercase().collect::<String>() + c.as_str()
+    })
 }
 
 #[cfg(test)]
@@ -151,6 +156,26 @@ mod tests {
             s.get("resolution_width").and_then(Value::as_f64),
             Some(2560.0)
         );
+    }
+
+    #[test]
+    fn rows_group_every_schema_setting_with_its_current_value() {
+        let mut s = Settings::default();
+        let mut drafts = Vec::new();
+        apply(
+            &mut s,
+            &mut drafts,
+            Edit::Choice("window_mode", "fullscreen".into()),
+        );
+        let rows = rows(&s, &drafts);
+        assert_eq!(rows.iter().filter(|r| !r.header).count(), SCHEMA.len());
+        assert!(rows[0].header && rows[0].label == "Display");
+        let wm = rows.iter().find(|r| r.id == "window_mode").unwrap();
+        assert_eq!(
+            (wm.kind, wm.options[wm.selected as usize].as_str()),
+            ("enum", "fullscreen")
+        );
+        assert_eq!(wm.label, "Window mode");
     }
 
     #[test]

@@ -12,55 +12,154 @@ const K: [u32; 64] = [
 
 /// Lowercase hex SHA-256 of `data`.
 pub fn hex(data: &[u8]) -> String {
-    let mut h: [u32; 8] = [
-        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
-        0x5be0cd19,
-    ];
-    let mut msg = data.to_vec();
-    msg.push(0x80);
-    while msg.len() % 64 != 56 {
-        msg.push(0);
+    let mut h = Hasher::new();
+    h.update(data);
+    h.finish_hex()
+}
+
+/// Streaming SHA-256 for inputs too large to hold in memory (disc images).
+#[derive(Clone)]
+pub struct Hasher {
+    h: [u32; 8],
+    buf: [u8; 64],
+    buf_len: usize,
+    total: u64,
+}
+
+impl Default for Hasher {
+    fn default() -> Self {
+        Self::new()
     }
-    msg.extend(((data.len() as u64) * 8).to_be_bytes());
-    for chunk in msg.chunks(64) {
-        let mut w = [0u32; 64];
-        for i in 0..16 {
-            w[i] = u32::from_be_bytes(chunk[i * 4..i * 4 + 4].try_into().unwrap());
-        }
-        for i in 16..64 {
-            let s0 = w[i - 15].rotate_right(7) ^ w[i - 15].rotate_right(18) ^ (w[i - 15] >> 3);
-            let s1 = w[i - 2].rotate_right(17) ^ w[i - 2].rotate_right(19) ^ (w[i - 2] >> 10);
-            w[i] = w[i - 16]
-                .wrapping_add(s0)
-                .wrapping_add(w[i - 7])
-                .wrapping_add(s1);
-        }
-        let mut v = h;
-        for i in 0..64 {
-            let s1 = v[4].rotate_right(6) ^ v[4].rotate_right(11) ^ v[4].rotate_right(25);
-            let ch = (v[4] & v[5]) ^ (!v[4] & v[6]);
-            let t1 = v[7]
-                .wrapping_add(s1)
-                .wrapping_add(ch)
-                .wrapping_add(K[i])
-                .wrapping_add(w[i]);
-            let s0 = v[0].rotate_right(2) ^ v[0].rotate_right(13) ^ v[0].rotate_right(22);
-            let maj = (v[0] & v[1]) ^ (v[0] & v[2]) ^ (v[1] & v[2]);
-            let t2 = s0.wrapping_add(maj);
-            v = [
-                t1.wrapping_add(t2),
-                v[0],
-                v[1],
-                v[2],
-                v[3].wrapping_add(t1),
-                v[4],
-                v[5],
-                v[6],
-            ];
-        }
-        for i in 0..8 {
-            h[i] = h[i].wrapping_add(v[i]);
+}
+
+impl Hasher {
+    pub fn new() -> Self {
+        Hasher {
+            h: [
+                0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
+                0x5be0cd19,
+            ],
+            buf: [0; 64],
+            buf_len: 0,
+            total: 0,
         }
     }
-    h.iter().map(|x| format!("{x:08x}")).collect()
+
+    pub fn update(&mut self, mut data: &[u8]) {
+        self.total += data.len() as u64;
+        if self.buf_len > 0 {
+            let take = (64 - self.buf_len).min(data.len());
+            self.buf[self.buf_len..self.buf_len + take].copy_from_slice(&data[..take]);
+            self.buf_len += take;
+            data = &data[take..];
+            if self.buf_len < 64 {
+                return;
+            }
+            let block = self.buf;
+            compress(&mut self.h, &block);
+            self.buf_len = 0;
+        }
+        let mut blocks = data.chunks_exact(64);
+        for block in &mut blocks {
+            compress(&mut self.h, block);
+        }
+        let rest = blocks.remainder();
+        self.buf[..rest.len()].copy_from_slice(rest);
+        self.buf_len = rest.len();
+    }
+
+    pub fn finish_hex(mut self) -> String {
+        let bits = self.total * 8;
+        let mut tail = vec![0x80u8];
+        while (self.buf_len + tail.len()) % 64 != 56 {
+            tail.push(0);
+        }
+        tail.extend(bits.to_be_bytes());
+        let total = self.total;
+        self.update(&tail);
+        self.total = total;
+        self.h.iter().map(|x| format!("{x:08x}")).collect()
+    }
+}
+
+fn compress(h: &mut [u32; 8], chunk: &[u8]) {
+    let mut w = [0u32; 64];
+    for i in 0..16 {
+        w[i] = u32::from_be_bytes([
+            chunk[i * 4],
+            chunk[i * 4 + 1],
+            chunk[i * 4 + 2],
+            chunk[i * 4 + 3],
+        ]);
+    }
+    for i in 16..64 {
+        let s0 = w[i - 15].rotate_right(7) ^ w[i - 15].rotate_right(18) ^ (w[i - 15] >> 3);
+        let s1 = w[i - 2].rotate_right(17) ^ w[i - 2].rotate_right(19) ^ (w[i - 2] >> 10);
+        w[i] = w[i - 16]
+            .wrapping_add(s0)
+            .wrapping_add(w[i - 7])
+            .wrapping_add(s1);
+    }
+    let mut v = *h;
+    for i in 0..64 {
+        let s1 = v[4].rotate_right(6) ^ v[4].rotate_right(11) ^ v[4].rotate_right(25);
+        let ch = (v[4] & v[5]) ^ (!v[4] & v[6]);
+        let t1 = v[7]
+            .wrapping_add(s1)
+            .wrapping_add(ch)
+            .wrapping_add(K[i])
+            .wrapping_add(w[i]);
+        let s0 = v[0].rotate_right(2) ^ v[0].rotate_right(13) ^ v[0].rotate_right(22);
+        let maj = (v[0] & v[1]) ^ (v[0] & v[2]) ^ (v[1] & v[2]);
+        let t2 = s0.wrapping_add(maj);
+        v = [
+            t1.wrapping_add(t2),
+            v[0],
+            v[1],
+            v[2],
+            v[3].wrapping_add(t1),
+            v[4],
+            v[5],
+            v[6],
+        ];
+    }
+    for i in 0..8 {
+        h[i] = h[i].wrapping_add(v[i]);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn known_vectors() {
+        assert_eq!(
+            hex(b""),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        );
+        assert_eq!(
+            hex(b"abc"),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+        assert_eq!(
+            hex(b"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"),
+            "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
+        );
+    }
+
+    #[test]
+    fn streaming_equals_one_shot_for_every_split() {
+        let data: Vec<u8> = (0..300u32).map(|i| (i * 7 + 3) as u8).collect();
+        for len in [0, 1, 55, 56, 63, 64, 65, 127, 128, 300] {
+            let whole = hex(&data[..len]);
+            for step in [1, 3, 63, 64, 100] {
+                let mut h = Hasher::new();
+                for part in data[..len].chunks(step) {
+                    h.update(part);
+                }
+                assert_eq!(h.finish_hex(), whole, "len {len} step {step}");
+            }
+        }
+    }
 }

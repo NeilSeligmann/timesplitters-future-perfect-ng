@@ -1,21 +1,27 @@
 [package]
 name = "tsfp-launcher"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2024"
 rust-version = "1.88"
 license = "GPL-3.0-or-later"
-description = "Desktop launcher: setup wizard, settings, content packs, mods, verify (T4332)"
+description = "Desktop launcher: setup wizard, settings, content packs, mods, verify (T4332, Slint UI T4349)"
 publish = false
+build = "build.rs"
 
-# Own workspace root, excluded from the main workspace like crates/tsfp-bevy: iced is a few hundred crates and must
-# not enter `cargo check --workspace`. All launcher logic lives in tsfp-launcher-core; this crate is the iced view.
+# Own workspace root, excluded from the main workspace like crates/tsfp-bevy: the UI toolkit is a few hundred crates and must
+# not enter `cargo check --workspace`. All launcher logic lives in tsfp-launcher-core; this crate is the Slint view
+# (used under Slint's GPL-3.0 option) plus the toolkit-independent controller.
 [workspace]
+
+[build-dependencies]
+slint-build = "~1.18.1"
 
 [dependencies]
 tsfp-launcher-core = { path = "../tsfp-launcher-core" }
 tsfp-settings = { path = "../tsfp-settings" }
 serde_json = "=1.0.145"
-iced = { version = "0.14.0", default-features = false, features = ["wgpu", "tiny-skia", "thread-pool", "x11", "wayland", "web-colors"] }
+# unstable-winit-030: file drag and drop through winit events (pinned to 1.18.x because that API is unstable).
+slint = { version = "~1.18.1", features = ["unstable-winit-030"] }
 rfd = "0.17.2"
 ureq = "3.5.0"
 minisign-verify = "0.3.0"

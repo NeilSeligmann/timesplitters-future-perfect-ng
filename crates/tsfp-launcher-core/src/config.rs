@@ -18,6 +18,8 @@ pub struct Config {
     /// Mod ids in load order; later entries win conflicts.
     pub enabled_mods: Vec<String>,
     pub enabled_packs: Vec<String>,
+    /// Disc image or folder used last (after an install: the verified copy inside the game folder).
+    pub last_disc: Option<String>,
 }
 
 impl Config {
@@ -28,6 +30,7 @@ impl Config {
             check_updates: true,
             enabled_mods: Vec::new(),
             enabled_packs: Vec::new(),
+            last_disc: None,
         }
     }
 
@@ -39,6 +42,7 @@ impl Config {
             "check_updates": self.check_updates,
             "enabled_mods": self.enabled_mods,
             "enabled_packs": self.enabled_packs,
+            "last_disc": self.last_disc,
         });
         serde_json::to_string_pretty(&v).unwrap_or_default() + "\n"
     }
@@ -75,6 +79,11 @@ impl Config {
                 .unwrap_or(true),
             enabled_mods: strings("enabled_mods"),
             enabled_packs: strings("enabled_packs"),
+            last_disc: o
+                .get("last_disc")
+                .and_then(Value::as_str)
+                .filter(|s| !s.is_empty())
+                .map(String::from),
         })
     }
 
