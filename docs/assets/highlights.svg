@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="803" height="32" viewBox="0 0 803 32" role="img" aria-label="Keyboard and mouse, widescreen and ultrawide, high frame rate: in progress. Mods, signed auto-updates: available. Online co-op: planned.">
+  <g transform="translate(1,1)">
+    <rect width="145" height="30" rx="15" fill="#101a2c" stroke="#233452"/>
+    <circle cx="14" cy="15" r="4" fill="#3fa9ff"/>
+    <text x="24" y="19.5" textLength="109" lengthAdjust="spacingAndGlyphs" fill="#e7eefb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600">Keyboard &amp; mouse</text>
+  </g>
+  <g transform="translate(152,1)">
+    <rect width="171" height="30" rx="15" fill="#101a2c" stroke="#233452"/>
+    <circle cx="14" cy="15" r="4" fill="#3fa9ff"/>
+    <text x="24" y="19.5" textLength="135" lengthAdjust="spacingAndGlyphs" fill="#e7eefb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600">Widescreen &amp; ultrawide</text>
+  </g>
+  <g transform="translate(329,1)">
+    <rect width="124" height="30" rx="15" fill="#101a2c" stroke="#233452"/>
+    <circle cx="14" cy="15" r="4" fill="#3fa9ff"/>
+    <text x="24" y="19.5" textLength="88" lengthAdjust="spacingAndGlyphs" fill="#e7eefb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600">High frame rate</text>
+  </g>
+  <g transform="translate(459,1)">
+    <rect width="67" height="30" rx="15" fill="#101a2c" stroke="#233452"/>
+    <circle cx="14" cy="15" r="4" fill="#22c55e"/>
+    <text x="24" y="19.5" textLength="31" lengthAdjust="spacingAndGlyphs" fill="#e7eefb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600">Mods</text>
+  </g>
+  <g transform="translate(532,1)">
+    <rect width="155" height="30" rx="15" fill="#101a2c" stroke="#233452"/>
+    <circle cx="14" cy="15" r="4" fill="#22c55e"/>
+    <text x="24" y="19.5" textLength="119" lengthAdjust="spacingAndGlyphs" fill="#e7eefb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600">Signed auto-updates</text>
+  </g>
+  <g transform="translate(693,1)">
+    <rect width="109" height="30" rx="15" fill="#101a2c" stroke="#233452"/>
+    <circle cx="14" cy="15" r="4" fill="#64748b"/>
+    <text x="24" y="19.5" textLength="73" lengthAdjust="spacingAndGlyphs" fill="#e7eefb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600">Online co-op</text>
+  </g>
+</svg>

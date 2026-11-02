@@ -6,6 +6,9 @@
 A native, open-source rebuild of *TimeSplitters: Future Perfect* for modern PCs,<br>
 with a launcher that sets everything up from your own copy of the game.
 
+<a href="docs/GOALS.md"><img src="docs/assets/highlights.svg" alt="Keyboard and mouse, widescreen and ultrawide, high frame rate: in progress. Mods, signed auto-updates: available. Online co-op: planned." width="803" height="32"></a><br>
+<sub><span>🟢 available</span> · <span>🔵 in progress</span> · <span>⚪ planned</span> · <a href="docs/GOALS.md">full roadmap</a></sub>
+
 [![Latest release](https://img.shields.io/github/v/release/NeilSeligmann/timesplitters-future-perfect-ng?label=release&color=2563eb)](https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest)
 [![Release build](https://img.shields.io/github/actions/workflow/status/NeilSeligmann/timesplitters-future-perfect-ng/launcher.yml?label=build)](https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/actions/workflows/launcher.yml)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)

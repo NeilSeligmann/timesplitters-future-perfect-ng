@@ -2,6 +2,14 @@
  "_doc": "T3840 (rule 24): adoption citations for roots that join the default-on set (tools/data/default_on_roots.json) or whose default-on dispatch changes. Each entry: va (hex), task, receipt (gate receipt id in the main root's gate receipt store), verdict (EQUAL), optional run_receipt (the 180 s fault-free run when it is a separate receipt). tools.agents.default_on_guard checks every landing.",
  "adoptions": [
   {
+   "va": "0x47560",
+   "waiver": "Batch: level6 quick smoke passed with 0x47560 and 0x8c020 enabled and 0x3faa0 excluded (T4344); official quick control passed."
+  },
+  {
+   "va": "0x8c020",
+   "waiver": "Batch: level6 quick smoke passed with 0x47560 and 0x8c020 enabled and 0x3faa0 excluded (T4344); official quick control passed."
+  },
+  {
    "va": "0x1c720",
    "waiver": "Restores a root that was already default-on and ran in Rust before wave 2 excluded it (docs/decisions/fast-adoption.md)."
   },
