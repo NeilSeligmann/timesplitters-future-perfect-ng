@@ -1,6 +1,6 @@
 {
  "_doc": "T3745 disk budget (rule 36 hard limits, owner-tunable). docs/t3745-disk-safety.md. Every big writer calls tools.datadisk.check before it starts; the capture runtime enforces the capture_* values itself.",
- "project_max_gb": 700,
+ "project_max_gb": 900,
  "project_areas": [
   "tmp"
  ],

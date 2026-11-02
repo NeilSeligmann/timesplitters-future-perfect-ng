@@ -2,6 +2,7 @@
 
 # TimeSplitters: Future Perfect NG
 
+**TimeSplitters: Future Perfect - Next Generation**<br>
 A native, open-source rebuild of *TimeSplitters: Future Perfect* for modern PCs,<br>
 with a launcher that sets everything up from your own copy of the game.
 
