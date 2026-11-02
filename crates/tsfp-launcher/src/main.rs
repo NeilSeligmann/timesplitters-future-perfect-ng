@@ -3,6 +3,7 @@
 
 mod app;
 mod mod_archive;
+mod pack_install;
 mod settings_view;
 mod updater;
 

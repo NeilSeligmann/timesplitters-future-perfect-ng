@@ -3,31 +3,38 @@
 # .github/workflows/. Decision: docs/decisions/launcher.md.
 name: launcher
 
+# Builds only for release tags (owner 2026-11-02: no CI minutes on main pushes or PRs). Manual runs stay
+# available from the Actions tab for one-off checks.
 on:
   push:
-    branches: [main]
     tags: ["v*"]
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   build:
+    # Intel Macs (macos-x64) are built manually from source, not in releases (owner 2026-11-02).
     strategy:
       fail-fast: false
       matrix:
         include:
           - { name: linux-x64, os: ubuntu-24.04, target: x86_64-unknown-linux-gnu }
           - { name: linux-arm64, os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu }
-          - { name: macos-x64, os: macos-15, target: x86_64-apple-darwin }
           - { name: macos-arm64, os: macos-15, target: aarch64-apple-darwin }
           - { name: windows-x64, os: windows-2025, target: x86_64-pc-windows-msvc }
           - { name: windows-arm64, os: windows-11-arm, target: aarch64-pc-windows-msvc }
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
+      - name: Tag matches launcher version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' crates/tsfp-launcher/Cargo.toml | head -1)
+          [ "v$version" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME != launcher version v$version"; exit 1; }
       - name: Toolchain
         shell: bash
         run: |
@@ -37,10 +44,8 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libwayland-dev
       - name: Test core
-        if: matrix.name != 'macos-x64'
         run: cargo test -p tsfp-launcher-core --locked
       - name: Test launcher
-        if: matrix.name != 'macos-x64'
         run: cargo test --manifest-path crates/tsfp-launcher/Cargo.toml --locked
       - name: Build
         run: cargo build --release --locked --manifest-path crates/tsfp-launcher/Cargo.toml --target ${{ matrix.target }}
@@ -55,11 +60,11 @@ jobs:
           mkdir -p release
           cp crates/tsfp-launcher/target/${{ matrix.target }}/release/tsfp-launcher${{ runner.os == 'Windows' && '.exe' || '' }} \
             release/tsfp-launcher-${{ matrix.name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: tsfp-launcher-${{ matrix.name }}
           path: dist/
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           name: release-${{ matrix.name }}
@@ -74,7 +79,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           pattern: release-*
           merge-multiple: true
@@ -96,7 +101,7 @@ jobs:
           done
           rm -f "$RUNNER_TEMP/minisign.key"
           ls -l release
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: release/*
           prerelease: ${{ contains(github.ref_name, '-') }}

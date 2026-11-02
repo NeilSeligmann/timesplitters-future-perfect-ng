@@ -151,7 +151,13 @@ fn packs_are_placeholders_until_installed() {
             .iter()
             .all(|p| packs::state(&d, p) == packs::PackState::Unavailable)
     );
+    // A folder without a verified manifest is not an install.
     std::fs::create_dir_all(packs::pack_dir(&d, "hq-music")).unwrap();
+    assert_eq!(
+        packs::state(&d, &packs::CATALOG[0]),
+        packs::PackState::Unavailable
+    );
+    write(&packs::pack_dir(&d, "hq-music").join("pack.json"), b"{}");
     assert_eq!(
         packs::state(&d, &packs::CATALOG[0]),
         packs::PackState::Installed
@@ -296,4 +302,64 @@ fn load_order_moves_and_active_json_lists_winners() {
     assert_eq!(v["files"]["t/b"], "base");
     assert_eq!(v["affects_gameplay"], true);
     assert!(mods::write_active(&m, &mods, &["nope".to_string()]).is_err());
+}
+
+fn pack_manifest(files: &[(&str, &[u8])]) -> String {
+    let rows: Vec<String> = files
+        .iter()
+        .map(|(p, b)| {
+            format!(
+                r#"{{"path":"{p}","url":"https://cdn.example/{p}","size":{},"sha256":"{}"}}"#,
+                b.len(),
+                tsfp_import::sha256::hex(b)
+            )
+        })
+        .collect();
+    format!(
+        r#"{{"schema":1,"id":"hq-music","version":"1","files":[{}]}}"#,
+        rows.join(",")
+    )
+}
+
+#[test]
+fn pack_manifest_rejects_unsafe_entries() {
+    let ok = pack_manifest(&[("music/a.flac", b"aa")]);
+    assert_eq!(packs::parse_manifest(&ok).unwrap().files.len(), 1);
+    for (from, to) in [
+        ("\"path\":\"music/a.flac", "\"path\":\"../a.flac"),
+        ("\"path\":\"music/a.flac", "\"path\":\"/etc/a"),
+        ("\"path\":\"music/a.flac", "\"path\":\"C:/a"),
+        ("https://", "http://"),
+        ("hq-music", "hq-other"),
+    ] {
+        assert!(
+            packs::parse_manifest(&ok.replacen(from, to, 1)).is_err(),
+            "{to}"
+        );
+    }
+    let bad_hash = ok.replace(&tsfp_import::sha256::hex(b"aa"), "zz");
+    assert!(packs::parse_manifest(&bad_hash).is_err());
+}
+
+#[test]
+fn pack_install_verify_and_repair_only_changed_files() {
+    let d = scratch("packinstall");
+    let text = pack_manifest(&[("music/a.flac", b"aa"), ("music/b.flac", b"bbb")]);
+    let m = packs::parse_manifest(&text).unwrap();
+    assert_eq!(packs::needed(&d, &m).len(), 2);
+    assert!(packs::store(&d, &m, &m.files[0], b"tampered").is_err());
+    packs::store(&d, &m, &m.files[0], b"aa").unwrap();
+    packs::store(&d, &m, &m.files[1], b"bbb").unwrap();
+    packs::commit(&d, &m, &text).unwrap();
+    assert!(packs::needed(&d, &m).is_empty());
+    assert_eq!(packs::installed(&d, "hq-music"), Some(m.clone()));
+    std::fs::write(packs::pack_dir(&d, "hq-music").join("music/b.flac"), b"bbX").unwrap();
+    let repair: Vec<_> = packs::needed(&d, &m)
+        .iter()
+        .map(|f| f.path.clone())
+        .collect();
+    assert_eq!(repair, ["music/b.flac"]);
+    packs::uninstall(&d, "hq-music").unwrap();
+    assert_eq!(packs::installed(&d, "hq-music"), None);
+    assert!(packs::uninstall(&d, "../x").is_err());
 }

@@ -105,4 +105,12 @@ def job(kind: str, cores: float, **needs: object) -> JobSpec:
 
     if "mem_mb" not in needs:
         needs["mem_mb"] = hosts.default_mem_mb(kind)
+    if needs.get("display") or needs.get("local_only"):
+        # Owner-PC-only work has nowhere else to go: asking for more cores than the owner cap used to
+        # fail the owner's own `build.sh --relift` ("exceeds local capabilities/core cap"). Run it
+        # at the cap instead (2026-11-02).
+        cap = hosts.policy().owner_max_cores
+        cores = min(cores, cap)
+        if needs.get("min_cores"):
+            needs["min_cores"] = min(float(needs["min_cores"]), cap)  # type: ignore[arg-type]
     return JobSpec(kind=kind, cores=cores, **needs)  # type: ignore[arg-type]

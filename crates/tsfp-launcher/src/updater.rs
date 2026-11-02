@@ -9,7 +9,7 @@ pub const PUBLIC_KEY: &str = "RWQvJv52Ih8oGINpp9v/f7iSFCtpZF4GOij50+r9qD1B4oKbWM
 
 const USER_AGENT: &str = concat!("tsfp-launcher/", env!("CARGO_PKG_VERSION"));
 
-fn get(url: &str) -> Result<Vec<u8>, String> {
+pub(crate) fn get(url: &str) -> Result<Vec<u8>, String> {
     let mut resp = ureq::get(url)
         .header("User-Agent", USER_AGENT)
         .call()

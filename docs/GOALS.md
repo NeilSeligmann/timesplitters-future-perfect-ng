@@ -8,12 +8,13 @@ Last reviewed: 2026-11-02.
 
 ## Launcher (T4330)
 
-- [x] **Done.** Desktop launcher for Linux, macOS and Windows on x64 and ARM64, built by CI on every platform (T4332)
+- [x] **Done.** Desktop launcher for Linux and Windows (x64, ARM64) and Apple Silicon Macs, released by CI; Intel
+      Macs build from source (T4332)
 - [ ] **Partial.** Auto-update: checks GitHub Releases per channel, installs only signed builds (T4333)
       [waits for the release signing key to be added to the repo]
 - [x] **Done.** Guided setup: pick or drop the disc image, identify it by hash, extract and verify (T4331, T4332)
-  - [ ] **Planned.** Optional high-quality music pack (T4334)
-  - [ ] **Planned.** Optional high-quality texture pack (T4334)
+  - [ ] **Partial.** Optional high-quality music pack [signed pack installer done (T4334); no source yet]
+  - [ ] **Partial.** Optional high-quality texture pack [signed pack installer done (T4334); no source yet]
   - [x] **Done.** Verify every installed file against its hash; damaged installs flagged for repair
 - [x] **Done.** Game settings editable in the launcher, shared with the in-game menu file (T4332)
 - [x] **Done.** Mods tab: install from zip, enable, load order, conflicts, remove (T4335)
@@ -64,8 +65,8 @@ Last reviewed: 2026-11-02.
 
 ## Assets and audio
 
-- [ ] **Partial.** Asset overrides [lossless extraction and the override folder contract done (`tsfp-import`); music
-      and texture packs planned (T4334)]
+- [ ] **Partial.** Asset overrides [lossless extraction and the override folder contract done (`tsfp-import`); signed
+      pack installer done (T4334); pack sources not chosen yet]
 - [ ] **Planned.** Higher-quality assets from the PS2, GameCube and other versions (the importer reads all three
       formats)
 

@@ -1,6 +1,7 @@
 //! Launcher state, messages and view. Long work (identify, install, verify) runs on a worker thread and
 //! streams messages back, so the window never blocks.
 use crate::mod_archive;
+use crate::pack_install;
 use crate::settings_view::{self, Edit};
 use crate::updater;
 use iced::futures::channel::mpsc;
@@ -72,6 +73,10 @@ pub enum Msg {
     UpdateApplied(Result<String, String>),
     ToggleMod(String, bool),
     MoveMod(String, isize),
+    PackInstall(&'static str),
+    PackRemove(&'static str),
+    PackProgress(String),
+    PackDone(Result<String, String>),
     RemoveMod(String),
     BrowseMod,
     PickedMod(Option<PathBuf>),
@@ -324,6 +329,36 @@ impl App {
                     self.config.enabled_mods.push(id);
                 }
             }
+            Msg::PackInstall(id) if !self.busy => {
+                if let Some(url) = packs::CATALOG
+                    .iter()
+                    .find(|p| p.id == id)
+                    .and_then(|p| p.manifest_url)
+                {
+                    self.busy = true;
+                    let dir = self.config.game_dir.clone();
+                    return background(move |send| {
+                        let r = pack_install::install(&dir, url, &|m| send(Msg::PackProgress(m)));
+                        send(Msg::PackDone(r));
+                    });
+                }
+            }
+            Msg::PackInstall(_) => {}
+            Msg::PackRemove(id) => {
+                self.notice = match packs::uninstall(&self.config.game_dir, id) {
+                    Ok(()) => format!("Removed {id}."),
+                    Err(e) => e,
+                };
+            }
+            Msg::PackProgress(m) => self.notice = m,
+            Msg::PackDone(Ok(m)) => {
+                self.busy = false;
+                self.notice = m;
+            }
+            Msg::PackDone(Err(e)) => {
+                self.busy = false;
+                self.notice = format!("Pack install failed: {e}");
+            }
             Msg::MoveMod(id, delta) => {
                 mods::move_in_order(&mut self.config.enabled_mods, &id, delta)
             }
@@ -572,10 +607,30 @@ impl App {
                         packs::PackState::NotInstalled => "not installed",
                         packs::PackState::Installed => "installed",
                     };
-                    c.push(column![
-                        text(format!("{} ({state})", p.title)).size(16),
-                        text(p.description).size(13),
-                    ])
+                    let action: Element<'_, Msg> = match packs::state(&self.config.game_dir, p) {
+                        packs::PackState::Unavailable => Space::new().into(),
+                        packs::PackState::NotInstalled => button("Install")
+                            .on_press_maybe((!self.busy).then_some(Msg::PackInstall(p.id)))
+                            .into(),
+                        packs::PackState::Installed => row![
+                            button("Repair")
+                                .on_press_maybe((!self.busy && p.manifest_url.is_some()).then_some(Msg::PackInstall(p.id))),
+                            button("Remove").style(button::danger).on_press(Msg::PackRemove(p.id)),
+                        ]
+                        .spacing(6)
+                        .into(),
+                    };
+                    c.push(
+                        row![
+                            column![
+                                text(format!("{} ({state})", p.title)).size(16),
+                                text(p.description).size(13),
+                            ]
+                            .width(Length::Fill),
+                            action,
+                        ]
+                        .align_y(iced::Alignment::Center),
+                    )
                 },
             )
             .push(text("Packs replace original assets and are labelled as differing from the original game.").size(12))
