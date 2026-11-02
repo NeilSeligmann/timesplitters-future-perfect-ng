@@ -1,0 +1,11 @@
+[package]
+name = "tsfp-t2-engine-object-flag"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+tsfp-gameplay = { path = "../tsfp-gameplay" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+
+[workspace]

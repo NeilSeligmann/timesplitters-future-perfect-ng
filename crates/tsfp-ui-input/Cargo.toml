@@ -1,0 +1,24 @@
+[package]
+name = "tsfp-ui-input"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "T2188 UI-5: UiInput (devices to UiEvents) and UiBindings (UI to game) contracts"
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-ui-model = { path = "../tsfp-ui-model" }
+tsfp-ui-renderer = { path = "../tsfp-ui-renderer" }
+tsfp-input = { path = "../tsfp-input" }
+tsfp-text-field = { path = "../tsfp-text-field" }
+tsfp-mapmaker = { path = "../tsfp-mapmaker" }
+tsfp-ui-mapmaker-pointer = { path = "../tsfp-ui-mapmaker-pointer" }
+tsfp-ui-row-input = { path = "../tsfp-ui-row-input" }
+
+[dev-dependencies]
+# T2431: the Story chain spec test drives the Rust UI handlers and the gameplay ports on one image.
+tsfp-gameplay = { path = "../tsfp-gameplay" }
+tsfp-state = { path = "../tsfp-state" }

@@ -1,0 +1,18 @@
+[package]
+name = "tsfp-dispatch"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3869 lane B: Rust guest runtime core (dispatch table, guest-call trampoline). Safe, no FFI."
+[workspace]
+[lints.rust]
+unsafe_code = "forbid"
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

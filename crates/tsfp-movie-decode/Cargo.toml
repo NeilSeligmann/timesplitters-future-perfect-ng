@@ -1,0 +1,15 @@
+[package]
+name = "tsfp-movie-decode"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+publish = false
+
+[dependencies]
+ffmpeg-next = "8"
+
+[dev-dependencies]
+tsfp-xmv-container = { path = "../tsfp-xmv-container" }
+
+[workspace]

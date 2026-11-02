@@ -1,0 +1,15 @@
+[package]
+name = "tsfp-video-present-capi"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["rlib", "staticlib", "cdylib"]
+
+[dependencies]
+tsfp-video-present = { path = "../tsfp-video-present" }

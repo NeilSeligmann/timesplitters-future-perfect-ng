@@ -1,0 +1,432 @@
+{
+  "tsfp-ai": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::too_many_arguments": 1
+    }
+  },
+  "tsfp-audio": {
+    "clippy_status": "unavailable",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::excessive_precision": 2,
+      "clippy::needless_bool_assign": 1,
+      "clippy::needless_late_init": 1,
+      "clippy::needless_range_loop": 7,
+      "clippy::too_many_arguments": 9
+    }
+  },
+  "tsfp-audio-capi": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::chunks_exact_to_as_chunks": 1,
+      "clippy::if_same_then_else": 2,
+      "clippy::too_many_arguments": 1
+    }
+  },
+  "tsfp-bevy": {
+    "clippy_status": "unavailable",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-c-diff": {
+    "clippy_status": "unavailable",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-coop-net": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-data-formats": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-engine-anim": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::assign_op_pattern": 1,
+      "clippy::doc_lazy_continuation": 2,
+      "clippy::needless_lifetimes": 1,
+      "clippy::needless_range_loop": 2,
+      "clippy::neg_cmp_op_on_partial_ord": 6
+    }
+  },
+  "tsfp-engine-audio": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-engine-core": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::needless_range_loop": 1
+    }
+  },
+  "tsfp-engine-fileio": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::incompatible_msrv": 1,
+      "clippy::manual_ignore_case_cmp": 1,
+      "clippy::manual_let_else": 1,
+      "clippy::result_unit_err": 1
+    }
+  },
+  "tsfp-engine-input": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::doc_lazy_continuation": 1
+    }
+  },
+  "tsfp-engine-memory": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::let_and_return": 1,
+      "clippy::manual_ignore_case_cmp": 1,
+      "clippy::manual_let_else": 2,
+      "unused_assignments": 1
+    }
+  },
+  "tsfp-engine-object": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::assign_op_pattern": 3,
+      "clippy::double_parens": 8,
+      "clippy::neg_cmp_op_on_partial_ord": 2
+    }
+  },
+  "tsfp-engine-physics": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::doc_lazy_continuation": 2,
+      "clippy::manual_range_contains": 1,
+      "dead_code": 22,
+      "unreachable_code": 9
+    }
+  },
+  "tsfp-engine-render": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::duplicate_mod": 1,
+      "clippy::neg_cmp_op_on_partial_ord": 1,
+      "clippy::ptr_arg": 1,
+      "dead_code": 12
+    }
+  },
+  "tsfp-fileio-capi": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "dead_code": 1
+    }
+  },
+  "tsfp-format-anim": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-bs": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-core": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-csinfo": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-igcs": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-pak": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-profile": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-script": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-xbr": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-format-xbt": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-game": {
+    "clippy_status": "unavailable",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-gameplay": {
+    "clippy_status": "unavailable",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::assign_op_pattern": 33,
+      "clippy::collapsible_if": 3,
+      "clippy::collapsible_match": 3,
+      "clippy::derivable_impls": 1,
+      "clippy::doc_lazy_continuation": 3,
+      "clippy::doc_overindented_list_items": 6,
+      "clippy::double_parens": 3,
+      "clippy::excessive_precision": 3,
+      "clippy::identity_op": 1,
+      "clippy::if_same_then_else": 3,
+      "clippy::manual_clamp": 2,
+      "clippy::manual_range_contains": 2,
+      "clippy::manual_range_patterns": 2,
+      "clippy::map_identity": 1,
+      "clippy::needless_late_init": 2,
+      "clippy::needless_range_loop": 9,
+      "clippy::neg_cmp_op_on_partial_ord": 36,
+      "clippy::neg_multiply": 6,
+      "clippy::only_used_in_recursion": 1,
+      "clippy::should_implement_trait": 2,
+      "clippy::too_many_arguments": 15,
+      "unused_assignments": 1,
+      "unused_variables": 3
+    }
+  },
+  "tsfp-host": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-import": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-input": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::unnecessary_map_or": 1,
+      "clippy::useless_format": 1
+    }
+  },
+  "tsfp-kernel-clock": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {
+      "clippy::collapsible_if": 2
+    }
+  },
+  "tsfp-kernel-clock-capi": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-kernel-object": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-kernel-services": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-kernel-services-capi": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-kernel-sync": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {
+      "clippy::collapsible_if": 1
+    }
+  },
+  "tsfp-kmem-capi": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {
+      "clippy::missing_safety_doc": 1
+    }
+  },
+  "tsfp-mapmaker": {
+    "clippy_status": "unavailable",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-network": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::derivable_impls": 1,
+      "clippy::type_complexity": 1,
+      "dead_code": 5
+    }
+  },
+  "tsfp-ports": {
+    "clippy_status": "unavailable",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  },
+  "tsfp-rt-host": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-state": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::too_many_arguments": 1,
+      "clippy::unnecessary_mut_passed": 1
+    }
+  },
+  "tsfp-text-field": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-types": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-ui": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {
+      "clippy::assign_op_pattern": 1,
+      "clippy::double_parens": 3,
+      "clippy::excessive_precision": 4,
+      "clippy::manual_range_contains": 1,
+      "clippy::neg_cmp_op_on_partial_ord": 4
+    }
+  },
+  "tsfp-ui-builders": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-ui-ext": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-ui-input": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-ui-mapmaker-pointer": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-ui-row-input": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-ui-model": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-ui-renderer": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-ui-wgpu": {
+    "clippy_status": "ok",
+    "fmt_gate": true,
+    "fmt_pass": true,
+    "warnings": {}
+  },
+  "tsfp-wgpu": {
+    "clippy_status": "ok",
+    "fmt_gate": false,
+    "fmt_pass": false,
+    "warnings": {}
+  }
+}

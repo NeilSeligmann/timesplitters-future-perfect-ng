@@ -1,0 +1,69 @@
+{
+  "_comment": "T2238 render-prep regions: retained tested camera/player/room/viewport/object regions; scalar globals are not reinterpreted as pointers. Old scene_heap captures can be diffed through this subset. Evidence docs/t2238-render-prep.md.",
+  "regions": [
+    {
+      "name": "scene_736670",
+      "spec": "0x736670:0x10"
+    },
+    {
+      "name": "scene_view_block",
+      "spec": "0x7330B0:0x60"
+    },
+    {
+      "name": "scene_7B0CC0",
+      "spec": "0x7B0CC0:0x40"
+    },
+    {
+      "name": "scene_708780",
+      "spec": "0x708780:0x60"
+    },
+    {
+      "name": "heap_7B0CC0",
+      "spec": "*0x7B0CC0+0x0:0x200"
+    },
+    {
+      "name": "heap_708788",
+      "spec": "*0x708788+0x0:0x200"
+    },
+    {
+      "name": "heap_7B0C7C",
+      "spec": "*0x7B0C7C+0x0:0x200"
+    },
+    {
+      "name": "heap_7B9784",
+      "spec": "*0x7B9784+0x0:0x200"
+    },
+    {
+      "name": "heap_7E71C8",
+      "spec": "*0x7E71C8+0x0:0x200"
+    },
+    {
+      "name": "heap_72F5E8",
+      "spec": "*0x72F5E8+0x0:0x200"
+    },
+    {
+      "name": "native_room_coverage",
+      "spec": "*0x7B0CC0+0x3BC:0x970"
+    },
+    {
+      "name": "native_portal_scratch",
+      "spec": "*0x708778+0x0:0x800"
+    },
+    {
+      "name": "native_recursion",
+      "spec": "*0x70383C+0x0:0x324"
+    },
+    {
+      "name": "native_object_room",
+      "spec": "*0x72F5E8+0x0:0x2E8"
+    },
+    {
+      "name": "native_bucket_counts",
+      "spec": "0x702D60:0xA0"
+    },
+    {
+      "name": "native_bucket_rooms",
+      "spec": "0x7042B8:0x3E80"
+    }
+  ]
+}

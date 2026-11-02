@@ -1,0 +1,13 @@
+{
+  "_comment": "T3398 host-only windows: the first is the typed D01C0 player/candidate snapshot and both ABI vec3 outputs; the second is diagnostic call/attachment coverage and is not adoption state.",
+  "regions": [
+    {
+      "name": "player_interaction_lock_on",
+      "spec": "=0xFFFF3800:0x30"
+    },
+    {
+      "name": "player_interaction_diagnostics",
+      "spec": "=0xFFFF3830:0x18"
+    }
+  ]
+}

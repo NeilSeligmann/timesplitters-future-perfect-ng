@@ -1,0 +1,45 @@
+{
+  "_comment": "Timers gate regions: t2409_owned minus vblank_delivery_counter, which diverges off/off (baseline vs baseline control, MEASURED on story-hud-weapons poll 1880 and story-l2-ai-marks poll 2168, T3879), so it cannot be compared. Also minus frame_timing_history and frame_clock_words: they hold vblank-delivery samples and diverge off/off (baseline vs baseline control, MEASURED story-level1 poll 7952, T3879), so they cannot be compared. Cadence stays covered by game_frame_counter and elapsed_frame_counter; the history/clock words are UNVERIFIED (label).",
+  "regions": [
+    {
+      "name": "timer_count",
+      "spec": "=0xFFFF0000:4"
+    },
+    {
+      "name": "timer_rows",
+      "spec": "=0xFFFF0004:0x708"
+    },
+    {
+      "name": "elapsed_frame_counter",
+      "spec": "=0xFFFF1014:4"
+    },
+    {
+      "name": "frame_step_outputs",
+      "spec": "=0xFFFF2010:0x10"
+    },
+    {
+      "name": "game_frame_counter",
+      "spec": "=0xFFFF1004:4"
+    },
+    {
+      "name": "multi_vblank_frame_counter",
+      "spec": "=0xFFFF1008:4"
+    },
+    {
+      "name": "frame_pause_word",
+      "spec": "=0xFFFF1018:4"
+    },
+    {
+      "name": "simulation_stamp",
+      "spec": "=0xFFFF1020:4"
+    },
+    {
+      "name": "event_latch",
+      "spec": "=0xFFFF100C:4"
+    },
+    {
+      "name": "event_callback",
+      "spec": "=0xFFFF1010:4"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-engine-anim"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-types = { path = "../tsfp-types" }
+tsfp-format-anim = { path = "../tsfp-format-anim" }
+
+[dev-dependencies]
+tsfp-format-pak = { path = "../tsfp-format-pak" }

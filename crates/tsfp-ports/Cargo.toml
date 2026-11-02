@@ -1,0 +1,138 @@
+[package]
+name = "tsfp-ports"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[lib]
+crate-type = ["rlib", "staticlib"]
+
+# Host workspace consumers use std; direct-rustc lifted harnesses keep no_std.
+[features]
+default = ["std"]
+std = ["dep:tsfp-engine-memory"]
+# The shared render_prep.rs source's fixtures are owned by tsfp-engine-render.
+render-prep-tests = []
+# T1690 tests may call the cold lifted Map Maker reference bodies. The host does not enable this.
+editor-next-reference = ["dep:tsfp-port-mapmaker-editor-native", "dep:tsfp-port-mapmaker-editor-native-2"]
+# T2384: expose the retained lifted editor body to Tier 1 tests only.
+editor-reference = []
+# T3434: oracle builds keep the A/B switch of Rule 24 retired systems (tools.retire).
+lifted-oracle = []
+test-diagnostics = []
+
+[dependencies]
+tsfp-render-prep-wire = { path = "../tsfp-render-prep-wire" }
+tsfp-ai-spawn-binding = { path = "../tsfp-ai-spawn-binding" }
+tsfp-ai-selector-transition = { path = "../tsfp-ai-selector-transition" }
+tsfp-engine-memory = { path = "../tsfp-engine-memory", optional = true }
+tsfp-port-engine-physics-ray = { path = "../tsfp-port-engine-physics-ray" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-port-audio-dispatch = { path = "../tsfp-port-audio-dispatch" }
+tsfp-port-gameplay-modes-multiplayer-1 = { path = "../tsfp-port-gameplay-modes-multiplayer-1" }
+tsfp-engine-object = { path = "../tsfp-engine-object" }
+tsfp-port-native-candidate-support = { path = "../tsfp-port-native-candidate-support" }
+tsfp-port-engine-anim-adapter = { path = "../tsfp-port-engine-anim-adapter" }
+tsfp-port-wire = { path = "../tsfp-port-wire" }
+# T3765: generated c2r lane roots (tools/lanes.py), appended to runtime::ROOTS.
+tsfp-lane-c2r = { path = "../tsfp-lane-c2r" }
+tsfp-weapon-owner = { path = "../tsfp-weapon-owner" }
+tsfp-weapon-realization = { path = "../tsfp-weapon-realization" }
+tsfp-port-mapmaker-storage = { path = "../tsfp-port-mapmaker-storage" }
+tsfp-port-mapmaker-ui = { path = "../tsfp-port-mapmaker-ui" }
+tsfp-port-mapmaker-ui-native = { path = "../tsfp-port-mapmaker-ui-native" }
+tsfp-port-mapmaker-ui-native-2 = { path = "../tsfp-port-mapmaker-ui-native-2" }
+tsfp-port-gameplay-inventory = { path = "../tsfp-port-gameplay-inventory" }
+tsfp-port-gameplay-modes = { path = "../tsfp-port-gameplay-modes" }
+tsfp-port-gameplay-player = { path = "../tsfp-port-gameplay-player" }
+tsfp-port-ui-menu = { path = "../tsfp-port-ui-menu" }
+tsfp-port-ui-settings = { path = "../tsfp-port-ui-settings" }
+tsfp-port-ai-characters = { path = "../tsfp-port-ai-characters" }
+tsfp-port-ai-pathfinding = { path = "../tsfp-port-ai-pathfinding" }
+tsfp-port-ai-behavior = { path = "../tsfp-port-ai-behavior" }
+tsfp-port-data-cutscenes = { path = "../tsfp-port-data-cutscenes" }
+tsfp-port-data-missions = { path = "../tsfp-port-data-missions" }
+tsfp-port-data-save = { path = "../tsfp-port-data-save" }
+tsfp-port-data-text = { path = "../tsfp-port-data-text" }
+tsfp-port-engine-object = { path = "../tsfp-port-engine-object" }
+tsfp-port-engine-physics = { path = "../tsfp-port-engine-physics" }
+tsfp-port-engine-render-effects = { path = "../tsfp-port-engine-render-effects" }
+tsfp-port-engine-render-scene = { path = "../tsfp-port-engine-render-scene" }
+tsfp-port-ui-framework = { path = "../tsfp-port-ui-framework" }
+tsfp-port-engine-render-d3d = { path = "../tsfp-port-engine-render-d3d" }
+tsfp-port-scene-t2-div-scene-1 = { path = "../tsfp-port-scene-t2-div-scene-1" }
+tsfp-port-library-crt = { path = "../tsfp-port-library-crt" }
+tsfp-port-library-xdk = { path = "../tsfp-port-library-xdk" }
+tsfp-port-mapmaker-editor = { path = "../tsfp-port-mapmaker-editor" }
+tsfp-port-mapmaker-editor-native = { path = "../tsfp-port-mapmaker-editor-native", optional = true }
+tsfp-port-mapmaker-editor-native-2 = { path = "../tsfp-port-mapmaker-editor-native-2", optional = true }
+tsfp-port-mapmaker-modes = { path = "../tsfp-port-mapmaker-modes" }
+tsfp-port-network-live = { path = "../tsfp-port-network-live" }
+tsfp-port-network-session = { path = "../tsfp-port-network-session" }
+tsfp-port-ui-hud = { path = "../tsfp-port-ui-hud" }
+tsfp-port-engine-object-2 = { path = "../tsfp-port-engine-object-2" }
+tsfp-port-engine-object-3 = { path = "../tsfp-port-engine-object-3" }
+tsfp-port-engine-object-4 = { path = "../tsfp-port-engine-object-4" }
+tsfp-port-engine-object-5 = { path = "../tsfp-port-engine-object-5" }
+tsfp-port-engine-object-6 = { path = "../tsfp-port-engine-object-6" }
+tsfp-port-engine-object-tier2 = { path = "../tsfp-port-engine-object-tier2" }
+tsfp-port-engine-render-effects-2 = { path = "../tsfp-port-engine-render-effects-2" }
+tsfp-port-engine-render-effects-live-return = { path = "../tsfp-port-engine-render-effects-live-return" }
+tsfp-port-library-xdk-2 = { path = "../tsfp-port-library-xdk-2" }
+tsfp-port-misc = { path = "../tsfp-port-misc" }
+tsfp-port-network-live-2 = { path = "../tsfp-port-network-live-2" }
+tsfp-port-network-syslink = { path = "../tsfp-port-network-syslink" }
+tsfp-port-ai-behavior-2 = { path = "../tsfp-port-ai-behavior-2" }
+tsfp-port-data-missions-2 = { path = "../tsfp-port-data-missions-2" }
+tsfp-port-data-missions-3 = { path = "../tsfp-port-data-missions-3" }
+tsfp-port-engine-input = { path = "../tsfp-port-engine-input" }
+tsfp-port-engine-math = { path = "../tsfp-port-engine-math" }
+tsfp-port-gameplay-player-2 = { path = "../tsfp-port-gameplay-player-2" }
+tsfp-player-interaction-fast-path = { path = "../tsfp-player-interaction-fast-path" }
+tsfp-port-gameplay-weapons = { path = "../tsfp-port-gameplay-weapons" }
+tsfp-port-ui-framework-2 = { path = "../tsfp-port-ui-framework-2" }
+tsfp-port-ui-menu-2 = { path = "../tsfp-port-ui-menu-2" }
+tsfp-port-ui-menu-3 = { path = "../tsfp-port-ui-menu-3" }
+tsfp-port-engine-render-effects-3 = { path = "../tsfp-port-engine-render-effects-3" }
+lighting_t2 = { package = "tsfp-port-lighting-t2-div-lighting-1", path = "../tsfp-port-lighting-t2-div-lighting-1" }
+tsfp-port-gameplay-weapons-2 = { path = "../tsfp-port-gameplay-weapons-2" }
+tsfp-port-ui-hud-2 = { path = "../tsfp-port-ui-hud-2" }
+tsfp-port-ui-hud-3 = { path = "../tsfp-port-ui-hud-3" }
+tsfp-port-ui-hud-4 = { path = "../tsfp-port-ui-hud-4" }
+tsfp-port-ui-hud-5 = { path = "../tsfp-port-ui-hud-5" }
+tsfp-port-ui-hud-6 = { path = "../tsfp-port-ui-hud-6" }
+tsfp-port-data-missions-4 = { path = "../tsfp-port-data-missions-4" }
+tsfp-port-data-missions-5 = { path = "../tsfp-port-data-missions-5" }
+tsfp-port-data-missions-6 = { path = "../tsfp-port-data-missions-6" }
+tsfp-port-gameplay-weapons-3 = { path = "../tsfp-port-gameplay-weapons-3" }
+tsfp-port-gameplay-weapons-4 = { path = "../tsfp-port-gameplay-weapons-4" }
+
+[dev-dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime", features = ["thread-retire"] }
+tsfp-port-wire = { path = "../tsfp-port-wire", features = ["thread-retire"] }
+tsfp-engine-anim = { path = "../tsfp-engine-anim" }
+tsfp-engine-fileio = { path = "../tsfp-engine-fileio" }
+tsfp-format-profile = { path = "../tsfp-format-profile" }
+tsfp-network = { path = "../tsfp-network" }
+
+# Keep standalone host integration tests out of both the root workspace and any
+# enclosing checkout workspace (for example, while running inside a worktree).
+[workspace]
+
+# The no_std lib has its own panic handler; T2399 made it a dependency-bearing
+# package, so plain cargo check needs panic=abort (tests still unwind).
+[profile.dev]
+panic = "abort"
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.release]
+panic = "abort"
+
+[profile.dev.package."*"]
+debug = false
+
+# T2454: cfgs set only by tools (coverage harness, lane mutation); declared so rustc does not warn at every use.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tsfp_cover)", "cfg(rust_lane_mutation)", "cfg(tsfp_mmx_harness)", "cfg(s3_missions_owned_differential)"] }

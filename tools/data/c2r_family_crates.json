@@ -1,0 +1,384 @@
+{
+  "schema": 1,
+  "families": [
+    {
+      "subsystem": "engine/anim-adapter",
+      "package": "tsfp-port-engine-anim-adapter",
+      "modules": []
+    },
+    {
+      "subsystem": "mapmaker/storage",
+      "package": "tsfp-port-mapmaker-storage",
+      "modules": ["save_mapmaker_002", "t2049_r3_storage_001"]
+    },
+    {
+      "subsystem": "mapmaker/ui",
+      "package": "tsfp-port-mapmaker-ui",
+      "modules": ["mapmaker_ui"]
+    },
+    {
+      "subsystem": "mapmaker/native-candidate-support",
+      "package": "tsfp-port-native-candidate-support",
+      "modules": []
+    },
+    {
+      "subsystem": "native/candidate-support",
+      "package": "tsfp-port-native-candidate-support",
+      "modules": []
+    },
+    {
+      "subsystem": "mapmaker/ui-native",
+      "package": "tsfp-port-mapmaker-ui-native",
+      "modules": []
+    },
+    {
+      "subsystem": "mapmaker/ui-native-2",
+      "package": "tsfp-port-mapmaker-ui-native-2",
+      "modules": []
+    },
+    {
+      "subsystem": "mapmaker/editor-native",
+      "package": "tsfp-port-mapmaker-editor-native",
+      "modules": []
+    },
+    {
+      "subsystem": "mapmaker/editor-native-2",
+      "package": "tsfp-port-mapmaker-editor-native-2",
+      "modules": []
+    },
+    {
+      "subsystem": "gameplay/inventory",
+      "package": "tsfp-port-gameplay-inventory",
+      "modules": ["gameplay_inventory", "leaf5_wired"],
+      "wire": true
+    },
+    {
+      "subsystem": "gameplay/modes",
+      "package": "tsfp-port-gameplay-modes",
+      "modules": ["modes_deferred", "t2049_remote2_modes_001"]
+    },
+    {
+      "subsystem": "gameplay/player",
+      "package": "tsfp-port-gameplay-player",
+      "modules": ["gameplay_player_2", "gameplay_player_3", "gameplay_player_stats", "leaf_wired", "objchar_wired18", "objchar_wired20", "objchar_wired21", "objchar_wired22", "objchar_wired23", "objchar_wired28", "player_wired"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/menu",
+      "package": "tsfp-port-ui-menu",
+      "modules": ["t2125_003", "ui_menu_t2042", "ui_menu", "ui_menu_4"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/settings",
+      "package": "tsfp-port-ui-settings",
+      "modules": ["ui_settings", "t1892_settings"],
+      "wire": true
+    },
+    {
+      "subsystem": "ai/characters",
+      "package": "tsfp-port-ai-characters",
+      "modules": ["t1954_characters", "t2435_18af40", "t1926_characters", "t1941_characters", "objchar_wired15"],
+      "wire": true
+    },
+    {
+      "subsystem": "ai/pathfinding",
+      "package": "tsfp-port-ai-pathfinding",
+      "modules": ["ai_pathfinding", "objchar_wired30", "t1892_pathfinding"],
+      "wire": true
+    },
+    {
+      "subsystem": "ai/behavior",
+      "package": "tsfp-port-ai-behavior",
+      "modules": ["ai_behavior", "t2125_002"]
+    },
+    {
+      "subsystem": "data/cutscenes",
+      "package": "tsfp-port-data-cutscenes",
+      "modules": ["t2125c_003", "t2006_001", "t2049_remote2_cutscenes_001", "t2049_nx_008", "t2049_exec_009"]
+    },
+    {
+      "subsystem": "data/missions",
+      "package": "tsfp-port-data-missions",
+      "modules": ["t2040_missions_2", "t2040_missions", "t2049_w23_004", "t2378_terminal_reference", "data_missions_4", "gamestate_wired", "t2040_missions_3", "t2064_missions", "leaf2_wired", "leaf4_wired", "objchar_wired12", "objchar_wired33"],
+      "wire": true
+    },
+    {
+      "subsystem": "data/save",
+      "package": "tsfp-port-data-save",
+      "modules": ["save_menu_001", "save_mapmaker_001", "t2049_r3_save_001"],
+      "wire": true
+    },
+    {
+      "subsystem": "data/text",
+      "package": "tsfp-port-data-text",
+      "modules": ["data_text"]
+    },
+    {
+      "subsystem": "engine/object",
+      "package": "tsfp-port-engine-object",
+      "modules": ["engine_object_6", "t2049_w23_001", "t2049_w23_002", "t2049_w23_007", "t2049_w34_001", "t2049_w34_003", "t2049_w7_001", "t2049_w7_003", "t2049_w7_005", "t2049_w7_006", "t2064_flags_2", "t2069_live_frame", "objchar_wired10", "objchar_wired11", "objchar_wired13", "objchar_wired14", "objchar_wired17", "objchar_wired27", "objchar_wired31", "objchar_wired34"],
+      "wire": true
+    },
+    {
+      "subsystem": "engine/physics",
+      "package": "tsfp-port-engine-physics",
+      "modules": ["t2125d_002", "engine_physics", "widemul_t1980"]
+    },
+    {
+      "subsystem": "engine/render/effects",
+      "package": "tsfp-port-engine-render-effects",
+      "modules": ["t2086_effect", "t2049_nx_006", "t2049_remote10_effects_002", "t2049_remote12_effects_001", "t2049_remote3_effects_001", "t2049_remote5_effects_001", "t2049_remote7_effects_001", "t2049_remote8_effects_001", "t2049_remote9_effects_002", "t2049_w23_005", "t2049_w23_006", "t2049_w23_008", "t2049_w34_004", "t2049_w34_005", "t2049_w34_006", "t2049_w34_007", "t2049_w34_008", "t2049_w7_004", "t2125_001"]
+    },
+    {
+      "subsystem": "engine/render/scene",
+      "package": "tsfp-port-engine-render-scene",
+      "modules": ["render_model"]
+    },
+    {
+      "subsystem": "ui/framework",
+      "package": "tsfp-port-ui-framework",
+      "modules": ["t1973_sweep", "ui_framework_2"]
+    },
+    {
+      "subsystem": "engine/render/d3d",
+      "package": "tsfp-port-engine-render-d3d",
+      "modules": ["t1976_render"]
+    },
+    {
+      "subsystem": "library/crt",
+      "package": "tsfp-port-library-crt",
+      "modules": ["t2008_switch", "t2125_remote15", "t2125d_005", "t2125_remote14_001", "t2125d_001", "t2125d_004", "t2008_seh"]
+    },
+    {
+      "subsystem": "library/xdk",
+      "package": "tsfp-port-library-xdk",
+      "modules": ["frontier_001", "t2008_mmx", "t2008_mmx_fixture", "t2008_tail", "t2125_remote11_001", "t2008_integer", "t2008_original", "t2125_remote10_001", "t2125_remote12_001", "t2125_remote13_001", "t2125_remote7_001"]
+    },
+    {
+      "subsystem": "mapmaker/editor",
+      "package": "tsfp-port-mapmaker-editor",
+      "modules": ["mapmaker_editor", "mapmaker_editor_2", "t2049_w23_003", "t2086_alloc", "mapmaker_editor_3"]
+    },
+    {
+      "subsystem": "mapmaker/modes",
+      "package": "tsfp-port-mapmaker-modes",
+      "modules": ["t2049_remote2_mapmaker_001"]
+    },
+    {
+      "subsystem": "network/live",
+      "package": "tsfp-port-network-live",
+      "modules": ["network_live_3", "network_live_4", "network_live_5", "network_live_6"]
+    },
+    {
+      "subsystem": "network/session",
+      "package": "tsfp-port-network-session",
+      "modules": ["network_session_3", "network_session", "network_session_2"]
+    },
+    {
+      "subsystem": "ui/hud",
+      "package": "tsfp-port-ui-hud",
+      "modules": ["t2049_w34_002", "t2049_w34_imul16_001", "ui_hud_2_split_001", "ui_hud_split_006"],
+      "wire": true
+    },
+    {
+      "subsystem": "engine/object",
+      "package": "tsfp-port-engine-object-2",
+      "modules": ["engine_object", "t2049_nx_002", "objchar_wired32", "objchar_wired36", "objchar_wired5", "objchar_wired6", "objchar_wired7", "objchar_wired8"],
+      "wire": true
+    },
+    {
+      "subsystem": "engine/object",
+      "package": "tsfp-port-engine-object-3",
+      "modules": ["engine_object_2", "objchar_wired", "objchar_wired9"],
+      "wire": true
+    },
+    {
+      "subsystem": "engine/object",
+      "package": "tsfp-port-engine-object-4",
+      "modules": ["engine_object_3"]
+    },
+    {
+      "subsystem": "engine/object",
+      "package": "tsfp-port-engine-object-5",
+      "modules": ["engine_object_4"]
+    },
+    {
+      "subsystem": "engine/object",
+      "package": "tsfp-port-engine-object-6",
+      "modules": ["engine_object_5", "t1966_sweep", "objchar_wired2"],
+      "wire": true
+    },
+    {
+      "subsystem": "engine/object",
+      "package": "tsfp-port-engine-object-tier2",
+      "modules": ["engine_mixed"]
+    },
+    {
+      "subsystem": "engine/render/effects",
+      "package": "tsfp-port-engine-render-effects-2",
+      "modules": ["t2006_002", "t2049_exec_004", "t2049_exec_005", "t2049_exec_006", "t2049_exec_007", "t2049_exec_008", "t2049_nx_001", "t2049_nx_003", "t2049_nx_004", "t2049_nx_005", "t2125c_002", "objchar_wired35", "t2049_nx_007"],
+      "wire": true
+    },
+    {
+      "subsystem": "library/xdk",
+      "package": "tsfp-port-library-xdk-2",
+      "modules": ["t2125_remote8_001", "t2125_remote9_001", "t2125_remote_001", "t2125d_003", "t2125e_001"]
+    },
+    {
+      "subsystem": "unknown",
+      "package": "tsfp-port-misc",
+      "modules": ["t2049_cls_001", "t2125c_001", "t2128_001"]
+    },
+    {
+      "subsystem": "network/live",
+      "package": "tsfp-port-network-live-2",
+      "modules": ["network_live", "network_live_2"]
+    },
+    {
+      "subsystem": "network/syslink",
+      "package": "tsfp-port-network-syslink",
+      "modules": ["t2049_w7_002"]
+    },
+    {
+      "subsystem": "ai/behavior",
+      "package": "tsfp-port-ai-behavior-2",
+      "modules": ["t2064_flags"],
+      "wire": true
+    },
+    {
+      "subsystem": "data/missions",
+      "package": "tsfp-port-data-missions-2",
+      "modules": ["data_missions_2"],
+      "wire": true
+    },
+    {
+      "subsystem": "data/missions",
+      "package": "tsfp-port-data-missions-3",
+      "modules": ["data_missions_3"],
+      "wire": true
+    },
+    {
+      "subsystem": "engine/input",
+      "package": "tsfp-port-engine-input",
+      "modules": ["leaf3_wired", "engine_input", "t1892_adapters", "t1892_input"],
+      "wire": true
+    },
+    {
+      "subsystem": "engine/math",
+      "package": "tsfp-port-engine-math",
+      "modules": ["objchar_wired4", "t3398_math4"],
+      "wire": true
+    },
+    {
+      "subsystem": "gameplay/player",
+      "package": "tsfp-port-gameplay-player-2",
+      "modules": ["gameplay_player"],
+      "wire": true
+    },
+    {
+      "subsystem": "gameplay/weapons",
+      "package": "tsfp-port-gameplay-weapons",
+      "modules": ["objchar_wired24", "player2_wired", "player3_wired", "t1925_weapons_split_002", "t1953_weapons"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/framework",
+      "package": "tsfp-port-ui-framework-2",
+      "modules": ["ui_framework"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/menu",
+      "package": "tsfp-port-ui-menu-2",
+      "modules": ["ui_menu_2", "ui_menu_t2042_dispatch"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/menu",
+      "package": "tsfp-port-ui-menu-3",
+      "modules": ["ui_menu_3"],
+      "wire": true
+    },
+    {
+      "subsystem": "engine/render/effects",
+      "package": "tsfp-port-engine-render-effects-3",
+      "modules": ["t2049_remote4_effects_001", "t2049_remote10_effects_001", "t2049_remote9_effects_001", "t2049_remote11_effects_001"]
+    },
+    {
+      "subsystem": "gameplay/weapons",
+      "package": "tsfp-port-gameplay-weapons-2",
+      "modules": ["t1940_weapons"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/hud",
+      "package": "tsfp-port-ui-hud-2",
+      "modules": ["ui_hud_2_split_002", "ui_hud_2_split_003"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/hud",
+      "package": "tsfp-port-ui-hud-3",
+      "modules": ["ui_hud_2_split_004", "ui_hud_2_split_005"]
+    },
+    {
+      "subsystem": "ui/hud",
+      "package": "tsfp-port-ui-hud-4",
+      "modules": ["ui_hud_split_001", "ui_hud_split_002"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/hud",
+      "package": "tsfp-port-ui-hud-5",
+      "modules": ["ui_hud_split_003", "ui_hud_split_004"],
+      "wire": true
+    },
+    {
+      "subsystem": "ui/hud",
+      "package": "tsfp-port-ui-hud-6",
+      "modules": ["ui_hud_split_005"],
+      "wire": true
+    },
+    {
+      "subsystem": "data/missions",
+      "package": "tsfp-port-data-missions-4",
+      "modules": ["data_missions_split_002", "missions_follow"],
+      "wire": true
+    },
+    {
+      "subsystem": "data/missions",
+      "package": "tsfp-port-data-missions-5",
+      "modules": ["data_missions_split_003"],
+      "wire": true
+    },
+    {
+      "subsystem": "data/missions",
+      "package": "tsfp-port-data-missions-6",
+      "modules": ["data_missions_split_001"],
+      "wire": true
+    },
+    {
+      "subsystem": "gameplay/weapons",
+      "package": "tsfp-port-gameplay-weapons-3",
+      "modules": ["t1925_weapons_split_003"]
+    },
+    {
+      "subsystem": "gameplay/weapons",
+      "package": "tsfp-port-gameplay-weapons-4",
+      "modules": ["t1925_weapons_split_001"]
+    },
+    {
+      "subsystem": "engine/math-libm",
+      "package": "tsfp-port-libm",
+      "modules": []
+    },
+    {
+      "subsystem": "lanes/typed",
+      "package": "tsfp-port-lanes-typed",
+      "modules": [],
+      "wire": true
+    }
+  ],
+  "facade_shadow_modules": ["data_missions", "data_missions_2", "data_missions_3", "data_missions_4", "data_missions_split_001", "data_missions_split_002", "data_missions_split_003", "engine_input", "engine_object", "engine_object_2", "engine_object_3", "engine_object_4", "engine_object_5", "engine_physics", "frontier_001", "gameplay_player", "gameplay_player_stats", "gamestate_wired", "leaf2_wired", "leaf3_wired", "leaf4_wired", "leaf5_wired", "leaf_wired", "mapmaker_editor", "mapmaker_editor_2", "mapmaker_editor_3", "missions_follow", "network_live", "network_live_2", "network_live_3", "network_live_4", "network_live_5", "network_live_6", "network_session", "network_session_2", "network_session_3", "objchar_wired", "objchar_wired10", "objchar_wired11", "objchar_wired12", "objchar_wired13", "objchar_wired14", "objchar_wired15", "objchar_wired17", "objchar_wired18", "objchar_wired2", "objchar_wired20", "objchar_wired21", "objchar_wired22", "objchar_wired23", "objchar_wired24", "objchar_wired27", "objchar_wired28", "objchar_wired30", "objchar_wired31", "objchar_wired32", "objchar_wired33", "objchar_wired34", "objchar_wired35", "objchar_wired36", "objchar_wired4", "objchar_wired5", "objchar_wired6", "objchar_wired7", "objchar_wired8", "objchar_wired9", "player2_wired", "player3_wired", "player_wired", "t1892_adapters", "t1892_input", "t1892_pathfinding", "t1892_settings", "t1925_weapons", "t1925_weapons_split_002", "t1925_weapons_split_003", "t1926_characters", "t1940_weapons", "t1941_characters", "t1953_weapons", "t1966_sweep", "t1976_render", "t2006_001", "t2006_002", "t2008_integer", "t2008_mmx", "t2008_mmx_fixture", "t2008_original", "t2008_seh", "t2008_switch", "t2008_tail", "t2040_missions", "t2040_missions_3", "t2049_cls_001", "t2049_exec_004", "t2049_exec_005", "t2049_exec_006", "t2049_exec_007", "t2049_exec_008", "t2049_exec_009", "t2049_nx_001", "t2049_nx_002", "t2049_nx_003", "t2049_nx_004", "t2049_nx_005", "t2049_nx_006", "t2049_nx_007", "t2049_nx_008", "t2049_r3_save_001", "t2049_remote10_effects_001", "t2049_remote10_effects_002", "t2049_remote11_effects_001", "t2049_remote12_effects_001", "t2049_remote2_cutscenes_001", "t2049_remote2_mapmaker_001", "t2049_remote2_modes_001", "t2049_remote3_effects_001", "t2049_remote4_effects_001", "t2049_remote5_effects_001", "t2049_remote7_effects_001", "t2049_remote8_effects_001", "t2049_remote9_effects_001", "t2049_remote9_effects_002", "t2049_w23_001", "t2049_w23_002", "t2049_w23_003", "t2049_w23_004", "t2049_w23_005", "t2049_w23_006", "t2049_w23_007", "t2049_w23_008", "t2049_w34_001", "t2049_w34_002", "t2049_w34_003", "t2049_w34_004", "t2049_w34_005", "t2049_w34_006", "t2049_w34_007", "t2049_w34_008", "t2049_w34_imul16_001", "t2049_w7_001", "t2049_w7_002", "t2049_w7_003", "t2049_w7_004", "t2049_w7_005", "t2049_w7_006", "t2064_flags", "t2064_flags_2", "t2064_missions", "t2069_live_frame", "t2086_alloc", "t2125_001", "t2125_remote10_001", "t2125_remote11_001", "t2125_remote12_001", "t2125_remote13_001", "t2125_remote14_001", "t2125_remote15", "t2125_remote7_001", "t2125_remote8_001", "t2125_remote9_001", "t2125_remote_001", "t2125c_001", "t2125c_002", "t2125d_001", "t2125d_003", "t2125d_004", "t2125d_005", "t2125e_001", "t2128_001", "t2378_terminal_reference", "t2435_18af40", "ui_framework", "ui_framework_2", "ui_hud", "ui_hud_2", "ui_hud_2_split_001", "ui_hud_2_split_002", "ui_hud_2_split_003", "ui_hud_2_split_004", "ui_hud_2_split_005", "ui_hud_split_001", "ui_hud_split_002", "ui_hud_split_003", "ui_hud_split_004", "ui_hud_split_005", "ui_hud_split_006", "ui_menu", "ui_menu_2", "ui_menu_3", "ui_menu_4", "ui_menu_t2042", "ui_menu_t2042_dispatch", "widemul_t1980"]
+}

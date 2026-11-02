@@ -1,0 +1,10 @@
+[package]
+name = "tsfp-port-audio-offline"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-ports = { path = "../tsfp-ports", features = ["std"] }

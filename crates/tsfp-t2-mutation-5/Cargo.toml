@@ -1,0 +1,11 @@
+[package]
+name = "tsfp-t2-mutation-5"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-engine-render = { path = "../tsfp-engine-render", default-features = false }

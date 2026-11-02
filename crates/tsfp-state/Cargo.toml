@@ -1,0 +1,35 @@
+[package]
+name = "tsfp-state"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+description = "T2058: typed views over guest memory for the recovered records (S3-1, docs/t-state-views.md)"
+publish = false
+
+# Standalone like crates/tsfp-audio (own workspace, no dependencies). The dev-dependency on
+# tsfp-types is the drift oracle: its repr(C) mirrors come from the same layout file.
+[workspace]
+
+[features]
+default = []
+# Isolates the Tier 1 fixture artifact in the shared multi-worktree cargo cache.
+terminal-diff-test = []
+
+[dev-dependencies]
+# Disc reading lives outside the library (tsfp-engine-fileio -> tsfp-input -> tsfp-state would cycle).
+tsfp-engine-fileio = { path = "../tsfp-engine-fileio" }
+tsfp-types = { path = "../tsfp-types" }
+tsfp-ports = { path = "../tsfp-ports", features = ["std"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+split-debuginfo = "unpacked"
+
+[profile.dev.package."*"]
+debug = false

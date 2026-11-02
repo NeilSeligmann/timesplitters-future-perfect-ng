@@ -1,0 +1,20 @@
+[package]
+name = "tsfp-ui-model"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tsfp-ui-renderer = { path = "../tsfp-ui-renderer" }
+tsfp-state = { path = "../tsfp-state" }
+tsfp-mapmaker = { path = "../tsfp-mapmaker" }
+
+[dev-dependencies]
+# T2191 Tier 1 differential of the pause menu model against the c2r translation.
+tsfp-ports = { path = "../tsfp-ports", features = ["std", "editor-next-reference", "editor-reference"] }
+# T2191 Tier 1 differential of the letterbox model against the Tier 1 guest-memory port.
+tsfp-ui = { path = "../tsfp-ui" }
+
+[lints]
+workspace = true

@@ -1,0 +1,29 @@
+[package]
+name = "tsfp-port-lanes-typed"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+# Path-included sources keep their doctests in their own crates (they name those crates' paths).
+[lib]
+doctest = false
+
+[dependencies]
+tsfp-port-mapmaker-editor-native = { path = "../tsfp-port-mapmaker-editor-native" }
+tsfp-port-mapmaker-editor-native-2 = { path = "../tsfp-port-mapmaker-editor-native-2" }
+tsfp-port-libm = { path = "../tsfp-port-libm" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-port-wire = { path = "../tsfp-port-wire" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tsfp_cover)"] }
+
+[workspace]
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

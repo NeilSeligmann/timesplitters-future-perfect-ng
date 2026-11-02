@@ -1,0 +1,57 @@
+{
+  "_comment": "T2409 partial state-owner slice: compare timers, frame/vblank counters, sampled frame words, pause and step outputs, three frame timing histories, and the measured event latch/callback pair through selected owners. The pair is not a claim about a larger queue layout. Addresses are host trace windows, not guest mappings.",
+  "regions": [
+    {
+      "name": "timer_count",
+      "spec": "=0xFFFF0000:4"
+    },
+    {
+      "name": "timer_rows",
+      "spec": "=0xFFFF0004:0x708"
+    },
+    {
+      "name": "vblank_delivery_counter",
+      "spec": "=0xFFFF1000:4"
+    },
+    {
+      "name": "elapsed_frame_counter",
+      "spec": "=0xFFFF1014:4"
+    },
+    {
+      "name": "frame_timing_history",
+      "spec": "=0xFFFF2000:0x3C"
+    },
+    {
+      "name": "frame_step_outputs",
+      "spec": "=0xFFFF2010:0x10"
+    },
+    {
+      "name": "frame_clock_words",
+      "spec": "=0xFFFF2020:0x10"
+    },
+    {
+      "name": "game_frame_counter",
+      "spec": "=0xFFFF1004:4"
+    },
+    {
+      "name": "multi_vblank_frame_counter",
+      "spec": "=0xFFFF1008:4"
+    },
+    {
+      "name": "frame_pause_word",
+      "spec": "=0xFFFF1018:4"
+    },
+    {
+      "name": "simulation_stamp",
+      "spec": "=0xFFFF1020:4"
+    },
+    {
+      "name": "event_latch",
+      "spec": "=0xFFFF100C:4"
+    },
+    {
+      "name": "event_callback",
+      "spec": "=0xFFFF1010:4"
+    }
+  ]
+}

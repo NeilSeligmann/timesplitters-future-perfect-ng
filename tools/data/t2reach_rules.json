@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "task": "T3793",
+  "doc": "docs/t3793-tier2-reachability-audit.md",
+  "note": "Name rules are INFERRED (names in tools/data/function_names.csv are INFERRED). They place a function that is statically live into class (b) or pick a recording session; they never drive a drop. Patterns are Python regexes over the lower-case name, matched with re.search.",
+  "harness": {
+    "max_closure": 40,
+    "library_sections": ["D3D", "XGRPH", "DSOUND", "XONLINE", "XNET", "XMV", "XPP", "DOLBY"],
+    "online_sections": ["XONLINE", "XNET"],
+    "ancestor_depth": 3
+  },
+  "service": [
+    {"kind": "online", "why": "Xbox Live or online service path (service is offline since 2010)", "pattern": "(^|_)(xonline|online|clan|clans|friends?|matchmak\\w*|optimatch|logon|gamertag|leaderboards?|passcode|xbox_live|live_service|presence|invit\\w*|download\\w*|voice_chat|communicator|headset|account)(_|$)"},
+    {"kind": "network-peer", "why": "System Link or network play needs a second console or a network peer", "pattern": "(^|_)(syslink|system_link|network|net|lan|ethernet|socket|packets?|host_game|join_game|remote_player)(_|$)"},
+    {"kind": "storage-fault", "why": "storage or memory-unit fault path (full, corrupt, removed, failed write)", "pattern": "(^|_)(disk_full|no_space|not_enough_space|insufficient|corrupt\\w*|damaged|unformatted|format\\w*_memory|mu_(insert|remov)\\w*|device_removed|write_fail\\w*|read_fail\\w*|save_fail\\w*|load_fail\\w*|io_error|dirty_disc|disc_error|eject\\w*)(_|$)"},
+    {"kind": "error-path", "why": "error, failure or abort branch", "pattern": "(^|_)(error|errors|fault|fail|failed|failure|abort|panic|assert\\w*|fatal)(_|$)"}
+  ],
+  "sessions": [
+    {"id": "S1", "title": "Profiles and saves", "minutes": 15, "pattern": "(^|_)(profiles?|save|saves|saved|load_game|savegame|checkpoint_save|slot_list|memory_unit|storage)(_|$)", "subsystems": ["data/save"], "steps": "Create, rename and delete profiles; save, overwrite, load and delete save slots; open the storage screen."},
+    {"id": "S2", "title": "Two-player setup and split screen", "minutes": 15, "pattern": "(^|_)(split|splitscreen|two_player|2p|player_count|local_players?|viewports?)(_|$)", "subsystems": [], "steps": "Two controllers: set up a 2-player Story or Arcade game, play in split screen, pause from each pad."},
+    {"id": "S3", "title": "Level start, level end and cutscenes", "minutes": 18, "pattern": "(^|_)(cutscenes?|intro|outro|briefing|debrief|credits|movie|fmv|level_end|level_start|mission_complete|mission_failed)(_|$)", "subsystems": ["data/cutscenes"], "steps": "Start and finish a Story level twice, watch every cutscene, fail a mission once and retry."},
+    {"id": "S4", "title": "Map Maker pools, weather and explosions", "minutes": 15, "pattern": "(^|_)(weather|rain|snow|lightning|fog|explosions?|explode|debris|barrels?|crates?|destructible)(_|$)", "subsystems": [], "steps": "Map Maker: place many crates and barrels, set weather, test-play and blow everything up."},
+    {"id": "S5", "title": "Dialogs, text entry and settings", "minutes": 12, "pattern": "(^|_)(dialogs?|popups?|confirm\\w*|keyboard|text_entry|text_input|on_screen|settings?|options?)(_|$)", "subsystems": ["data/text", "ui/settings"], "steps": "Open every confirm dialog, type names with the on-screen keyboard, change and revert every option page."},
+    {"id": "S6", "title": "Story campaign breadth", "minutes": 20, "pattern": "(^|_)(objectives?|mission|missions|script|scripted|trigger|checkpoint|story|npc|ally|allies|escort|boss)(_|$)", "subsystems": ["data/missions", "ai", "gameplay/modes/story"], "steps": "Play Story levels not yet recorded (one level per session), complete every objective, die once at a checkpoint, follow and escort allies."},
+    {"id": "S7", "title": "Arcade game modes breadth", "minutes": 20, "pattern": "(^|_)(arcade|deathmatch|team|teams|bag|flag|virus|vampire|shrink|thief|elimination|zones?|assault|bots?|score|scores|scoring|round|rounds|handicap)(_|$)", "subsystems": ["gameplay/modes", "gameplay/modes/multiplayer"], "steps": "Arcade: one short round of every game mode with bots, team and free-for-all, change scoring and handicap options."},
+    {"id": "S8", "title": "Weapons and pickups", "minutes": 15, "pattern": "(^|_)(weapons?|ammo|grenades?|mines?|rockets?|projectiles?|reload|scope|zoom|secondary|pickups?|powerups?|melee|throw\\w*)(_|$)", "subsystems": ["gameplay/weapons", "gameplay/inventory"], "steps": "Pick up and fire every weapon, primary and secondary fire, reload, zoom, throw grenades and mines, melee."},
+    {"id": "S9", "title": "Vehicles and turrets", "minutes": 10, "pattern": "(^|_)(vehicles?|turrets?|drive|driver|hover\\w*|mounted|mount|seat|bike|tank)(_|$)", "subsystems": ["gameplay/vehicles"], "steps": "Enter, drive, fire from and leave every vehicle and turret in the Story levels that have them."},
+    {"id": "S10", "title": "Map Maker full editor", "minutes": 20, "pattern": "(^|_)(mapedit|mapmaker|editor|tiles?|tileset|lights?|lighting|placement|place|palette)(_|$)", "subsystems": ["mapmaker"], "steps": "Map Maker: every tile set, place and delete tiles, items, AI and lights, save, load and test the map in every Map Maker mode."},
+    {"id": "S11", "title": "Front-end menu walk", "minutes": 15, "pattern": "(^|_)(menu|menus|page|pages|widget|button|list|scroll|tab|extras|cheats?|unlock\\w*|gallery|stats|challenges?|league|awards?|medals?)(_|$)", "subsystems": ["ui/menu", "ui/framework"], "steps": "Visit every front-end page (Story, Arcade, Challenge, League, Extras, Options, Profiles), scroll every list to both ends, open every tab."},
+    {"id": "S12", "title": "Movement, damage and death", "minutes": 15, "pattern": "(^|_)(damage|health|death|die|dies|dead|respawn|fall|falls|crouch|ladders?|swim\\w*|fire|burn\\w*|electric\\w*|gas|poison|stun\\w*|knockback|ragdoll)(_|$)", "subsystems": ["gameplay/player", "engine/physics", "engine/anim"], "steps": "Crouch, climb, fall from height, take every damage type (fire, electric, gas, explosion), die and respawn."},
+    {"id": "S13", "title": "HUD, camera and screen effects", "minutes": 10, "pattern": "(^|_)(hud|radar|overlay|crosshair|reticle|camera|fade|flash|blur|screen_effect|tint)(_|$)", "subsystems": ["ui/hud", "engine/render", "engine/render/effects", "engine/render/scene"], "steps": "Trigger every HUD state (low health, low ammo, lock-on, objectives popup), use every camera mode, trigger screen flashes and fades."},
+    {"id": "S14", "title": "Object and world breadth", "minutes": 15, "pattern": "", "subsystems": ["engine/object", "engine/math", "gameplay"], "steps": "Interact with every object type in a level (doors, switches, lifts, terminals, breakables) and visit every room."}
+  ]
+}

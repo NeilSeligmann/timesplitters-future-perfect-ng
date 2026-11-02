@@ -1,0 +1,22 @@
+[package]
+name = "tsfp-t2-offline"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "T3742 capture-based Tier 2 offline differential runner: fault-tracked guest arena, callee stubs, lifted-fidelity control, per-entry verdicts"
+
+# The runner maps the guest arena, changes page protections and handles SIGSEGV, so it opts out
+# of the workspace unsafe ban (like tsfp-c-diff). Linux x86_64 only.
+[lints.rust]
+unsafe_code = "allow"
+
+[features]
+test-link-stubs = []
+
+[dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-port-engine-anim-adapter = { path = "../tsfp-port-engine-anim-adapter" }
+tsfp-t2-lanes = { path = "../tsfp-t2-lanes" }
+libc = "0.2"

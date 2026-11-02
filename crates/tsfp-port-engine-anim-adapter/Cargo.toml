@@ -1,0 +1,18 @@
+[package]
+name = "tsfp-port-engine-anim-adapter"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+
+[workspace]
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

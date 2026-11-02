@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-port-runtime"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# Unit-test builds of every port crate enable this (dev-dependency) so RETIRE is one per test thread (T3447).
+thread-retire = []
+
+[dependencies]
+spin = { version = "0.9", default-features = false, features = ["mutex", "spin_mutex"] }

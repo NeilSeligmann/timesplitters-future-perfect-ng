@@ -1,0 +1,22 @@
+[package]
+name = "tsfp-kernel-services"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+publish = false
+
+[workspace]
+
+[features]
+default = []
+# Test-only compilation of the repository C oracle; production Rust has no C dependency.
+c-oracle = []
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

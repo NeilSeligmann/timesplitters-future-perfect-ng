@@ -1,0 +1,88 @@
+//! Retained-mode UI model (T2186, UI-3): pages, widgets, layout, focus graph, transitions,
+//! theme, text by id, a page recorder, a menu-tree loader, patch layers and a bridge to the
+//! `tsfp-ui-renderer` contract. See docs/t-ui-model.md. No game strings or data live here.
+
+pub mod ammo;
+pub mod anchor;
+pub mod animation_clock;
+pub mod arcade_category_page;
+pub mod arcade_challenge;
+pub mod arcade_menu_session;
+pub mod arcade_menu_view;
+pub mod bridge;
+pub mod builder;
+pub mod challenge_menu_page;
+pub mod crosshair;
+pub mod default_style;
+pub mod default_widgets;
+pub mod focus;
+pub mod font;
+pub mod frame;
+pub mod framehash;
+pub mod frontend;
+pub mod health;
+pub mod hud_effects;
+pub mod hud_messages;
+pub mod hud_native;
+pub mod hud_prompts;
+pub mod hud_radar;
+pub mod hud_rank;
+pub mod hud_weapons;
+pub mod ingame;
+pub mod ingame_result;
+pub mod ingame_rows;
+pub mod json;
+pub mod layout;
+pub mod letterbox;
+pub mod list_rows;
+pub mod loader;
+pub mod mapmaker;
+pub mod mapmaker_assault_options;
+pub mod mapmaker_assault_phase_assignment;
+pub mod mapmaker_controls;
+pub mod mapmaker_description;
+pub mod mapmaker_document_close;
+pub mod mapmaker_editor_menu;
+pub mod mapmaker_editor_settings;
+pub mod mapmaker_modes;
+pub mod mapmaker_palette;
+pub mod mapmaker_palette_properties;
+pub mod mapmaker_preview;
+pub mod mapmaker_selection;
+pub mod mapmaker_set_lists;
+pub mod mapmaker_settings;
+pub mod mapmaker_storage;
+pub mod menu_input;
+pub mod messages;
+pub mod model;
+pub mod objective;
+pub mod option_rows;
+pub mod patch;
+pub mod pause;
+pub mod pause_actions;
+pub mod pause_widgets;
+pub mod present;
+pub mod progress_summary;
+pub mod raster;
+pub mod shaper;
+pub mod skin;
+pub mod strings;
+pub mod switch;
+pub mod transition;
+pub mod view;
+pub mod xbe;
+
+pub use bridge::{RenderLayout, TextPlacement};
+pub use builder::{BuilderError, ModelRecorder, PageBuilder};
+pub use focus::{Dir, FocusGraph, FocusIssue, NavLayout, Neighbours, Wrap};
+pub use frame::{ShapedRun, TextPart, TextShaper, UiFrame};
+pub use loader::{LoadError, LoadOptions, RectCells, RectEdges};
+pub use menu_input::{MenuAction, MenuFocus, MenuInput};
+pub use model::*;
+pub use patch::{Change, Conflict, Insert, PageSelector, PatchError, PatchOp, Preset, UiPatch};
+pub use view::UiView;
+
+pub mod text_widget;
+
+pub mod hud_producers;
+pub mod hud_rows;

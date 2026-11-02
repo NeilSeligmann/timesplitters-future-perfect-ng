@@ -1,0 +1,13 @@
+[package]
+name = "tsfp-scene-capture"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tsfp-engine-render = { path = "../tsfp-engine-render" }
+tsfp-render-prep = { path = "../tsfp-render-prep" }
+
+[lints]
+workspace = true

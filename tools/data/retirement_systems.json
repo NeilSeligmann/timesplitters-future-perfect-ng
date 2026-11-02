@@ -1,0 +1,544 @@
+{
+ "_comment": "T3434 Rule 24 retirement candidates for python3 -m tools.retire. Port profiles use source/form to enumerate replaced VAs; REPLACE profiles use kind=replace and replacement to enumerate host switch, C units, symbols, call sites, build entries and staged evidence. switch is the A/B selector; hook is the lifted_selectable name; profile is the tools.gate evidence profile.",
+ "systems": {
+  "fileio": {
+   "kind": "replace",
+   "subsystem": "data/assets",
+   "task": "T2225",
+   "adoption": "docs/t-fileio-lifecycle-rust.md (T2225; REPLACE-class host file-I/O boundary)",
+   "profile": "fileio-lifecycle",
+   "switch": {
+    "env": "--rust-fileio",
+    "on": "default",
+    "off": "--legacy-fileio"
+   },
+   "replacement": {
+    "rust_switch": "--rust-fileio",
+    "fallback_switch": "--legacy-fileio",
+    "compatibility_releases": 1,
+    "remove_after": "all listed production C callers have native Rust replacements; a host build with kernel_file.c and xdvdfs.c excluded succeeds; then the full regress loop passes with Rust as default",
+    "call_site_prerequisite": "move every listed production C caller to Rust and prove the host builds with kernel_file.c and xdvdfs.c excluded",
+    "translation_units": [
+     {
+      "path": "src/xbox/kernel_file.c"
+     },
+     {
+      "path": "src/xbox/xdvdfs.c"
+     }
+    ],
+    "symbol_prefixes": [
+     "kernel_file_",
+     "xdvdfs_"
+    ],
+    "build_files": [
+     "CMakeLists.txt",
+     "cmake/rust-fileio.cmake"
+    ],
+    "build_edits": [
+     {
+      "path": "CMakeLists.txt",
+      "before": "if(TSFP_NATIVE_FILEIO)\n  tsfp_native_fileio(tsfp_xbox)\nelse()\n  target_sources(tsfp_xbox PRIVATE src/xbox/kernel_file.c src/xbox/xdvdfs.c)\nendif()",
+      "after": "if(TSFP_NATIVE_FILEIO)\n  tsfp_native_fileio(tsfp_xbox)\nendif()"
+     },
+     {
+      "path": "CMakeLists.txt",
+      "before": "add_executable(test_kernel_file tests/c/test_kernel_file.c)\ntarget_link_libraries(test_kernel_file PRIVATE tsfp_xbox)\nset_target_properties(test_kernel_file PROPERTIES POSITION_INDEPENDENT_CODE ON)\ntsfp_native_fileio_contract(test_kernel_file)\nadd_test(NAME kernel_file COMMAND test_kernel_file)\n",
+      "after": ""
+     },
+     {
+      "path": "CMakeLists.txt",
+      "before": "add_executable(test_xdvdfs_c tests/c/test_xdvdfs_c.c)\ntarget_link_libraries(test_xdvdfs_c PRIVATE tsfp_xbox)\nset_target_properties(test_xdvdfs_c PROPERTIES POSITION_INDEPENDENT_CODE ON)\nadd_test(NAME xdvdfs_c COMMAND test_xdvdfs_c)\n",
+      "after": ""
+     },
+     {
+      "path": "cmake/rust-fileio.cmake",
+      "before": "    # A strong object precedes the oracle archive, so its kernel_file.o is never pulled.\n    add_library(tsfp_fileio_selected_kernel OBJECT src/xbox/kernel_file.c)\n    target_include_directories(tsfp_fileio_selected_kernel PRIVATE\n      $<TARGET_PROPERTY:tsfp_xbox,INCLUDE_DIRECTORIES>)\n    target_compile_definitions(tsfp_fileio_selected_kernel PRIVATE\n      $<TARGET_PROPERTY:tsfp_xbox,COMPILE_DEFINITIONS> TSFP_FILEIO_SELECTED_KERNEL=1)\n    target_sources(tsfp_host PRIVATE $<TARGET_OBJECTS:tsfp_fileio_selected_kernel>)\n",
+      "after": ""
+     },
+     {
+      "path": "cmake/rust-fileio.cmake",
+      "before": "    add_executable(${suite}_selected ${suite_sources}\n      $<TARGET_OBJECTS:tsfp_fileio_selected_kernel>)",
+      "after": "    add_executable(${suite}_selected ${suite_sources})"
+     }
+    ],
+    "exclusion_build": {
+     "target": "tsfp_host",
+     "binary": "tsfp_host",
+     "build_dir": "build/t3879-fileio-exclusion",
+     "cmake_options": [
+      "-DCMAKE_C_COMPILER=clang",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DTSFP_LIFTED_OPT=-O2",
+      "-DTSFP_RUST_PORTS=ON",
+      "-DTSFP_RUST_MAIN=ON",
+      "-DTSFP_RUST_BEVY=ON",
+      "-DTSFP_RUST_FILEIO=ON",
+      "-DTSFP_RUST_KMEM=ON",
+      "-DTSFP_RUST_RT_HOST=ON",
+      "-DTSFP_NATIVE_FILEIO=ON",
+      "-DTSFP_RUST_FILEIO_TESTS=OFF"
+     ]
+    },
+    "minimum_equal_routes": 3,
+    "required_routes": [
+     {
+      "receipt": "0a449e0ab669e5fc9aebfa9705e05ec2",
+      "route": "story-level1-20261018"
+     },
+     {
+      "receipt": "bb31f293ff86a7e2fab3669496174464",
+      "route": "arcade-splitscreen-20261026"
+     },
+     {
+      "receipt": "58cf933301436090c2c5ebb2599c58d5",
+      "route": "arcade-weapons-20261022"
+     }
+    ],
+    "current_head_gate": "1bbe42201acf239b0f23ffa5b57349cf",
+    "verified_180s": {
+     "receipt": "8a5d2453c489bcd52f3c76bb368996f6",
+     "status": "VERIFIED",
+     "verification_record": "docs/tasks/T2225.md"
+    },
+    "notes": [
+     "REPLACE retires by the host switch; guest-function roots are not the retirement unit.",
+     "Route receipts span recorded candidate commits/build-input hashes; inspect provenance before removal.",
+     "The 180 s VERIFIED receipt is the REA-verified T2225 slice-B result; current-head gate evidence is recorded separately in docs/tasks/T2225.md."
+    ]
+   }
+  },
+  "kmem": {
+   "kind": "replace",
+   "subsystem": "engine/memory",
+   "task": "T3879",
+   "adoption": "docs/t-memory-platform-retirement.md (MEM-1; kmem C model retired by T3935; Rust remains the host path)",
+   "profile": "kmem",
+   "switch": {
+    "env": "TSFP_RUST_KMEM",
+    "on": "1",
+    "off": "0"
+   },
+   "replacement": {
+    "rust_switch": "TSFP_RUST_KMEM=1",
+    "fallback_switch": "TSFP_RUST_KMEM=0",
+    "compatibility_releases": 1,
+    "remove_after": "COMPLETED by T3935 after three distinct EQUAL/fault-free/180 s routes, caller migration, no-C host build and default-path regress; see docs/t3935-kmem-retirement-plan.md",
+    "call_site_prerequisite": "COMPLETED by T3935: production callers and kmem_rust.c wrappers use the Rust ABI; linker wraps were removed after the no-C host build succeeded",
+    "translation_units": [
+     {
+      "path": "src/xbox/guest_mem.c"
+     },
+     {
+      "path": "src/xbox/kernel_memory.c"
+     },
+     {
+      "path": "src/xbox/kernel_pool.c"
+     }
+    ],
+    "symbol_prefixes": [
+     "guest_",
+     "kernel_memory_",
+     "kernel_pool_"
+    ],
+    "build_files": [
+     "CMakeLists.txt",
+     "cmake/rust-kmem.cmake"
+    ],
+    "gate_waiver": {
+     "commit": "1bdddb184072d2b78fabc9bea4a0dc55ceba2c49",
+     "paths": [
+      "crates/tsfp-kmem-capi",
+      "crates/tsfp-engine-memory"
+     ],
+     "reason": "T3935: the kmem gate baseline is the C model (TSFP_RUST_KMEM=0), which cannot coexist with callers moved to the Rust ABI; the T3928 receipts bind the Rust model, unchanged since."
+    },
+    "exclusion_build": {
+     "target": "tsfp_host",
+     "binary": "tsfp_host",
+     "build_dir": "build/t3935-kmem-exclusion",
+     "cmake_options": [
+      "-DCMAKE_C_COMPILER=clang",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DTSFP_LIFTED_OPT=-O2",
+      "-DTSFP_RUST_PORTS=ON",
+      "-DTSFP_RUST_MAIN=ON",
+      "-DTSFP_RUST_BEVY=ON",
+      "-DTSFP_RUST_FILEIO=ON",
+      "-DTSFP_RUST_KMEM=ON",
+      "-DTSFP_RUST_RT_HOST=ON",
+      "-DTSFP_NATIVE_FILEIO=ON",
+      "-DTSFP_RUST_FILEIO_TESTS=OFF"
+     ]
+    },
+    "minimum_equal_routes": 3,
+    "required_routes": [
+     {
+      "receipt": "e6db249ac634d344093a696de8ebc3ce",
+      "route": "story-level1-20261018"
+     },
+     {
+      "receipt": "c0c43783d2e203d1cc6e297a18571708",
+      "route": "story-hud-weapons-20261020"
+     },
+     {
+      "receipt": "9719a0074df052d2390569060be73e4f",
+      "route": "story-l2-ai-marks-20261022"
+     }
+    ],
+    "verified_180s": {
+     "receipt": "e6db249ac634d344093a696de8ebc3ce",
+     "status": "VERIFIED",
+     "verification_record": "docs/t3906-host-memory-capture-stream.md"
+    },
+    "notes": [
+     "T3928/T3935 2026-10-31: three EQUAL 180 s gates at 1bdddb1840, caller migration, C model removal, no-C host build and default-path regress are complete; see docs/t3935-kmem-retirement-plan.md.",
+     "Historical masked/100 s comparisons and T3604 off/off controls do not satisfy retirement.",
+     "The replacement planner and retirement guard share a production C reference inventory; dynamic linking and indirect dependencies still require a no-C build proof.",
+     "This entry covers host memory only; game arena, bump, pool and ledger require their separate contracts and evidence."
+    ]
+   }
+  },
+  "game-bump": {
+   "kind": "replace",
+   "subsystem": "engine/memory",
+   "task": "T3879",
+   "adoption": "docs/t-memory-platform-retirement.md (MEM-3; 0x3E970 bump allocator default-on, TSFP_RUST_GAME_BUMP=0 selects the lifted C)",
+   "profile": "memory-bump",
+   "switch": {
+    "env": "TSFP_RUST_GAME_BUMP",
+    "on": "1",
+    "off": "0"
+   },
+   "replacement": {
+    "rust_switch": "TSFP_RUST_GAME_BUMP=1",
+    "fallback_switch": "TSFP_RUST_GAME_BUMP=0",
+    "compatibility_releases": 1,
+    "remove_after": "three distinct EQUAL/fault-free/180 s owner routes; default-path regress loop passes; then drop the C arm of src/game/bump_allocator.c",
+    "call_site_prerequisite": "none: the guest-call bridge in src/game/bump_allocator.c is the only caller; the C arm is the oracle until the removal",
+    "translation_units": [
+     {
+      "path": "src/game/bump_allocator.c"
+     }
+    ],
+    "symbol_prefixes": [
+     "game_bump_"
+    ],
+    "build_files": [
+     "CMakeLists.txt"
+    ],
+    "minimum_equal_routes": 3,
+    "required_routes": [],
+    "verified_180s": {
+     "receipt": "2840bbdda0719e18677a96cccec30b99",
+     "status": "VERIFIED"
+    },
+    "notes": [
+     "One EQUAL 180 s receipt on story-level1-20261018 (gameplay start, remote); two more routes are needed for removal.",
+     "0x3E970 is a coverage-only gate root: Rust runs inside the C bridge, there is no per-call Rust row."
+    ]
+   }
+  },
+  "audio": {
+   "kind": "replace",
+   "subsystem": "engine/audio",
+   "task": "T3879",
+   "adoption": "docs/t-audio-replace.md (Rust audio host remains opt-in; retirement evidence pending)",
+   "profile": "audio",
+   "switch": {
+    "env": "TSFP_RUST_AUDIO_HOST",
+    "on": "1",
+    "off": "0"
+   },
+   "replacement": {
+    "rust_switch": "TSFP_RUST_AUDIO_HOST=1",
+    "candidate_host_profile": "gate-rust-audio-host",
+    "fallback_switch": "TSFP_RUST_AUDIO_HOST=0",
+    "compatibility_releases": 1,
+    "remove_after": "complete Rust host and sink replacement; current-head equal gates and 180 s fault-free evidence; offline PCM conformance; move all production callers; prove a no-C audio host build and default-path regress pass; obtain live-routing stop-line clearance",
+    "call_site_prerequisite": "move all production audio callers and shared presentation sink audio services to Rust; retain the oracle until conformance and adoption gates pass",
+    "translation_units": [],
+    "symbols": [
+     "tsfp_audio_buffer_stop_boundary"
+    ],
+    "symbol_prefixes": [
+     "dsound_",
+     "audio_stretch_",
+     "tsfp_audio_host_"
+    ],
+    "rust_entry_dirs": [
+     "crates/tsfp-audio-host-wiring/src",
+     "crates/tsfp-audio-capi/src/hle_host_entry.rs"
+    ],
+    "build_files": [
+     "CMakeLists.txt"
+    ],
+    "exclusion_build": {
+     "target": "tsfp_host",
+     "binary": "tsfp_host",
+     "build_dir": "build/t3879-audio-exclusion",
+     "cmake_options": [
+      "-DCMAKE_C_COMPILER=clang",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DTSFP_LIFTED_OPT=-O2",
+      "-DTSFP_RUST_AUDIO_HOST=ON"
+     ]
+    },
+    "minimum_equal_routes": 3,
+    "required_routes": [
+     {
+      "receipt": "df1fa21c8f2e058c7fe945a7de3b3b4f",
+      "route": "story-level1-20261018"
+     },
+     {
+      "receipt": "4fcc00f259b66421eb59ddca23900d01",
+      "route": "story-hud-weapons-20261020"
+     },
+     {
+      "receipt": "a8b524714dbd0840e64eb152d82000ea",
+      "route": "story-l2-ai-marks-20261022"
+     }
+    ],
+    "verified_180s": {
+     "receipt": "df1fa21c8f2e058c7fe945a7de3b3b4f",
+     "status": "VERIFIED",
+     "verification_record": "docs/t3919-audio-final-gate-20261031.md"
+    },
+    "notes": [
+     "The opt-in runtime selector also requires a Rust audio host build; it is not default-on.",
+     "present_sink.c also owns window and non-audio services and is not a whole-unit deletion target; its audio path still requires replacement.",
+     "The comparison oracle dsound_audio_cmp.c is a listed translation unit (T3918): it checks the replacement until conformance passes, and the removal is gated on that conformance evidence, so it goes with the other C units."
+    ]
+   }
+  },
+  "input": {
+   "kind": "replace",
+   "subsystem": "engine/input",
+   "task": "T3879",
+   "adoption": "docs/t-input-platform-retirement.md (IN-1; six default-on input roots; XInput C retirement evidence pending)",
+   "profile": "input",
+   "switch": {
+    "env": "TSFP_RUST_INPUT_HLE",
+    "on": "1",
+    "off": "0"
+   },
+   "replacement": {
+    "rust_switch": "TSFP_RUST_INPUT_HLE=1",
+    "fallback_switch": "TSFP_RUST_INPUT_HLE=0",
+    "compatibility_releases": 1,
+    "remove_after": "three distinct EQUAL/fault-free/180 s owner routes; move all listed production XInput C callers to Rust; host builds without the listed units; Rust-default regress loop passes",
+    "call_site_prerequisite": "Port production callers of the listed XInput C units to Rust; retain the C input-record replay reader as the baseline until the Rust reader is EQUAL on every required route",
+    "translation_units": [
+     {
+      "path": "src/input/xinput_devices.c"
+     },
+     {
+      "path": "src/input/xinput_hle.c"
+     },
+     {
+      "path": "src/input/xinput_host_source.c"
+     },
+     {
+      "path": "src/input/xinput_hotkey.c"
+     },
+     {
+      "path": "src/input/xinput_nav_record.c"
+     },
+     {
+      "path": "src/input/xinput_record.c"
+     },
+     {
+      "path": "src/input/xinput_route.c"
+     },
+     {
+      "path": "src/input/xinput_route_nav.c"
+     },
+     {
+      "path": "src/input/xinput_route_nav_spec.c"
+     },
+     {
+      "path": "src/input/xinput_route_spec.c"
+     },
+     {
+      "path": "src/input/xinput_source.c"
+     },
+     {
+      "path": "src/host/tsfp_input_host_wiring.c"
+     }
+    ],
+    "symbol_prefixes": [
+     "xinput_",
+     "XInput",
+     "tsfp_input_host_"
+    ],
+    "rust_entry_dirs": [
+     "crates/tsfp-input-host-wiring/src",
+     "crates/tsfp-input-route-spec/src",
+     "crates/tsfp-input-hotkey-host/src"
+    ],
+    "build_files": [
+     "CMakeLists.txt"
+    ],
+    "minimum_equal_routes": 3,
+    "required_routes": [
+     {
+      "receipt": "f3020c8091840bc1ba25364435d495ee",
+      "route": "r5-story-gameplay-20261016"
+     },
+     {
+      "receipt": "97729e64016c03609457498a9578d7c8",
+      "route": "story-level1-20261018"
+     },
+     {
+      "receipt": "1c65ec292242c9611895345b8ab0f75c",
+      "route": "story-weapon-pickup-fire-20261021"
+     }
+    ],
+    "verified_180s": {
+     "receipt": "1c65ec292242c9611895345b8ab0f75c",
+     "status": "VERIFIED",
+     "verification_record": "docs/t-input-platform-retirement.md"
+    },
+    "notes": [
+     "The input gate covers the six hot, default-on engine/input roots; remaining T1995 roots stay open until added to the port contract.",
+     "IN-5 (T3915): TSFP_BUILD_INPUT_HLE and the Rust selector default on; TSFP_RUST_INPUT_HLE=0 is the C fallback for one release. The C entry table still owns names, kinds and diagnostics and mirrors registrations into the Rust registry."
+    ]
+   }
+  },
+  "inventory": {
+   "task": "T3418",
+   "adoption": "docs/t2411-weapons-inventory.md (T3418 default-on)",
+   "source": "crates/tsfp-ports/src/rea_inventory_runtime.rs",
+   "form": "match_arms",
+   "dispatch_fn": "run_enabled",
+   "switch": {
+    "env": "TSFP_REA_INVENTORY_NATIVE",
+    "on": "1",
+    "off": "0"
+   },
+   "hook": "inventory",
+   "profile": "inventory",
+   "focused_tests": [
+    "rea_inventory"
+   ]
+  },
+  "story-sequencer": {
+   "task": "T2431",
+   "adoption": "docs/t2431-story-sequencer.md",
+   "source": "crates/tsfp-ports/src/story_sequencer_lane.rs",
+   "form": "roots_const",
+   "partial_vas": [
+    "0x2D2C70"
+   ],
+   "partial_why": "only the mode 4 branch of 0x2D2C70 routes to the sequencer (modes_lane::run_mode_4); the modes lane owns that VA",
+   "switch": {
+    "env": "TSFP_STORY_SEQUENCER",
+    "on": "rust",
+    "off": "off"
+   },
+   "hook": "story-sequencer",
+   "profile": "story-sequencer",
+   "focused_tests": [
+    "story_sequencer"
+   ]
+  },
+  "timers": {
+   "kind": "replace",
+   "subsystem": "engine/core",
+   "task": "T3934",
+   "profile": "timers",
+   "adoption": "docs/t-core-timers-gate.md (timers/vblank/clock Rust-owned in tsfp-kernel-clock; three EQUAL gates 2026-11-01, C callers and no-C build still open)",
+   "switch": {
+    "env": "TSFP_RUST_GAME_TIMERS",
+    "on": "1",
+    "off": "0"
+   },
+   "replacement": {
+    "rust_switch": "TSFP_RUST_GAME_TIMERS=1",
+    "fallback_switch": "TSFP_RUST_GAME_TIMERS=0",
+    "compatibility_releases": 1,
+    "remove_after": "EQUAL timers gate on three owner routes plus 180 s fault-free; move production callers to Rust; no-C build; default-path regress pass",
+    "call_site_prerequisite": "timer/vblank/frame-clock host callers use tsfp-kernel-clock; C kept as oracle until gates pass",
+    "translation_units": [
+     {
+      "path": "src/host/recomp_second_vblank.c"
+     },
+     {
+      "path": "src/host/recomp_vblank_quiescence.c"
+     }
+    ],
+    "symbol_prefixes": [
+     "recomp_second_vblank_",
+     "recomp_vblank_quiescence_"
+    ],
+    "build_files": [
+     "CMakeLists.txt"
+    ],
+    "minimum_equal_routes": 3,
+    "required_routes": [
+     {
+      "receipt": "cd612d7058619a4bd5962b506b0174f8",
+      "route": "story-level1-20261018"
+     },
+     {
+      "receipt": "dc5a89d1d690cf94fe73be00255271a6",
+      "route": "story-hud-weapons-20261020"
+     },
+     {
+      "receipt": "3a60e65426d143dd5072fd935561044b",
+      "route": "story-l2-ai-marks-20261022"
+     }
+    ],
+    "verified_180s": {
+     "receipt": "cd612d7058619a4bd5962b506b0174f8",
+     "status": "VERIFIED"
+    }
+   },
+   "notes": [
+    "T3879 2026-11-01: three EQUAL timers gates (receipts above, ~190 s runs, UNVERIFIED regions documented in docs/t-core-timers-gate.md); production C callers, C removal, no-C build and regress still open."
+   ]
+  },
+  "video": {
+   "kind": "replace",
+   "subsystem": "platform/video",
+   "task": "T3938",
+   "profile": "video-present",
+   "adoption": "docs/t3938-video-host-inventory.md (host presentation latch opt-in in tsfp-video-present; no EQUAL receipt yet)",
+   "switch": {
+    "env": "TSFP_RUST_VIDEO_PRESENT",
+    "on": "1",
+    "off": "0"
+   },
+   "replacement": {
+    "rust_switch": "TSFP_RUST_VIDEO_PRESENT=1",
+    "fallback_switch": "TSFP_RUST_VIDEO_PRESENT=0",
+    "compatibility_releases": 1,
+    "remove_after": "EQUAL video-present gate on a movie-playing route plus 180 s fault-free; picture latch, display-mode and movie queue duties moved to Rust; no-C build; default-path regress pass",
+    "call_site_prerequisite": "present_sink.c video duties (latch, pacing, movie queue) extracted from its audio/input integration and routed to tsfp-video-present; C kept as oracle until gates pass",
+    "translation_units": [
+     {
+      "path": "src/host/present_sink.c"
+     },
+     {
+      "path": "src/host/xmv_original.c"
+     }
+    ],
+    "symbol_prefixes": [
+     "present_sink_",
+     "xmv_original_"
+    ],
+    "build_files": [
+     "CMakeLists.txt"
+    ],
+    "minimum_equal_routes": 1,
+    "required_routes": [],
+    "verified_180s": {
+     "receipt": "none-yet",
+     "status": "PENDING"
+    }
+   },
+   "notes": [
+    "No video gate receipt exists; no gate profile has a real candidate selector yet. Retirement must refuse until an EQUAL movie-playing route and a 180 s run are recorded."
+   ]
+  }
+ }
+}

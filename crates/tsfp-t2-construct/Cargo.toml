@@ -1,0 +1,18 @@
+[package]
+name = "tsfp-t2-construct"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "T3796 constructed-call Tier 2: run the lifted original on fabricated inputs inside a capture host so the capture runtime records reference corpus entries"
+
+# Runs guest code in the tsfp-t2-offline fault-tracked arena through the C host API (raw
+# pointers, FFI), so it opts out of the workspace unsafe ban like tsfp-t2-offline. Linux x86_64 only.
+[lints.rust]
+unsafe_code = "allow"
+
+[dependencies]
+tsfp-t2-offline = { path = "../tsfp-t2-offline" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+libc = "0.2"

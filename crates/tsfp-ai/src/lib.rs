@@ -1,0 +1,96 @@
+//! ai: Rust ports of proven ai-tree roots (T1836 wave 12). See docs/t1836-rust-wave12.md.
+
+extern crate alloc;
+
+pub mod call_leaves;
+#[path = "../../tsfp-engine-memory/src/gprs.rs"]
+pub mod gprs;
+#[path = "../../tsfp-engine-memory/src/leaf.rs"]
+pub mod memory;
+pub mod table_leaves;
+
+pub mod awareness;
+pub mod movement_approach;
+pub mod navigation_node_domain;
+pub mod navigation_scoring;
+pub mod pathfinding;
+pub mod perception_geometry;
+pub mod point_tables;
+pub mod rea_actor_room_clamp;
+pub mod rea_actor_spawn_adjustment;
+pub mod rea_actor_spawn_branch;
+pub mod rea_actor_tick_prelude;
+pub mod rea_affine_transform;
+pub mod rea_ai_types;
+pub mod rea_angle_delta;
+pub mod rea_attachment_target;
+pub mod rea_awareness_actor_services;
+pub mod rea_awareness_groups;
+pub mod rea_awareness_leaves;
+pub mod rea_awareness_pipeline;
+pub mod rea_awareness_sources;
+pub mod rea_behavior_followup;
+pub mod rea_behavior_guard;
+pub mod rea_candidate_bank_unlink;
+pub mod rea_candidate_context_pool;
+pub mod rea_candidate_slot;
+pub mod rea_character_leaves;
+pub mod rea_controller_selector_26d1b0;
+pub mod rea_controller_target_commit;
+pub mod rea_controller_value_12540;
+pub mod rea_direction_offset;
+pub mod rea_emitter_attachment;
+pub mod rea_executor;
+pub mod rea_executor_gate;
+pub mod rea_group_alert;
+pub mod rea_group_target;
+pub mod rea_link_decision;
+pub mod rea_link_gate;
+pub mod rea_links;
+pub mod rea_masked_selector_613d0;
+pub mod rea_mechanism;
+pub mod rea_movement;
+pub mod rea_nav_link;
+pub mod rea_nearest_position;
+pub mod rea_object_pool_ledger;
+pub mod rea_packed_copy;
+pub mod rea_packed_three_of_four;
+pub mod rea_partial_route_retry;
+pub mod rea_particle_pool;
+pub mod rea_period_adjust;
+pub mod rea_point_follow;
+pub mod rea_point_table_query;
+pub mod rea_request_gate;
+pub mod rea_request_pool;
+pub mod rea_rng;
+pub mod rea_route_peek;
+pub mod rea_routes;
+pub mod rea_scheduler_admission;
+pub mod rea_script_fields;
+pub mod rea_selected_row_adjustment;
+pub mod rea_selector_transition;
+pub mod rea_sound_request;
+pub mod rea_spawn_binding;
+pub mod rea_target_handoff;
+pub mod rea_target_selector;
+pub mod rea_tick_state;
+pub mod rea_u16_component_decode;
+pub mod rea_weapon_cycle;
+pub mod rea_weapon_group;
+pub mod rea_weapon_selection;
+pub mod rea_weapon_subrecord;
+pub mod rea_weapon_turn;
+pub mod rea_weapon_turn_step;
+pub mod weapon_ammo_cap;
+pub mod weapon_ammo_fallback;
+pub mod weapon_context;
+#[path = "../../tsfp-state/src/weapon_cycle.rs"]
+pub mod weapon_cycle;
+pub mod weapon_readiness;
+pub mod weapon_transition;
+
+pub mod characters;
+
+#[cfg(test)]
+#[path = "../tests/support/mod.rs"]
+mod test_support;

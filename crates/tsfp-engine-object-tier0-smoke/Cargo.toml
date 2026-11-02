@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[package]
+name = "tsfp-engine-object-tier0-smoke"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+tsfp-port-engine-object-4 = { path = "../tsfp-port-engine-object-4" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+
+[workspace]

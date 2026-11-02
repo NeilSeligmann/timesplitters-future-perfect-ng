@@ -1,0 +1,8 @@
+{
+  "allowed": [
+    {
+      "va": "001C8540",
+      "reason": "I-T3398-20: ext root (game_anim_pak_list_open) and leaf_lane root. Safe since 36ce1175bf: a declined ext call on a lane root falls through to the lane path. Remove when one registration is dropped."
+    }
+  ]
+}

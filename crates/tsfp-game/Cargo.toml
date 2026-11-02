@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-game"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+build = "build.rs"
+publish = false
+
+# build.rs links the C host only when TSFP_GAME_HOST_BUILD_DIR or TSFP_LIFTED_DIR is set (docs/t-rust-main.md).
+# Without either the crate compiles (cargo check/test work) with a stub entry and the binary only reports that.
+
+[dependencies]
+# T2189 UI-6: the `--ui=rust|legacy` switch is parsed here and stripped before the C host sees it.
+tsfp-ui-model = { path = "../tsfp-ui-model" }
+# T2310 UI-12: native page actions at the frame boundary (scripted route for Tier 2 traces).
+tsfp-ui-input = { path = "../tsfp-ui-input" }

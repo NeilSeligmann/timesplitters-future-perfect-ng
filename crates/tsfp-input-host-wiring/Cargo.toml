@@ -1,0 +1,14 @@
+[package]
+name = "tsfp-input-host-wiring"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3975: the tsfp_input_host_* entry points (input host duties) in Rust, Rust-owned wiring state"
+
+# Standalone like tsfp-audio-host-wiring. Slice 1 holds the pure plan model only (no C exports yet), so
+# `tools.retire` still counts the C unit src/host/tsfp_input_host_wiring.c as the implementation.
+[workspace]
+
+[lib]
+doctest = false

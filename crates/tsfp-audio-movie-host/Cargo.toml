@@ -1,0 +1,19 @@
+[package]
+name = "tsfp-audio-movie-host"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Rust host facade for the XMV DirectSound movie stream"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["rlib"]
+# The glue imports host and capi C symbols that exist only in the final cdylib, so it has no unit tests of its own: the
+# C oracle suites (tests/c/test_dsound_device_movie_calls.c) and the tsfp-audio movie model tests verify it.
+test = false
+doctest = false
+
+[dependencies]
+tsfp-audio = { path = "../tsfp-audio" }

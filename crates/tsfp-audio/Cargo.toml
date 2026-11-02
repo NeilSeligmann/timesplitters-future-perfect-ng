@@ -1,0 +1,20 @@
+[package]
+name = "tsfp-audio"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+description = "T2046: Rust-only audio replace system (contract, ADPCM, mixer) with no C in the loop"
+publish = false
+
+# This crate is a root-workspace member so importer and runtime audio share the pinned decoder.
+
+[dependencies]
+xbadpcm = "=0.1.1"
+
+[dev-dependencies]
+# Tests only: the Rust GuestRegions model (T2048 slice K) supplies the guest heap for the lifecycle.
+tsfp-engine-memory = { path = "../tsfp-engine-memory" }
+
+[lints.rust]
+unsafe_code = "forbid"

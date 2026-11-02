@@ -1,0 +1,10 @@
+[package]
+name = "tsfp-port-mapmaker-editor-native-2"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+tsfp-port-mapmaker-editor-native = { path = "../tsfp-port-mapmaker-editor-native" }
+
+[workspace]

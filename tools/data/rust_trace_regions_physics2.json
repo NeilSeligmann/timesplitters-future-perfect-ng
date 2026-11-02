@@ -1,0 +1,111 @@
+{
+ "_comment": "T2117 engine/physics regions v2 (16 max): the downstream state the ray casts and sweeps feed: the whole 0x70AA00 contact block, the 0x733000 and 0x7356C0 hit scratch, 0x7AC5A0 ray scratch, the controlled object and player record, the six first NPC objects and the first NPC context, the collision node tables. float_ranges as in the NPC and player files.",
+ "regions": [
+  {
+   "name": "level_state",
+   "spec": "0x79094C:4"
+  },
+  {
+   "name": "pad_block_70aa",
+   "spec": "0x70AA00:0x100"
+  },
+  {
+   "name": "hit_scratch_7330",
+   "spec": "0x733000:0x100"
+  },
+  {
+   "name": "hit_pair_7356",
+   "spec": "0x7356C0:0x40"
+  },
+  {
+   "name": "ray_scratch",
+   "spec": "0x7AC580:0x60"
+  },
+  {
+   "name": "controlled_object",
+   "spec": "*0x7B0C48+0:0x1584",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "player_record",
+   "spec": "*0x7B0C7C+0:0x2000"
+  },
+  {
+   "name": "npc_obj0",
+   "spec": "**0x7A3580+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_obj1",
+   "spec": "**0x7A3584+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_obj2",
+   "spec": "**0x7A3588+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_obj3",
+   "spec": "**0x7A358C+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_obj4",
+   "spec": "**0x7A3590+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_obj5",
+   "spec": "**0x7A3594+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_ctx0",
+   "spec": "*0x7A3580+0:0xA00"
+  },
+  {
+   "name": "entry_74c458",
+   "spec": "*0x74C458+0:0x180"
+  },
+  {
+   "name": "nodes_74c464",
+   "spec": "*0x74C464+0:0x400"
+  }
+ ]
+}

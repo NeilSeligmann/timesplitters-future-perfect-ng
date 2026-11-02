@@ -1,0 +1,18 @@
+[package]
+name = "tsfp-launcher-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Launcher logic without UI: disc identification, guided install, verify, config, mods and packs (T4331)"
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-import = { path = "../tsfp-import" }
+serde_json = "=1.0.145"
+
+[[bin]]
+name = "tsfp-launcher-cli"
+path = "src/main.rs"

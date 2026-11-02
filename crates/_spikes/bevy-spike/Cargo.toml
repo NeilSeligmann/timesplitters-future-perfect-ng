@@ -1,0 +1,26 @@
+# T1984 throwaway spike. Own workspace root: excluded from the main workspace.
+[package]
+name = "bevy-spike"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[workspace]
+members = ["core"]
+
+[dependencies]
+spike-core = { path = "core" }
+bevy = { version = "=0.16.1", default-features = false, features = [
+  "bevy_asset", "bevy_core_pipeline", "bevy_render", "bevy_sprite", "bevy_winit",
+  "bevy_window", "bevy_log", "bevy_audio", "bevy_gilrs", "x11", "wav", "multi_threaded",
+  "std", "async_executor",
+] }
+
+[profile.dev]
+opt-level = 1
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+[profile.dev.package."*"]
+opt-level = 2
+debug = false

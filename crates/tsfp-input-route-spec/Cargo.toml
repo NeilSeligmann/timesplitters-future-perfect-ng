@@ -1,0 +1,14 @@
+[package]
+name = "tsfp-input-route-spec"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3975 slice 3: the route wait and poke trigger grammar (src/input/xinput_route_spec.c) in Rust, C ABI exports"
+
+# Standalone like tsfp-input-host-wiring; linked into the host through tsfp-input-capi (feature rust-input-host).
+[workspace]
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+doctest = false

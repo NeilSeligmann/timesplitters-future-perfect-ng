@@ -1,0 +1,9 @@
+{
+  "_comment": "T3879 MEM-4: ledger.rs clears 0x200 primary and 0x14 secondary words; capture both full tables, flags, bases/counts/totals and history pointers. Does not compare allocated payload contents; no masks.",
+  "regions": [
+    {"name": "ledger_enabled", "spec": "0x4C81B4:4"},
+    {"name": "ledger_primary_rows", "spec": "0x6B7B68:0x800"},
+    {"name": "ledger_secondary_rows", "spec": "0x6B7B18:0x50"},
+    {"name": "ledger_accounting_and_history", "spec": "0x6B8368:0x50"}
+  ]
+}

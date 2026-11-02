@@ -1,0 +1,13 @@
+[package]
+name = "tsfp-t2-cutscenes"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+tsfp-data-formats = { path = "../tsfp-data-formats" }
+tsfp-engine-memory = { path = "../tsfp-engine-memory" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-types = { path = "../tsfp-types" }
+
+[workspace]

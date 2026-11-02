@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-engine-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-types = { path = "../tsfp-types" }
+tsfp-engine-memory = { path = "../tsfp-engine-memory" }
+tsfp-host = { path = "../tsfp-host" }
+tsfp-engine-object = { path = "../tsfp-engine-object" }
+tsfp-input = { path = "../tsfp-input" }

@@ -1,0 +1,17 @@
+[package]
+name = "tsfp-input"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "T2160 stage 1 of the input rework (T2166): device layer, per-slot router, PlayerInput and the compatibility shim"
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-state = { path = "../tsfp-state" }
+
+[dev-dependencies]
+tsfp-ports = { path = "../tsfp-ports", features = ["std"] }
+tsfp-engine-render = { path = "../tsfp-engine-render" }

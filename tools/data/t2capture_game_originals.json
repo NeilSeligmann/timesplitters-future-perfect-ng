@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "doc": "T3794: in a capture build (TSFP_BUILD_CAPTURE=1) the lifted original of every src/game registration runs instead of the hand-written replacement, so its call gets a capture frame (tools/t2capture/game_originals.py). Registrations from the sources listed here keep their replacement: they carry a host duty the lifted body cannot do on its own.",
+  "keep_replacement_sources": {
+    "codewrite_roots.inc": "code-write transaction and SMC host duty (T1818), registered from codewrite_roots.c",
+    "codewrite_tx_roots.inc": "code-write transaction and SMC host duty (T1818), registered from codewrite_tx_roots.c",
+    "rust_ext_roots.c": "Rust ext root adapters run retained originals already (rust-ext-originals-all, transformed in capture builds)"
+  }
+}

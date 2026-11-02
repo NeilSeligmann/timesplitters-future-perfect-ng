@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-render-prep"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-render-prep-wire = { path = "../tsfp-render-prep-wire" }
+tsfp-engine-render = { path = "../tsfp-engine-render" }
+
+[dev-dependencies]
+tsfp-state = { path = "../tsfp-state" }

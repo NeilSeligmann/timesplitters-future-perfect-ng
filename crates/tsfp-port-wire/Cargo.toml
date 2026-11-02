@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[package]
+name = "tsfp-port-wire"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[features]
+# Unit-test builds of every dependent crate enable this (dev-dependency) so the PlayerSet and Missions owners are one
+# per test thread (T2175, T3447), as they were when this code lived in tsfp-ports. Production keeps the process statics.
+thread-retire = ["tsfp-port-runtime/thread-retire"]
+
+[dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+
+[workspace]
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false
+
+# T2454: cfgs set only by tools (coverage and MMX harnesses, lane mutation); declared so rustc does not warn at every use.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tsfp_cover)", "cfg(rust_lane_mutation)", "cfg(tsfp_mmx_harness)", "cfg(s3_missions_owned_differential)"] }

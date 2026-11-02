@@ -1,0 +1,19 @@
+{
+ "_comment": "T2116 menu route regions: level and mode cells, input ring and pad words (menu navigation), voice banks and save allocator records (text and profile), HUD vars, popup table, first 0x2000 bytes of the save slot table. Float words: none known, ints compared exactly.",
+ "regions": [
+  {"name": "level_state", "spec": "0x79094C:0x4"},
+  {"name": "mode_bytes", "spec": "0x7DE455:0x4"},
+  {"name": "mode_flags", "spec": "0x7DE400:0x80"},
+  {"name": "input_ring", "spec": "0x75AEC8:0x2C"},
+  {"name": "pad_table", "spec": "0x6B93C0:0x114"},
+  {"name": "pad_exchange", "spec": "0x6B9888:0x4"},
+  {"name": "pad_poll_state", "spec": "0x74CF70:0x194"},
+  {"name": "pad_flags", "spec": "0x47DF00:0x48"},
+  {"name": "voice_banks", "spec": "0x7E7200:0x20"},
+  {"name": "hud_vars", "spec": "0x7E7260:0x40"},
+  {"name": "popup_table", "spec": "0x514710:0x140"},
+  {"name": "popup_counter", "spec": "0x75AF00:0x4"},
+  {"name": "slot_table_head", "spec": "0x7BEDC0:0x2000"},
+  {"name": "alloc_records", "spec": "0x7BC9C0:0x2400"}
+ ]
+}

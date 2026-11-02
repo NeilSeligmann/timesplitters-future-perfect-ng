@@ -1,0 +1,13 @@
+[package]
+name = "tsfp-engine-physics"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-types = { path = "../tsfp-types" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }

@@ -1,0 +1,22 @@
+[package]
+name = "tsfp-input-intake"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+# T3820: the single host-device intake of the Bevy shell. Every keyboard, mouse, cursor, focus and
+# raw gamepad event is recorded here (input.rec v6 `D` rows) before any consumer routes it, and a
+# replay puts the recorded events back into the same Bevy event queues. Standalone like tsfp-bevy
+# (Bevy must not enter the root workspace's `cargo check --workspace`); it uses only the Bevy
+# sub-crates it needs, at the versions and features tsfp-bevy already builds.
+[workspace]
+
+[dependencies]
+tsfp-input = { path = "../tsfp-input" }
+bevy_app = { version = "=0.16.1", default-features = false, features = ["std", "bevy_reflect"] }
+bevy_ecs = { version = "=0.16.1", default-features = false, features = ["std", "bevy_reflect"] }
+bevy_input = { version = "=0.16.1", default-features = false, features = ["std", "bevy_reflect"] }
+bevy_math = { version = "=0.16.1", default-features = false, features = ["std"] }
+bevy_reflect = { version = "=0.16.1", default-features = false, features = ["std"] }
+bevy_window = { version = "=0.16.1", default-features = false, features = ["std", "bevy_reflect"] }

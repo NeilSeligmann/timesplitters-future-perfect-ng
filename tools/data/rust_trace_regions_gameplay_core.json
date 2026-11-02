@@ -1,0 +1,17 @@
+{
+  "_comment": "T3405 route-wide gameplay state for routes without live NPC actor objects. Keeps the global, player, mode, match, transition, object, party and save-table regions; NPC actor slots are covered by rust_trace_regions_gameplay.json on gameplay-start routes.",
+  "regions": [
+    {"name": "level_state", "spec": "0x79094C:4"},
+    {"name": "player_ptr", "spec": "0x7B0C48:4"},
+    {"name": "player_record", "spec": "*0x7B0C48+0:0x1584", "float_ranges": [[168, 12]]},
+    {"name": "npc_count", "spec": "0x74C37C:4"},
+    {"name": "npc_table", "spec": "0x7A3580:0x80"},
+    {"name": "mode_flags", "spec": "0x7DE400:0x80"},
+    {"name": "match_state", "spec": "0x7DE300:0x40"},
+    {"name": "transition_state", "spec": "0x6B9890:0x40"},
+    {"name": "object_table", "spec": "0x7A2BE4:0x40"},
+    {"name": "party_flag", "spec": "0x7330D0:0x10"},
+    {"name": "profile_ptr", "spec": "0x6F1E0C:4"},
+    {"name": "slot_table_head", "spec": "0x7BEDC0:0x80"}
+  ]
+}

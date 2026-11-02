@@ -1,0 +1,11 @@
+[package]
+name = "tsfp-movie-overlay"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Intro-movie overlay hand-off of the shared-texture (--wgpu-share) presentation: which source the window shows while the C compositor holds a movie picture"
+
+# The one C-called export lives here (tsfp-bevy is size-frozen), so unsafe_code is denied instead of forbidden.
+[lints.rust]
+unsafe_code = "deny"

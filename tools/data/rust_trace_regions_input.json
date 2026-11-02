@@ -1,0 +1,16 @@
+{
+ "_comment": "T1988 engine/input and ai/pathfinding trace regions (<=16). Addresses are the global constants the c2r translations of the selected roots read or write (crates/tsfp-ports/src/c2r/engine_input.rs, ai_pathfinding.rs), see docs/t-tier2-input.md. input_ring = the button-sequence ring 0x75AEC8 (ten halfword pairs) plus its head index 0x75AEF0 pushed by 0x1CCE70 and scanned by 0x1CCF80 (the 'pad ring head' capture of docs/t1974-hud-tier2.md). pad_table = the per-player pad entries 0x6B93C0..0x6B94D0 written by 0x438B0 and read by 0x42B60/0x42970. pad_poll_state = the 0x18FF70 device state block 0x74CF70..0x74D104. pad_flags = 0x47DF00..0x47DF48. nav_occupancy = 0x715F2C used by 0x2A5C30.",
+ "regions": [
+  {"name": "level_state", "spec": "0x79094C:4"},
+  {"name": "player_ptr", "spec": "0x7B0C48:4"},
+  {"name": "input_ring", "spec": "0x75AEC8:0x2C"},
+  {"name": "pad_table", "spec": "0x6B93C0:0x114", "float_ranges": [[0, 276]]},
+  {"name": "pad_exchange", "spec": "0x6B9888:4"},
+  {"name": "pad_poll_state", "spec": "0x74CF70:0x194"},
+  {"name": "pad_flags", "spec": "0x47DF00:0x48"},
+  {"name": "word_7e7240", "spec": "0x7E7240:4"},
+  {"name": "pad_ptr_76b0fc", "spec": "0x76B0FC:4"},
+  {"name": "nav_occupancy", "spec": "0x715F2C:4"},
+  {"name": "player_head", "spec": "*0x7B0C48+0:0x100", "float_ranges": [[0, 256]]}
+ ]
+}

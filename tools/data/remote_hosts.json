@@ -1,0 +1,71 @@
+{
+  "_doc": "T3435 remote build and gate hosts; mirrors docs/remote-build-hosts.md. Measured 2026-10-20. T3472 phase 2: canon_root is the FIXED absolute dir (equal on every host, under its counted data root) holding src-<slot>/ and cargo/ so the shared sccache hits across hosts; sccache is the store route (server|forward|reverse|none, tools/wt/sccache_hosts.py). owner_files lists which owner inputs already exist on the host (never copy without owner approval). cargo_hygiene uses TSFP_REMOTE_EXEC_HOST for remote identities, with local_host as the main owner PC. capture_reserved_cores (T3803): CPUs that remote builds (verify, prebuilt) leave free for capture replays through taskset.",
+  "worker_state_root": "/workspace/tsfp-worker",
+  "disk_mounts": {
+    "_doc": "class remote-disk-full (2026-10-28): the laptop root / was 100% full while /workspace had 85 GB free, so prebuilds failed. Probes measure the free space of every filesystem under always plus each host workdir, canon_root(/cargo), toolchain_dir, target_dir, replay_cache_dir and data_paths. The root / must keep root_floor_gb (a host entry may override it), every other mount the host disk_floor_gb. A mount under its floor refuses new builds and verifies and raises HEALTH remote-disk. tools/wt/disk_mounts.py.",
+    "always": [
+      "/",
+      "/tmp"
+    ],
+    "root_floor_gb": 5
+  },
+  "job_costs": {
+    "_doc": "T3837 (tools/wt/host_budget.py): the share of a host budget one job holds. cores = cores + cores_per_cargo_job x the job's CARGO_BUILD_JOBS (1-min load units); mem_mb = peak RSS rounded up. MEASURED: verify peak RSS p90 3.69 GB, max 4.2 GB (145 laptop runs, T3798), deck 3.7-4.0 GB; prebuilt build max 3.6 GB (droplet); capture tsfp-bevy about 1.0 core and 0.66 GB plus the rust_trace driver 0.3 GB (laptop 2026-10-27 09:06).",
+    "verify": {
+      "cores_per_cargo_job": 1.0,
+      "mem_mb": 4500
+    },
+    "build": {
+      "cores_per_cargo_job": 1.0,
+      "mem_mb": 4500
+    },
+    "capture": {
+      "cores": 1.5,
+      "mem_mb": 1000
+    }
+  },
+  "dispatch": {
+    "_doc": "T4272 (tools/dispatch): cargo/pytest use available capped owner-PC capacity immediately through local_first_kinds. Automatic remote work needs allowed automatic_capabilities, exact passing command/environment evidence and remote_min_seconds of measured/explicitly estimated work; unknown estimates are zero. Deck general builds/tests are paused while explicit specialized execution remains available. Remote-only never spills locally. CPU/memory/slot/load/disk admission remains enforced. remote_busy_after_s and remote_down_after_s retain specialized-job spillover; short_pytest_max_files is a historical compatibility field superseded by the common local-first policy.",
+    "owner_pc": {
+      "max_cores": 16,
+      "max_jobs": 6,
+      "max_load_per_core": 1.0,
+      "remote_down_after_s": 60,
+      "remote_busy_after_s": 60,
+      "capabilities": [
+        "verify",
+        "build",
+        "pytest",
+        "replay",
+        "capture",
+        "game",
+        "gpu",
+        "display"
+      ]
+    },
+    "mem_mb_by_kind": {
+      "pytest": 3000,
+      "replay": 1000,
+      "gate": 1000,
+      "game": 1500
+    },
+    "short_pytest_max_files": 2,
+    "local_first_kinds": [
+      "cargo",
+      "pytest"
+    ],
+    "remote_min_seconds": 120,
+    "poll_s": 5,
+    "probe_ttl_s": 60,
+    "max_attempts": 3,
+    "remote_only_wait_s": 900
+  },
+  "cargo_hygiene": {
+    "local_host": "owner-pc",
+    "default_cap_gb": 150,
+    "cap_gb_by_host": {
+      "owner-pc": 60
+    }
+  },
+  "hosts": []
+}

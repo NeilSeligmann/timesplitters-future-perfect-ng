@@ -1,0 +1,227 @@
+{
+ "_comment": "T1879 trace regions, at most 16 (host --dump-guest-range grammar: A:N, *A+OFF:N, **A+OFF1+OFF2:N). Addresses MEASURED in docs/gameplay-frontier.md, docs/t-ai-enemy-encounter.md and tools/t1240_drive.py. float_ranges = (byte offset, dword count) compared with epsilon, ignore_ranges = (byte offset, byte count) never compared. T1918: npc_body0..5 = the animation body [[[table+4i]]+4] of the first six characters (three level host form ***), layer ids +0xD4/+0x12C, times, speeds, blend +0x198.",
+ "regions": [
+  {
+   "name": "level_state",
+   "spec": "0x79094C:4"
+  },
+  {
+   "name": "player_ptr",
+   "spec": "0x7B0C48:4"
+  },
+  {
+   "name": "player_record",
+   "spec": "*0x7B0C48+0:0x1584",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_count",
+   "spec": "0x74C37C:4"
+  },
+  {
+   "name": "npc_table",
+   "spec": "0x7A3580:0x80"
+  },
+  {
+   "name": "npc_slot0",
+   "spec": "**0x7A3580+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_slot1",
+   "spec": "**0x7A3584+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_slot2",
+   "spec": "**0x7A3588+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_slot3",
+   "spec": "**0x7A358C+0+0:0xEA0",
+   "float_ranges": [
+    [
+     168,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "npc_body0",
+   "spec": "***0x7A3580+0+4+0:0x1C0",
+   "float_ranges": [
+    [
+     220,
+     2
+    ],
+    [
+     264,
+     1
+    ],
+    [
+     308,
+     2
+    ],
+    [
+     352,
+     1
+    ],
+    [
+     408,
+     1
+    ]
+   ]
+  },
+  {
+   "name": "npc_body1",
+   "spec": "***0x7A3584+0+4+0:0x1C0",
+   "float_ranges": [
+    [
+     220,
+     2
+    ],
+    [
+     264,
+     1
+    ],
+    [
+     308,
+     2
+    ],
+    [
+     352,
+     1
+    ],
+    [
+     408,
+     1
+    ]
+   ]
+  },
+  {
+   "name": "npc_body2",
+   "spec": "***0x7A3588+0+4+0:0x1C0",
+   "float_ranges": [
+    [
+     220,
+     2
+    ],
+    [
+     264,
+     1
+    ],
+    [
+     308,
+     2
+    ],
+    [
+     352,
+     1
+    ],
+    [
+     408,
+     1
+    ]
+   ]
+  },
+  {
+   "name": "npc_body3",
+   "spec": "***0x7A358C+0+4+0:0x1C0",
+   "float_ranges": [
+    [
+     220,
+     2
+    ],
+    [
+     264,
+     1
+    ],
+    [
+     308,
+     2
+    ],
+    [
+     352,
+     1
+    ],
+    [
+     408,
+     1
+    ]
+   ]
+  },
+  {
+   "name": "npc_body4",
+   "spec": "***0x7A3590+0+4+0:0x1C0",
+   "float_ranges": [
+    [
+     220,
+     2
+    ],
+    [
+     264,
+     1
+    ],
+    [
+     308,
+     2
+    ],
+    [
+     352,
+     1
+    ],
+    [
+     408,
+     1
+    ]
+   ]
+  },
+  {
+   "name": "npc_body5",
+   "spec": "***0x7A3594+0+4+0:0x1C0",
+   "float_ranges": [
+    [
+     220,
+     2
+    ],
+    [
+     264,
+     1
+    ],
+    [
+     308,
+     2
+    ],
+    [
+     352,
+     1
+    ],
+    [
+     408,
+     1
+    ]
+   ]
+  }
+ ]
+}

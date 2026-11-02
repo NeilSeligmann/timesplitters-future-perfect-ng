@@ -1,0 +1,32 @@
+[package]
+name = "tsfp-rt-host"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+description = "T2136: in-process render runtime for the hybrid host (render thread owning the wgpu LiveRenderer, bounded line queue, C ABI)"
+publish = false
+
+# Standalone like crates/tsfp-ports and tsfp-fileio-capi: the C ABI needs `unsafe`, wgpu stays out of the root workspace.
+[workspace]
+
+[lib]
+# cdylib, not staticlib: libtsfp_ports.a is no_std with its own copy of core/compiler_builtins and a libc allocator, a second
+# std staticlib in the same link would collide with it. A shared object keeps its std, allocator and panic runtime private.
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+tsfp-wgpu = { path = "../tsfp-wgpu" }
+tsfp-engine-anim = { path = "../tsfp-engine-anim" }
+tsfp-format-anim = { path = "../tsfp-format-anim" }
+tsfp-audio = { path = "../tsfp-audio" }
+wgpu = "=24.0.5"
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+split-debuginfo = "unpacked"
+
+[profile.dev.package."*"]
+debug = false

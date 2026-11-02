@@ -1,0 +1,22 @@
+[package]
+name = "tsfp-ui-builders"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "T2189 UI-6: runs the ported (c2r) menu page builders against a recording toolkit and fills a tsfp-ui-model UiModel"
+
+# Standalone like tsfp-ports (which is excluded from the root workspace).
+[workspace]
+
+[dependencies]
+tsfp-ports = { path = "../tsfp-ports", features = ["std"] }
+tsfp-ui-model = { path = "../tsfp-ui-model" }
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+split-debuginfo = "unpacked"
+
+[profile.dev.package."*"]
+debug = false

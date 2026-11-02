@@ -1,0 +1,13 @@
+[package]
+name = "tsfp-port-audio-dispatch"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# The single C ABI switch is required by the linked host; keep its unsafe-symbol exception local.
+[lints.rust]
+unsafe_code = "allow"
+
+[dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }

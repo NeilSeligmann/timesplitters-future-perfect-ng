@@ -1,0 +1,5 @@
+{
+  "_comment": "T3390: per recording stem, a port-0 poll shortly after gameplay starts, under the T3393 tick replay clock and --render none. adoption_gate compares from it with a cached DMTCP snapshot by default (--full-replay opts out); trace_store keeps one snapshot there per route and prebuilt. MEASURED story-level1-20261018: the level load ends at poll 7898 or 7920 (T3400), a snapshot at 7950 is after both.",
+  "story-level1-20261018": 7950,
+  "mapmaker-editor-20261018": 2900
+}

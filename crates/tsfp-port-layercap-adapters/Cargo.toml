@@ -1,0 +1,12 @@
+[package]
+name = "tsfp-port-layercap-adapters"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-port-engine-input = { path = "../tsfp-port-engine-input" }
+tsfp-ports = { path = "../tsfp-ports", features = ["std"] }
+
+[workspace]

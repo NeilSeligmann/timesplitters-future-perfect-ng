@@ -1,0 +1,12 @@
+[package]
+name = "tsfp-ui-row-input"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "T3809/T3811 native row input policy: slider steps, greyed-row help, unhandled-kind reports (new leaf crate, rule 37)"
+
+[lints]
+workspace = true
+
+[dependencies]

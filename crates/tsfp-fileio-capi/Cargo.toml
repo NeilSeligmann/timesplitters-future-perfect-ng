@@ -1,0 +1,32 @@
+[package]
+name = "tsfp-fileio-capi"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+# Standalone and outside the root workspace (like tsfp-ports): a C ABI needs `unsafe`, which the
+# workspace forbids. The safe logic stays in tsfp-engine-fileio.
+[workspace]
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[features]
+native-fileio = []
+
+[dependencies]
+tsfp-engine-fileio = { path = "../tsfp-engine-fileio" }
+tsfp-host-fileio-setup = { path = "../tsfp-host-fileio-setup" }
+libc = "=0.2.190"
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+split-debuginfo = "unpacked"
+
+[profile.dev.package."*"]
+debug = false
+
+[dev-dependencies]
+tsfp-kmem-capi = { path = "../tsfp-kmem-capi" }

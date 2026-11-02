@@ -1,0 +1,17 @@
+[package]
+name = "tsfp-input-route-engine"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3975 slice 5b: the route player (src/input/xinput_route.c) in Rust with Rust-owned state, C ABI exports"
+
+# Standalone like tsfp-input-route-spec; linked into the host through tsfp-input-capi (feature rust-input-host).
+[workspace]
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+doctest = false
+
+[dependencies]
+tsfp-input-route-spec = { path = "../tsfp-input-route-spec" }

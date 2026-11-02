@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-engine-object"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[features]
+default = []
+object-handle-stamp = []
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-types = { path = "../tsfp-types" }

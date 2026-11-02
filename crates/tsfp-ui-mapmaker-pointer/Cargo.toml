@@ -1,0 +1,13 @@
+[package]
+name = "tsfp-ui-mapmaker-pointer"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "T2328 native Map Maker cursor ownership and edit-view placement (split from tsfp-ui-input by T3799, rule 37)"
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-mapmaker = { path = "../tsfp-mapmaker" }

@@ -1,0 +1,15 @@
+[package]
+name = "tsfp-t2-misc"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+# Capture-only adapters for the miscellaneous hand-port Tier 2 item.
+[dependencies]
+tsfp-engine-core = { path = "../tsfp-engine-core" }
+tsfp-engine-object = { path = "../tsfp-engine-object" }
+tsfp-engine-render = { path = "../tsfp-engine-render" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-ports = { path = "../tsfp-ports" }
+
+[workspace]

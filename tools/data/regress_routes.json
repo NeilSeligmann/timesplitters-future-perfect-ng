@@ -1,0 +1,12 @@
+{
+ "_doc": "tools.regress standing routes (short name -> owner recording stem, docs/owner-recordings.md) and the pak each must open (regex, null = route-end check only). T3819 (claude-1 2026-10-27): only routes the desync sweep measured IN SYNC count as gameplay coverage (docs/t-replay-desync-l3-l4.md); arcade-full and mapmaker-assault left because their replays never leave the front end (tools/data/replay_fidelity_baseline.json). Re-add Arcade and Map Maker routes from owner v6 re-records. story-level1 has no owner open reference (play dir gone): its fidelity is unchecked.",
+ "routes": {
+  "story-hud-weapons": {"stem": "story-hud-weapons-20261020", "expect_pak": "pak/story/l_\\d+_st\\.pak"},
+  "story-level1": {"stem": "story-level1-20261018", "expect_pak": "pak/story/l_\\d+_st\\.pak"},
+  "story-arcade-transitions": {"stem": "story-arcade-transitions-20261024", "expect_pak": "pak/story/l_\\d+_st\\.pak"},
+  "story-autoaim-shots": {"stem": "story-autoaim-shots-20261024", "expect_pak": "pak/story/l_\\d+_st\\.pak"}
+ },
+ "expect_pak_extra": {
+  "story-l1-crash-20261022": "pak/story/l_\\d+_st\\.pak"
+ }
+}

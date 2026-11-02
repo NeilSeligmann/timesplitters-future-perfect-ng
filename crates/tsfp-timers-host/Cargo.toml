@@ -1,0 +1,12 @@
+[package]
+name = "tsfp-timers-host"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "Rust host contract for virtual timer and audio-clock duties"
+
+[workspace]
+
+[lib]
+crate-type = ["rlib"]

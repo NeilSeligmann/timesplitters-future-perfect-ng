@@ -1,0 +1,15 @@
+[package]
+name = "tsfp-mapmaker"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-gameplay = { path = "../tsfp-gameplay" }
+tsfp-data-formats = { path = "../tsfp-data-formats" }
+tsfp-ui = { path = "../tsfp-ui" }
+tsfp-engine-fileio = { path = "../tsfp-engine-fileio" }

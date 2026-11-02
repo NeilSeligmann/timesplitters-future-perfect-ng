@@ -1,0 +1,9 @@
+{
+  "_comment": "T3397 canonical queue projections: off/reference reads the REA guest ABI into this shape; the lifecycle candidate serializes Rust-owned typed state into a reserved host-only read window. The window is 0x16E4 bytes per player and never maps to or writes guest memory.",
+  "regions": [
+    {"name": "hud_messages_p0", "spec": "=0xFFFF4000:0x16E4"},
+    {"name": "hud_messages_p1", "spec": "=0xFFFF6000:0x16E4"},
+    {"name": "hud_messages_p2", "spec": "=0xFFFF8000:0x16E4"},
+    {"name": "hud_messages_p3", "spec": "=0xFFFFA000:0x16E4"}
+  ]
+}

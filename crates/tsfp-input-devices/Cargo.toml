@@ -1,0 +1,10 @@
+[package]
+name = "tsfp-input-devices"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "T3926: Rust-owned XInput device state (devices lock, single synthetic pad, multiport host handles, pending feedback)"
+
+[lints]
+workspace = true

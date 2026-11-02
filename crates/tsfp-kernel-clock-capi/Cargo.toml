@@ -1,0 +1,22 @@
+[package]
+name = "tsfp-kernel-clock-capi"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+[lib]
+crate-type = ["cdylib"]
+[workspace]
+[dependencies]
+tsfp-kernel-clock = { path = "../tsfp-kernel-clock" }
+tsfp-frame-phase = { path = "../tsfp-frame-phase" }
+tsfp-vblank-quiescence = { path = "../tsfp-vblank-quiescence" }
+tsfp-timers-host = { path = "../tsfp-timers-host" }
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

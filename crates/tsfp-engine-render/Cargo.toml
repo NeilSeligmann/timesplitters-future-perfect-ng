@@ -1,0 +1,21 @@
+[package]
+name = "tsfp-engine-render"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[features]
+default = ["std", "render-prep-tests"]
+# T1976: without it the modules compile for the no_std lane build (crates/tsfp-ports/src/render_port.rs).
+std = []
+# Tests embedded in render_prep.rs require this crate's state and ports dependencies.
+render-prep-tests = []
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-host = { path = "../tsfp-host" }
+tsfp-ports = { path = "../tsfp-ports", features = ["std"] }
+tsfp-state = { path = "../tsfp-state" }

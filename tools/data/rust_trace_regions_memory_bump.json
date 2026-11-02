@@ -1,0 +1,7 @@
+{
+  "_comment": "T2048 bump allocator contract state for the highest-weight game allocator root 0x3E970; compares the measured cursor and accounting words from docs/t-memory-replace.md section 8.5.10.",
+  "regions": [
+    {"name": "bump_cursor", "spec": "0x6B839C:4"},
+    {"name": "bump_total", "spec": "0x6B83B8:4"}
+  ]
+}

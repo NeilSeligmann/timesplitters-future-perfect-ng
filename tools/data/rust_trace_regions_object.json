@@ -1,0 +1,53 @@
+{
+ "_comment": "T2026 engine/object trace regions v1 (guessed from static writes of the c2r translations; refined from MUTWRITE logs). T2262: player_obj_tail (*0x7B0C48+0x100:0x100) adds the object bounds fields 0x1a8..0x1c8 written by 0xA6530 from the 0x9E840 output; the 0x74C46C entry chains were probed and are null on the Story route (docs/t-object-tier2.md).",
+ "regions": [
+  {
+   "name": "pool_counts",
+   "spec": "0x7B54E0:0x40"
+  },
+  {
+   "name": "pool_caps",
+   "spec": "0x7B5BA0:0x40"
+  },
+  {
+   "name": "pool_bases",
+   "spec": "0x7B5F00:0x40"
+  },
+  {
+   "name": "pool_used",
+   "spec": "0x72F298:0x10"
+  },
+  {
+   "name": "update_list",
+   "spec": "0x7B4CC0:0x40"
+  },
+  {
+   "name": "update_count",
+   "spec": "0x7B54C0:0x20"
+  },
+  {
+   "name": "player_prefix",
+   "spec": "0x7B0C48:0x100"
+  },
+  {
+   "name": "character_head",
+   "spec": "0x7A3580:0x100"
+  },
+  {
+   "name": "flag_array",
+   "spec": "0x7A2820:0x100"
+  },
+  {
+   "name": "callback_table",
+   "spec": "0x72F2E0:0x40"
+  },
+  {
+   "name": "player_prefix_obj",
+   "spec": "*0x7B0C48+0:0x100"
+  },
+  {
+   "name": "player_obj_tail",
+   "spec": "*0x7B0C48+0x100:0x100"
+  }
+ ]
+}

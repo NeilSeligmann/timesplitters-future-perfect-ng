@@ -1,0 +1,17 @@
+[package]
+name = "tsfp-input-hotkey-host"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3975 slice 4: the --hotkey grammar, chord table handle and host label actions (src/input/xinput_hotkey.c, src/host/hotkey_actions.c) in Rust, C ABI exports"
+
+# Standalone like tsfp-input-route-spec; linked into the host through tsfp-input-capi (feature rust-input-host).
+[workspace]
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+doctest = false
+
+[dependencies]
+tsfp-input-devices = { path = "../tsfp-input-devices" }

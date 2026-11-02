@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+[package]
+name = "tsfp-weapon-realization"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[workspace]
+
+[dependencies]
+tsfp-weapon-owner = { path = "../tsfp-weapon-owner" }
+tsfp-weapon-realization-protocol = { path = "../tsfp-weapon-realization-protocol" }
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tsfp_cover)", "cfg(rust_lane_mutation)", "cfg(tsfp_mmx_harness)", "cfg(s3_missions_owned_differential)"] }

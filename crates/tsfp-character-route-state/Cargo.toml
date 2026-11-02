@@ -1,0 +1,13 @@
+[package]
+name = "tsfp-character-route-state"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tsfp-state = { path = "../tsfp-state" }
+
+[dev-dependencies]
+
+[lints.rust]
+unsafe_code = "forbid"

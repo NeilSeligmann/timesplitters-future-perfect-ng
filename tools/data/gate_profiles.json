@@ -1,0 +1,808 @@
+{
+  "_comment": "T3416 gate profiles for python3 -m tools.gate. switches: candidate-only (Rust port selectors, host flags rust-weapon-hands/rust-rea-ai/rea-inventory-native, TSFP_*=v). env: both sides. roots: hex VAs that must be called in the candidate window. dependencies: env that any matching selector needs on both sides. Sources are the cited task docs; edit here when a system's gate changes. adopted: Rust ports adopted on main whose host default needs an explicit selector; added to BOTH sides unless a profile sets \"adopted\": false or --no-adopted is passed (Story sequencer T2431 and inventory T3418 are default-on in the host and need nothing). baseline_env: env only on the switch-off side (to A/B an adopted default-on system).",
+  "dependencies": [
+    {
+      "selector": "(?i)0x0*(3d370|3c440|153b00)",
+      "env": [
+        "TSFP_RUST_STARTUP_VBLANK_CLOCK=1"
+      ],
+      "why": "the saved Story route needs the T3409 startup clock on both sides before gameplay; TSFP_RUST_FRAME_LOOP is candidate-only because enabling the C2R frame body on the off/off baseline stops before the first input poll (docs/run-notes/T2409.md, docs/t3409-startup-clock.md)"
+    }
+  ],
+  "profiles": {
+    "video-present": {
+      "switch_kind": "env",
+      "switches": [
+        "TSFP_RUST_VIDEO_PRESENT=1"
+      ],
+      "baseline_env": [
+        "TSFP_RUST_VIDEO_PRESENT=0"
+      ],
+      "regions": "tools/data/rust_trace_regions.json",
+      "roots": [
+        "0x30280"
+      ],
+      "coverage_only_roots": [
+        "0x30280"
+      ],
+      "route": "frontend-pages-20261026",
+      "start": "boot",
+      "adopted": false,
+      "source": "T3938 docs/xmv-contracts.md section 3: 0x30280 is the title's movie-play function and calls the XMV exports; frontend-pages-20261026 plays the Extras movies (docs/owner-recordings.md). CANDIDATE: TSFP_RUST_VIDEO_PRESENT is not implemented yet (latch unwired), so this selects capture coverage only, not adoption evidence (INFERRED route)."
+    },
+    "verify-all": {
+      "switches": [],
+      "regions": "tools/data/rust_trace_regions_gameplay_core.json",
+      "roots": [],
+      "route": "story-level1",
+      "start": "gameplay",
+      "adopted": false,
+      "source": "docs/tier2-verify-all.md (T3449 route-wide Tier 2 matrix)"
+    },
+    "render-vertex-bindings": {
+      "switches": [
+        "render",
+        "TSFP_RENDER_NATIVE_VERTEX_BINDINGS=1"
+      ],
+      "env": [
+        "TSFP_RT_HOST_BINARY=1",
+        "TSFP_WGPU_LIVE=1"
+      ],
+      "regions": "tools/data/rust_trace_regions_render.json",
+      "roots": [
+        "0x1EB00"
+      ],
+      "route": "story-level1",
+      "start": "gameplay",
+      "adopted": false,
+      "source": "docs/run-notes/T2024.md and docs/t-render-device-contract.md (typed 0x1EB00 SetVertexBindings A/B)"
+    },
+    "fileio-lifecycle": {
+      "switches": [
+        "--rust-fileio",
+        "TSFP_FILEIO_LOG=tmp/t2225-fileio-rust.log"
+      ],
+      "baseline_host_args": [
+        "--legacy-fileio"
+      ],
+      "baseline_env": [
+        "TSFP_FILEIO_LOG=tmp/t2225-fileio-c.log"
+      ],
+      "regions": "tools/data/rust_trace_regions_gameplay_core.json",
+      "roots": [],
+      "route": "story-level1",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t-fileio-lifecycle-rust.md and docs/t-contract-data-assets.md; supported-path replace-class contract smoke only, not C retirement"
+    },
+    "timers": {
+      "switches": [
+        "0x3d370",
+        "0x3c440",
+        "0x1538c0",
+        "--interactive",
+        "--no-vblank-poll-blank",
+        "--no-vblank-worker-blanks",
+        "TSFP_RUST_FRAME_LOOP=1",
+        "TSFP_RUST_GAME_TIMERS=1"
+      ],
+      "baseline_host_args": [
+        "--interactive",
+        "--no-vblank-poll-blank",
+        "--no-vblank-worker-blanks"
+      ],
+      "env": [
+        "TSFP_RUST_STARTUP_VBLANK_CLOCK=1"
+      ],
+      "baseline_env": [
+        "TSFP_RUST_FRAME_LOOP=0"
+      ],
+      "regions": "tools/data/rust_trace_regions_timers_gate.json",
+      "roots": [
+        "0x3C440",
+        "0x1538C0"
+      ],
+      "route": "story-level1",
+      "routes": [
+        "r5",
+        "story-level1",
+        "arcade-weapons",
+        "story-l2-arcade",
+        "story-arcade-transitions",
+        "story-hud-weapons",
+        "story-l2-ai-marks"
+      ],
+      "start": "gameplay",
+      "adopted": false,
+      "source": "docs/run-notes/T2409.md, docs/t1670-native-frame-timers.md, docs/t3409-startup-clock.md; T3607 gameplay-start mapping for arcade-weapons and story-l2-arcade owner recordings"
+    },
+    "startup-vblank": {
+      "switches": [
+        "0x1538c0",
+        "TSFP_RUST_STARTUP_VBLANK_CLOCK=1",
+        "--interactive",
+        "--no-vblank-owner-waits",
+    "--no-vblank-worker-blanks",
+    "--no-vblank-poll-blank"
+      ],
+      "env": [
+        "TSFP_RUST_FRAME_LOOP=0"
+      ],
+      "baseline_host_args": [
+        "--interactive",
+        "--vblank-owner-waits",
+        "1000000",
+        "--vblank-worker-blanks",
+        "1000000",
+    "--no-vblank-poll-blank"
+      ],
+      "regions": "tools/data/rust_trace_regions_t2409_owned.json",
+      "route": "story-hud-weapons",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t3409-startup-clock.md and docs/t1670-native-frame-timers.md; T3409 clock state is exercised through the host callback seam and checked via varying T2409-owned regions"
+    },
+    "pickup-tick": {
+      "switches": [
+        "pickup-tick"
+      ],
+      "regions": "tools/data/rust_trace_regions_weapons_rule24.json",
+      "roots": [
+        "0xC1850"
+      ],
+      "route": "weapon-lifecycle",
+      "start": "gameplay",
+      "adopted": false,
+      "source": "T3398: crates/tsfp-ports/src/pickup_tick.rs (0xC1850 pickup tick, weapons_lane word pickup-tick); weapons rule24 regions"
+    },
+    "weapons": {
+      "switches": [
+        "rust-weapon-hands"
+      ],
+      "regions": "tools/data/rust_trace_regions_weapons_rule24.json",
+      "roots": [
+        "0x1B6EC0",
+        "0x1B7BC0",
+        "0x1B9760",
+        "0x1BC990",
+        "0x1BE870",
+        "0x1BF9E0"
+      ],
+      "route": "story-level1",
+      "start": "gameplay",
+      "adopted": false,
+      "source": "docs/t2411-weapons-inventory.md T3418 gate (REA AI off both sides; weapon hands DIVERGED there)"
+    },
+    "arcade-weapon-reload": {
+      "switches": [
+        "rust-weapon-hands"
+      ],
+      "regions": "tools/data/rust_trace_regions_weapons_rule24.json",
+      "roots": [
+        "0x1B7BC0"
+      ],
+      "route": "story-arcade-transitions",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t-weapons-port-readiness-ammo-profile-restore.md (0x1B7BC0 reload wrapper; 0x1B6EC0 lifted fallback), docs/t2411-weapons-inventory.md T3418 state regions"
+    },
+    "arcade-weapon-fire": {
+      "switches": [
+        "0x1C17B0"
+      ],
+      "regions": "tools/data/rust_trace_regions_weapons_rule24.json",
+      "roots": [
+        "0x1C17B0"
+      ],
+      "route": "story-hud-weapons",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t1682-rea-projectiles.md (0x1C17B0 ammo/fire caller and 0x1C0200 downstream shot dispatch); crates/tsfp-ports/src/weapons_lane.rs selects 0x1C17B0"
+    },
+    "hud-messages": {
+      "switch_kind": "env",
+      "switches": [
+        "TSFP_HUD_MESSAGES_LIFECYCLE=1",
+        "TSFP_HUD_NATIVE=messages"
+      ],
+      "regions": "tools/data/rust_trace_regions_hud_messages.json",
+      "roots": [
+        "0x12D350",
+        "0x14A5A0",
+        "0x14AC80",
+        "0x149810"
+      ],
+      "route": "story-level1",
+      "start": "10000",
+      "source": "docs/t3397-hud-message-lifecycle.md; docs/t1695-rea-messages.md"
+    },
+    "player-interaction": {
+      "switches": [
+        "player-interaction"
+      ],
+      "regions": "tools/data/rust_trace_regions_player_interaction.json",
+      "roots": [
+        "0xD0730"
+      ],
+      "route": "story-hud-weapons-20261020",
+      "start": "gameplay",
+      "baseline_host_args": [
+        "--rust-ports=0xD0730"
+      ],
+      "adopted": false,
+      "source": "docs/t3398-player-interaction.md (D0730 C2R caller on both sides so the off-side nested D01C0 projection is observable; 2026-10-21)"
+    },
+    "ai": {
+      "switches": [
+        "rust-rea-ai",
+        "0x266250"
+      ],
+      "regions": "tools/data/rust_trace_regions_gameplay.json",
+      "roots": [
+        "0x266250"
+      ],
+      "route": "r5",
+      "routes": [
+        "r5",
+        "story-level1"
+      ],
+      "start": "boot",
+      "source": "claude-1 decision 2026-10-24: r8-arcade is excluded because root 0x266250 is never called there. Require EQUAL Tier 2 on r5-story-gameplay and story-level1-20261018, the covering routes with 1540 and 152 calls. Independent uncached 180 s gates passed at 07:08 UTC (receipts fe219da0ab635e52d43e01330160a59e and cd7b442c90ebbe8f5ceac83541b48d8d); this completes the route evidence and supports default-on with the A/B switch retained. See docs/tasks/T2407.md and docs/t2407-rea-ai-state.md#independent-verify-result-2026-10-24",
+      "adopted": true
+    },
+    "ai-adapter-12f00": {
+      "switches": [
+        "--rust-rea-ai-enable=0x12f00"
+      ],
+      "regions": "tools/data/rust_trace_regions_gameplay.json",
+      "roots": [],
+      "route": "story-level1",
+      "start": "gameplay",
+      "source": "docs/t3421-rea-12f00.md (candidate-only mechanism resolver; adopted REA-AI runtime is shared by both sides)"
+    },
+    "wsola": {
+      "candidate_host_profile": "gate-wsola",
+      "baseline_host_profile": "gate-wsola",
+      "same_host": true,
+      "wsola_activity": true,
+      "switches": ["TSFP_WSOLA_BACKEND=rust"],
+      "baseline_env": ["TSFP_WSOLA_BACKEND=c"],
+      "env": ["TSFP_WSOLA_REPORT=1", "TSFP_INPUT_REPLAY_HOLD=1"],
+      "shared_host_args": ["--audio-sink", "sdl"],
+      "regions": "tools/data/rust_trace_regions_audio.json",
+      "roots": [],
+      "route": "arcade-weapons-20261022",
+      "start": "boot",
+      "adopted": false,
+      "source": "T2046 same-binary WSOLA engine gate; not full audio-host adoption"
+    },
+    "audio": {
+      "candidate_host_profile": "gate-rust-audio-host",
+      "env": [
+        "TSFP_RUST_INPUT_HLE=0"
+      ],
+      "_comment_t3783": "T3783: coverage_only_roots for 0x28610 0x29AF0 0x29F30 0x462F0 0x46350 0x46610 (530be60bbf) reverted, these roots run in Rust when the stop report is present; restore when the audio-host shutdown report is fixed.",
+      "switches": [
+        "TSFP_BEVY_AUDIO_RUST_RING=1",
+        "0x462f0",
+        "0x46350",
+        "0x46610",
+        "0x28610",
+        "0x29f30",
+        "0x29af0"
+      ],
+      "regions": "tools/data/rust_trace_regions_audio.json",
+      "roots": [
+        "0x462F0",
+        "0x46350",
+        "0x46610",
+        "0x28610",
+        "0x29F30",
+        "0x29AF0"
+      ],
+      "baseline_env": [
+        "TSFP_RUST_INPUT_HLE=0"
+      ],
+      "route": "story-level1",
+      "start": "gameplay",
+      "source": "T2046 Rust host conformance: guest state regions compare the host variants; roots must run in Rust (T3783)"
+    },
+    "mapmaker-ui": {
+      "switch_kind": "env",
+      "switches": [
+        "TSFP_MAPMAKER_UI=rust"
+      ],
+      "regions": "tools/data/rust_trace_regions_mapmaker_ui.json",
+      "roots": [
+        "0x30A550",
+        "0x2C87B0",
+        "0x3165C0",
+        "0x319FC0",
+        "0x326990",
+        "0x32F740",
+        "0x335980"
+      ],
+      "route": "mapmaker-editor",
+      "start": "gameplay",
+      "source": "docs/t-mapmaker-rule24-adoption.md (T2408 route adoption; Map Maker UI C2R roots from tsfp-port-mapmaker-ui)"
+    },
+    "mapmaker-overlay-306460": {
+      "switches": [
+        "TSFP_MAPMAKER_OVERLAY=rust"
+      ],
+      "baseline_env": [
+        "TSFP_MAPMAKER_OVERLAY=off"
+      ],
+      "regions": "tools/data/rust_trace_regions_mapmaker_ui.json",
+      "roots": [
+        "0x306460"
+      ],
+      "route": "mapmaker-editor",
+      "start": "gameplay",
+      "adopted": false,
+      "source": "T2432 isolated 0x306460 Map Maker overlay Rule 24 follow-up"
+    },
+    "input": {
+      "switches": [
+        "0x18ff70",
+        "0x42970",
+        "0x1ccf80",
+        "0x438b0",
+        "0x1cce70",
+        "0x42b60"
+      ],
+      "regions": "tools/data/rust_trace_regions_input.json",
+      "roots": [
+        "0x18ff70",
+        "0x42970",
+        "0x1ccf80",
+        "0x438b0",
+        "0x1cce70",
+        "0x42b60"
+      ],
+      "env": [
+        "TSFP_RUST_INPUT_HLE=1"
+      ],
+      "baseline_env": [
+        "TSFP_RUST_INPUT_HLE=0"
+      ],
+      "route": "story-level1",
+      "start": "gameplay",
+      "adopted": true,
+      "source": "docs/t-input-platform-retirement.md (IN-1; six default-on engine/input roots and captured real-input regions)"
+    },
+    "inventory": {
+      "switches": [
+        "TSFP_REA_INVENTORY_NATIVE=1"
+      ],
+      "root_selectors": [
+        "inventory",
+        "player"
+      ],
+      "baseline_env": [
+        "TSFP_REA_INVENTORY_NATIVE=0"
+      ],
+      "regions": "tools/data/rust_trace_regions_weapons_rule24.json",
+      "roots": [
+        "0x1b99b0",
+        "0xbe860"
+      ],
+      "route": "story-level1",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t2411-weapons-inventory.md T3499/T2411: typed REA owner lookup and interaction roots; T3600: start boot because 0x1b99b0 is only called before poll 7950 (11 calls, none in a gameplay window on 3 commits), 0x1b99f0 and 0xa0d30 dropped (no call in the story-hud-weapons window on 3 commits, unproven elsewhere), docs/t3600-gate-invalid-triage.md"
+    },
+    "kmem": {
+      "env": [
+        "TSFP_RUST_INPUT_HLE=0"
+      ],
+      "switch_kind": "env",
+      "switches": [
+        "TSFP_RUST_KMEM=1"
+      ],
+      "baseline_env": [
+        "TSFP_RUST_KMEM=0"
+      ],
+      "regions": "tools/data/rust_trace_regions_gameplay_core.json",
+      "roots": [],
+      "route": "story-level1",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t-memory-platform-retirement.md (T3879 MEM-1); docs/t-kmem-deterministic-placement.md (T3604). Host memory boundary, explicit C baseline; fresh rule-24 evidence required."
+    },
+    "memory-arena": {
+      "switches": [
+        "TSFP_RUST_GAME_ARENA=1"
+      ],
+      "regions": "tools/data/rust_trace_regions_gameplay_core.json",
+      "roots": [
+        "0x237480"
+      ],
+      "route": "story-level1",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t3597-gate-prebuilt-modules.md (T2048 arena adoption gate; the gate prebuilt carries the arena module since T3597; regions and roots are provisional, T2048 refines them)"
+    },
+    "memory-bump": {
+      "switch_kind": "env",
+      "switches": [
+        "TSFP_RUST_GAME_BUMP=1"
+      ],
+      "baseline_env": ["TSFP_RUST_GAME_BUMP=0"],
+      "regions": "tools/data/rust_trace_regions_memory_bump.json",
+      "roots": [
+        "0x3e970"
+      ],
+      "coverage_only_roots": ["0x3e970"],
+      "route": "story-l2-ai-marks-20261022",
+      "start": "mark:1",
+      "adopted": false,
+      "source": "T2048 high-weight allocator conformance from docs/t-memory-replace.md section 8.5.10 and docs/t1673-rea-memory.md; root 0x3e970 has 2,699,809 measured calls overall, including 1,248,635 in the retained Story trace"
+    },
+    "memory-pool": {
+      "switch_kind": "env",
+      "switches": ["TSFP_RUST_GAME_POOL=1"],
+      "baseline_env": ["TSFP_RUST_GAME_POOL=0"],
+      "regions": "tools/data/rust_trace_regions_memory_pool.json",
+      "roots": ["0x3ed20"],
+      "route": "story-level1",
+      "start": "boot",
+      "adopted": false,
+      "source": "T3879 MEM-4; docs/t-memory-platform-retirement.md. Pool allocate-by-kind coverage and allocator state; provisional route, no adoption evidence. Uses gate prebuilt with TSFP_BUILD_GAME_POOL=1."
+    },
+    "memory-ledger": {
+      "switch_kind": "env",
+      "switches": ["TSFP_RUST_GAME_LEDGER=1"],
+      "baseline_env": ["TSFP_RUST_GAME_LEDGER=0"],
+      "regions": "tools/data/rust_trace_regions_memory_ledger.json",
+      "roots": ["0x3e440"],
+      "route": "story-level1",
+      "start": "boot",
+      "adopted": false,
+      "source": "T3879 MEM-4; docs/t-memory-platform-retirement.md. Primary ledger allocation coverage, both row tables and accounting; provisional route, no adoption evidence. Uses gate prebuilt with TSFP_BUILD_GAME_LEDGER=1."
+    },
+    "story-sequencer": {
+      "switches": [
+        "0x2d3bf0",
+        "TSFP_STORY_SEQUENCER=rust"
+      ],
+      "baseline_env": [
+        "TSFP_STORY_SEQUENCER=off"
+      ],
+      "regions": "tools/data/rust_trace_regions_story.json",
+      "roots": [
+        "0x65940"
+      ],
+      "route": "story-level1",
+      "start": "boot",
+      "default_ports": true,
+      "source": "docs/t2431-story-sequencer.md (default_ports: both sides run play.sh's default port set, tools/data/default_on_roots.json, T3784; adopted default-on; T3434 retirement gate, INFERRED route/start)"
+    },
+    "story-result": {
+      "switches": [
+        "TSFP_STORY_RESULT=rust"
+      ],
+      "baseline_env": [
+        "TSFP_STORY_RESULT=off"
+      ],
+      "regions": "tools/data/rust_trace_regions_story.json",
+      "roots": [
+        "0x228870"
+      ],
+      "route": "story-hud-weapons",
+      "start": "gameplay",
+      "adopted": false,
+      "source": "docs/t2448-story-result.md and unk_story_completion_result_consumer_order (Story-level-one result reducer)"
+    },
+    "story-objective-progress": {
+      "switches": [
+        "TSFP_STORY_RESULT=rust",
+        "TSFP_STORY_OBJECTIVE_PROGRESS=rust"
+      ],
+      "baseline_env": [
+        "TSFP_STORY_RESULT=off",
+        "TSFP_STORY_OBJECTIVE_PROGRESS=off"
+      ],
+      "regions": "tools/data/rust_trace_regions_story.json",
+      "roots": [
+        "0x2282B0",
+        "0x2274C0"
+      ],
+      "route": "story-hud-weapons",
+      "start": "gameplay",
+      "seconds": 180,
+      "adopted": false,
+      "source": "docs/t2464-story-objective-progress.md; docs/t2448-story-result.md; docs/t-story-event-engine.md. Roots objective member update 0x2282B0 and completion helper 0x2274C0; route must be selected from T3706 coverage and show natural completion."
+    },
+    "math-roots": {
+      "switches": [
+        "0x151FC0",
+        "0x152090",
+        "0x59320",
+        "0x150960",
+        "0x582A0",
+        "0x583E0",
+        "0x58340",
+        "0x1506B0",
+        "0x591D0"
+      ],
+      "regions": "tools/data/rust_trace_regions_gameplay_core.json",
+      "roots": [
+        "0x151FC0",
+        "0x152090",
+        "0x59320",
+        "0x150960",
+        "0x582A0",
+        "0x583E0",
+        "0x58340",
+        "0x1506B0",
+        "0x591D0"
+      ],
+      "route": "r5-story-gameplay-20261016",
+      "start": "boot",
+      "source": "docs/t3702-tier2-promotion.md (T3398 math/anim lane roots registered via leaf_lane, 9 heaviest r5 roots)"
+    },
+    "engine-anim": {
+      "switches": [
+        "0x60B30",
+        "TSFP_ANIM_SHADOW=1"
+      ],
+      "regions": "tools/data/rust_trace_regions_anim_t3402.json",
+      "roots": [
+        "0x60B30"
+      ],
+      "route": "story-level1",
+      "start": "boot",
+      "source": "docs/t3402-animation-prefix.md (0x60B30 boot-window shadow and live NPC body state)"
+    },
+    "engine-object": {
+      "switches": [
+        "0xbe860"
+      ],
+      "regions": "tools/data/rust_trace_regions_object.json",
+      "roots": [
+        "0xbe860"
+      ],
+      "route": "r5",
+      "start": "gameplay",
+      "adopted": false,
+      "source": "T3702 first executed-weight slice: 0xBE860 is the highest-weight non-Tier-2 engine/object root in docs/data/t1884-exec-weights.csv (1,590,376 r5 Story calls); Tier 1 c2r and lane evidence in docs/t-object-tier2.md"
+    },
+    "engine-object-room-table": {
+      "switches": ["0x128fa0"],
+      "regions": "tools/data/rust_trace_regions_render_prep.json",
+      "roots": ["0x128fa0"],
+      "route": "r5",
+      "start": "boot",
+      "adopted": false,
+      "source": "T3702 next executed-weight candidate (538,924 r5 calls); the render-prep map covers dereferenced room-table and object-record outputs. Function semantics remain INFERRED; docs/t-object-tier2.md"
+    },
+    "engine-anim-resource-prefix": {
+      "switches": [
+        "TSFP_ANIM_RESOURCE_PREFIX=rust"
+      ],
+      "regions": "tools/data/rust_trace_regions_anim_t3402.json",
+      "roots": [
+        "0x1C8540"
+      ],
+      "route": "story-level1",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t3402-animation-prefix.md (0x1C8540 typed dependency-prefix seam; downstream NPC state only)"
+    },
+    "physics-contact-delivery": {
+      "switches": [
+        "--rust-contact-delivery"
+      ],
+      "regions": "tools/data/rust_trace_regions_physics2.json",
+      "roots": [],
+      "route": "story-arcade-transitions",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t3396-physics-contacts.md (Arcade contact pass and deferred drain observed; no dynamic owner callback observed; guest roots remain lifted)"
+    },
+    "ui-framework": {
+      "switches": [
+        "0x3fcf0",
+        "0x3f8d0",
+        "0x74760",
+        "0x40740",
+        "0x722b0",
+        "0x40fa0",
+        "0x77470",
+        "0x774b0",
+        "0x40f00",
+        "0x76400",
+        "0x757e0"
+      ],
+      "regions": "tools/data/rust_trace_regions_hud.json",
+      "roots": [
+        "0x3FCF0",
+        "0x3F8D0",
+        "0x74760",
+        "0x40740",
+        "0x722B0",
+        "0x40FA0",
+        "0x77470",
+        "0x774B0",
+        "0x40F00",
+        "0x76400",
+        "0x757E0"
+      ],
+      "route": "story-level1",
+      "start": "gameplay",
+      "adopted": false,
+      "source": "docs/t2409-ui-framework-tier2.md (T2409w rule 42: heaviest ui/framework c2r roots through crates/tsfp-ports/src/ui_framework_lane.rs; regions are the T1974 HUD draw-capture set)"
+    },
+    "ui-framework-widgets": {
+      "switches": [
+        "0x40f00",
+        "0x722b0",
+        "0x74760",
+        "0x757e0",
+        "0x76400"
+      ],
+      "regions": "tools/data/rust_trace_regions_menu.json",
+      "roots": [
+        "0x40F00",
+        "0x722B0",
+        "0x74760",
+        "0x757E0",
+        "0x76400"
+      ],
+      "route": "r5-story-gameplay",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t2409-ui-framework-tier2.md (REA: widget roots run in the r5 frontend/menu part; regions are the T2116 menu set)"
+    },
+    "ui-framework-widgets-a": {
+      "switches": [
+        "0x40f00",
+        "0x722b0",
+        "0x757e0"
+      ],
+      "regions": "tools/data/rust_trace_regions_menu.json",
+      "roots": [
+        "0x40F00",
+        "0x722B0",
+        "0x757E0"
+      ],
+      "route": "r5-story-gameplay",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t2409-ui-framework-tier2.md (REA: widget roots run in the r5 frontend/menu part; regions are the T2116 menu set)"
+    },
+    "ui-framework-widgets-b": {
+      "switches": [
+        "0x74760",
+        "0x76400"
+      ],
+      "regions": "tools/data/rust_trace_regions_menu.json",
+      "roots": [
+        "0x74760",
+        "0x76400"
+      ],
+      "route": "r5-story-gameplay",
+      "start": "boot",
+      "adopted": false,
+      "source": "docs/t2409-ui-framework-tier2.md (rerun of roots 0x74760 and 0x76400 with the cx-stackresidue and cx-calltail gate fixes; new name because the older names are on the no-rerun list)"
+    },
+    "hud-lane-t3734": {
+      "switches": [
+        "0x40260",
+        "0x23f2e0",
+        "0x2d7240",
+        "0x12cb40",
+        "0x12cbb0",
+        "0x336570",
+        "0xfc9f0",
+        "0x42f90",
+        "0x80f20",
+        "0x2e5900",
+        "0x315e50",
+        "0x2d8100",
+        "0x81ec0",
+        "0x56120",
+        "0x560e0",
+        "0x42fd0",
+        "0x1ccec0",
+        "0x1cef70",
+        "0x1ce9a0",
+        "0xfe000",
+        "0x14d480",
+        "0x81ce0",
+        "0x2e4b80",
+        "0xf9250",
+        "0x14af00"
+      ],
+      "regions": "tools/data/rust_trace_regions_hud.json",
+      "roots": [
+        "0x40260",
+        "0x23f2e0",
+        "0x2d7240",
+        "0x12cb40",
+        "0x12cbb0",
+        "0x336570",
+        "0xfc9f0",
+        "0x42f90",
+        "0x80f20",
+        "0x2e5900",
+        "0x315e50",
+        "0x2d8100",
+        "0x81ec0",
+        "0x56120",
+        "0x560e0",
+        "0x42fd0",
+        "0x1ccec0",
+        "0x1cef70",
+        "0x1ce9a0",
+        "0xfe000",
+        "0x14d480",
+        "0x81ce0",
+        "0x2e4b80",
+        "0xf9250",
+        "0x14af00"
+      ],
+      "route": "r5",
+      "start": "boot",
+      "adopted": false,
+      "source": "T3734 docs/t3734-ui-hud-tier2.md: 25 ui/hud hud_lane roots on the r5 Story gameplay replay (story-level1 is inert for HUD)"
+    },
+    "math-roots-gp": {
+      "switches": [
+        "0x151FC0",
+        "0x152090",
+        "0x59320",
+        "0x150960",
+        "0x582A0",
+        "0x583E0",
+        "0x58340",
+        "0x1506B0",
+        "0x591D0"
+      ],
+      "regions": "tools/data/rust_trace_regions_gameplay_core.json",
+      "roots": [
+        "0x151FC0",
+        "0x152090",
+        "0x59320",
+        "0x150960",
+        "0x582A0",
+        "0x583E0",
+        "0x58340",
+        "0x1506B0",
+        "0x591D0"
+      ],
+      "route": "r5-story-gameplay-20261016",
+      "start": "gameplay",
+      "source": "docs/t3702-tier2-promotion.md (math-roots from the gameplay start, math-roots-from-boot was UNREACHABLE)"
+    },
+    "math-group1": {
+      "switches": [
+        "0x153440",
+        "0x1531D0",
+        "0x151650",
+        "0x153240",
+        "0x5CEF0",
+        "0x5F430"
+      ],
+      "regions": "tools/data/rust_trace_regions_gameplay_core.json",
+      "roots": [
+        "0x153440",
+        "0x1531D0",
+        "0x151650",
+        "0x153240",
+        "0x5CEF0",
+        "0x5F430"
+      ],
+      "route": "story-level1",
+      "start": "gameplay",
+      "source": "docs/t3702-route-coverage.md GROUP 1 (objchar_wired4) minus 0x153270 (Map Maker crash, I-T3398-17)"
+    }
+  },
+  "adopted": {
+    "switches": [
+      "0x266250"
+    ],
+    "why": "T2385 REA AI runtime adopted 2026-10-20: host default --rust-rea-ai, needs its root selected"
+  }
+}

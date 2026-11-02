@@ -1,0 +1,17 @@
+[package]
+name = "tsfp-t2-offline-lifted"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "T3742 test-only: the tsfp-t2-offline runner against the private lifted originals of small engine/math ports"
+
+# The test calls the extracted lifted object through FFI. No production code, never a dependency.
+[lints.rust]
+unsafe_code = "allow"
+
+[dev-dependencies]
+tsfp-t2-offline = { path = "../tsfp-t2-offline" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-port-engine-math = { path = "../tsfp-port-engine-math" }

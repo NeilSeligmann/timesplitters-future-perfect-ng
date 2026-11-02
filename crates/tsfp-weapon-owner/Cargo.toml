@@ -1,0 +1,18 @@
+[package]
+name = "tsfp-weapon-owner"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[workspace]
+
+[dependencies]
+tsfp-port-wire = { path = "../tsfp-port-wire" }
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

@@ -1,0 +1,31 @@
+[package]
+name = "tsfp-gameplay"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The modes motion ports need std float math; the no_std hybrid lane (tsfp-ports) compiles the modes sources without it.
+default = ["motion"]
+motion = []
+
+[dependencies]
+tsfp-engine-core = { path = "../tsfp-engine-core" }
+tsfp-engine-object = { path = "../tsfp-engine-object" }
+tsfp-ai = { path = "../tsfp-ai" }
+tsfp-format-pak = { path = "../tsfp-format-pak" }
+tsfp-engine-anim = { path = "../tsfp-engine-anim" }
+tsfp-state = { path = "../tsfp-state" }
+tsfp-input = { path = "../tsfp-input" }
+tsfp-format-csinfo = { path = "../tsfp-format-csinfo" }
+tsfp-format-igcs = { path = "../tsfp-format-igcs" }
+tsfp-port-gameplay-modes-multiplayer-1 = { path = "../tsfp-port-gameplay-modes-multiplayer-1" }
+
+[dev-dependencies]
+tsfp-format-core = { path = "../tsfp-format-core" }
+tsfp-format-anim = { path = "../tsfp-format-anim" }
+tsfp-ports = { path = "../tsfp-ports", features = ["std"] }

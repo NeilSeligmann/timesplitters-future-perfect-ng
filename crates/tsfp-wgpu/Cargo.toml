@@ -1,0 +1,35 @@
+[package]
+name = "tsfp-wgpu"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+description = "T2024: wgpu renderer behind the T1898 RenderDevice trait, developed offline against recorded call streams"
+publish = false
+
+# Standalone like crates/tsfp-ports: wgpu (and its lock file) stay out of the root workspace so the
+# offline root build and its Cargo.lock are untouched. Build with `cargo ... --manifest-path`.
+[workspace]
+
+[dependencies]
+tsfp-engine-anim = { path = "../tsfp-engine-anim" }
+tsfp-engine-render = { path = "../tsfp-engine-render" }
+# Same wgpu as bevy 0.16.1 (docs/t-bevy-spike.md), pinned.
+wgpu = "=24.0.5"
+pollster = "=0.4.0"
+bytemuck = { version = "=1.25.2", features = ["derive"] }
+
+[dev-dependencies]
+tsfp-gameplay = { path = "../tsfp-gameplay" }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+split-debuginfo = "unpacked"
+
+[profile.dev.package."*"]
+debug = false

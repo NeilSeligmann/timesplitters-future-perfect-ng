@@ -1,0 +1,57 @@
+# Launcher build matrix for the public repo (github.com/NeilSeligmann/timesplitters-future-perfect-ng).
+# Source of truth: tools/release/github/workflows/ in the private repo; the release export (T4337) copies it to
+# .github/workflows/. Decision: docs/decisions/launcher.md.
+name: launcher
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux-x64, os: ubuntu-24.04, target: x86_64-unknown-linux-gnu }
+          - { name: linux-arm64, os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu }
+          - { name: macos-x64, os: macos-15, target: x86_64-apple-darwin }
+          - { name: macos-arm64, os: macos-15, target: aarch64-apple-darwin }
+          - { name: windows-x64, os: windows-2025, target: x86_64-pc-windows-msvc }
+          - { name: windows-arm64, os: windows-11-arm, target: aarch64-pc-windows-msvc }
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Toolchain
+        shell: bash
+        run: |
+          rustup show active-toolchain || rustup toolchain install
+          rustup target add ${{ matrix.target }}
+      - name: Linux packages
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libwayland-dev
+      - name: Test core
+        if: matrix.name != 'macos-x64'
+        run: cargo test -p tsfp-launcher-core --locked
+      - name: Test launcher
+        if: matrix.name != 'macos-x64'
+        run: cargo test --manifest-path crates/tsfp-launcher/Cargo.toml --locked
+      - name: Build
+        run: cargo build --release --locked --manifest-path crates/tsfp-launcher/Cargo.toml --target ${{ matrix.target }}
+      - name: Package
+        shell: bash
+        run: |
+          out=dist/tsfp-launcher-${{ matrix.name }}
+          mkdir -p "$out"
+          cp crates/tsfp-launcher/target/${{ matrix.target }}/release/tsfp-launcher${{ runner.os == 'Windows' && '.exe' || '' }} "$out/"
+          cp LICENSE "$out/"
+      - uses: actions/upload-artifact@v5
+        with:
+          name: tsfp-launcher-${{ matrix.name }}
+          path: dist/

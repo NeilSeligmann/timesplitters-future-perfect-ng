@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-engine-memory"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+native-owner-lifecycle = []
+
+[dependencies]
+tsfp-types = { path = "../tsfp-types" }

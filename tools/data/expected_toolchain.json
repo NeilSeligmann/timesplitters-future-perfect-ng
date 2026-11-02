@@ -1,0 +1,10 @@
+{
+  "_doc": "T3737 / docs/t-toolchain-parity.md: the first `--version` line of each tool that the prebuilt input hash folds in (tools/wt/cache_keys.py tool_versions, names cc, cmake, python3). Builder hosts must report exactly these (provision step toolchain-parity). Values are the owner PC container's, the toolchain the hash is computed under; bump all three together with the owner PC. build_image: the Debian 13 build container (tools/fleet/remote/builder-image/Dockerfile) that fleet.json hosts with build_container run builds and the probe in (docs/t-toolchain-parity.md); id is the docker image ID.",
+  "cc": "Debian clang version 19.1.7 (3+b1)",
+  "cmake": "cmake version 3.31.6",
+  "python3": "Python 3.13.5",
+  "build_image": {
+    "name": "tsfp-build:trixie",
+    "id": "sha256:bc1602560c785227dca945b7d5c73cf0a91b918807288175da1ff0a6c4609225"
+  }
+}

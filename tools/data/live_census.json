@@ -1,0 +1,103 @@
+{
+  "_doc": "T3824 live hit census default gate, read by tools.live_census.gate (build.sh default of TSFP_BUILD_LIVE_CENSUS). ON only when measured.overhead_pct <= threshold_pct. Evidence: docs/t3824-live-hit-census.md.",
+  "threshold_pct": 2.0,
+  "measured": {
+    "overhead_pct": -1.74,
+    "metric": "host cpu_s (src/host/host_cost.c) of a fast-forward replay to route end (render none), median per profile, census vs census-off build, interleaved, same worker and sha",
+    "cpu_overhead_pct": -1.74,
+    "wall_overhead_pct": -1.54,
+    "host": "deck",
+    "sha": "3810639f7a425bf735c99620c0df098c807b3df5",
+    "route": "arcade-full-20261020.rec",
+    "runs": {
+      "census-off": [
+        {
+          "cpu_s": 25.137,
+          "instructions": null,
+          "census_hits": null,
+          "run_seconds": 44.826
+        },
+        {
+          "cpu_s": 23.087,
+          "instructions": null,
+          "census_hits": null,
+          "run_seconds": 31.361
+        },
+        {
+          "cpu_s": 23.322,
+          "instructions": null,
+          "census_hits": null,
+          "run_seconds": 42.068
+        },
+        {
+          "cpu_s": 25.156,
+          "instructions": null,
+          "census_hits": null,
+          "run_seconds": 27.691
+        }
+      ],
+      "census": [
+        {
+          "cpu_s": 22.18,
+          "instructions": null,
+          "census_hits": 1715,
+          "run_seconds": 38.266
+        },
+        {
+          "cpu_s": 22.958,
+          "instructions": null,
+          "census_hits": null,
+          "run_seconds": 34.035
+        },
+        {
+          "cpu_s": 25.048,
+          "instructions": null,
+          "census_hits": null,
+          "run_seconds": 38.845
+        },
+        {
+          "cpu_s": 24.656,
+          "instructions": null,
+          "census_hits": 1715,
+          "run_seconds": 33.177
+        }
+      ]
+    },
+    "measured_at": "2026-10-27T05:32:59Z",
+    "note": "perf instructions unavailable on the deck (perf_event_paranoid), so CPU time. Run-to-run spread of the same build is about 12% (off 23.1 to 25.2 s), so the result is: no overhead measurable at this resolution; the -1.74% median is noise. Design: inline asm-store probe (src/host/live_census_hit.h)."
+  },
+  "history": [
+    {
+      "design": "-finstrument-functions hook",
+      "sha": "fb170033fc",
+      "host": "deck",
+      "metric": "wall run_seconds",
+      "off": [
+        38.3,
+        60.1
+      ],
+      "on": [
+        83.5,
+        47.4
+      ],
+      "verdict": "about 33% median (2x in round 1); replaced"
+    },
+    {
+      "design": "inline plain C byte store",
+      "sha": "2169f32428",
+      "host": "deck",
+      "metric": "wall run_seconds",
+      "off": [
+        55.2,
+        47.8,
+        69.8
+      ],
+      "on": [
+        244.1,
+        75.7,
+        42.6
+      ],
+      "verdict": "wall time too noisy (244 s outlier under concurrent replays); replaced by the asm store and CPU time"
+    }
+  ]
+}

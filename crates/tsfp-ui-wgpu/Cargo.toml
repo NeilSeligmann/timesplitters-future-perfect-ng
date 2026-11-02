@@ -1,0 +1,43 @@
+[package]
+name = "tsfp-ui-wgpu"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+publish = false
+
+# Keep the GPU dependency out of the offline root workspace.
+[workspace]
+
+[dependencies]
+tsfp-ui-renderer = { path = "../tsfp-ui-renderer" }
+# T2189 slice 13: PagePresenter and the frame-hash scaffold (path only, no network deps).
+tsfp-ui-model = { path = "../tsfp-ui-model" }
+tsfp-wgpu = { path = "../tsfp-wgpu" }
+# T2189 slice 15: read default.xbe and the string banks from the owner's disc image at run time
+# (pure Rust XDVDFS reader and inflate, no crates.io deps, so the Bevy shell's offline cargo home builds it).
+tsfp-import = { path = "../tsfp-import" }
+tsfp-format-core = { path = "../tsfp-format-core" }
+tsfp-format-pak = { path = "../tsfp-format-pak" }
+wgpu = "=24.0.5"
+# T2307: outline font rasteriser of the opt-in `improved` preset (MIT OR Apache-2.0). Optional so the
+# offline cargo homes without it still build; tools/dev/build.sh fetches it and enables the feature.
+ab_glyph = { version = "=0.2.32", optional = true }
+
+[features]
+outline-fonts = ["dep:ab_glyph"]
+
+[dev-dependencies]
+pollster = "=0.4.0"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+split-debuginfo = "unpacked"
+
+[profile.dev.package."*"]
+debug = false

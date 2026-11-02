@@ -1,0 +1,26 @@
+[package]
+name = "tsfp-input-capi"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+# The C ABI uses unsafe pointer access; the state model remains safe in tsfp-input.
+[workspace]
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+tsfp-input = { path = "../tsfp-input" }
+tsfp-input-devices = { path = "../tsfp-input-devices" }
+tsfp-input-record = { path = "../tsfp-input-record" }
+tsfp-input-host-wiring = { path = "../tsfp-input-host-wiring", optional = true }
+tsfp-input-route-spec = { path = "../tsfp-input-route-spec", optional = true }
+tsfp-input-hotkey-host = { path = "../tsfp-input-hotkey-host", optional = true }
+tsfp-input-route-engine = { path = "../tsfp-input-route-engine", optional = true }
+tsfp-input-mu = { path = "../tsfp-input-mu", optional = true }
+
+# T3975: the tsfp_input_host_* entry points; needs the host executable (C XInput modules), so opt-in per build.
+[features]
+rust-input-host = ["dep:tsfp-input-host-wiring", "dep:tsfp-input-route-spec", "dep:tsfp-input-hotkey-host", "dep:tsfp-input-route-engine", "dep:tsfp-input-mu"]

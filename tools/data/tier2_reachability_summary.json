@@ -1,0 +1,244 @@
+{
+ "by_subsystem": {
+  "ai/behavior": {
+   "b": 2,
+   "c": 113,
+   "d": 4,
+   "e": 2
+  },
+  "ai/characters": {
+   "b": 2,
+   "c": 73,
+   "e": 4
+  },
+  "ai/pathfinding": {
+   "c": 13
+  },
+  "data/cutscenes": {
+   "b": 1,
+   "c": 35,
+   "d": 1,
+   "e": 1
+  },
+  "data/missions": {
+   "b": 1,
+   "c": 390,
+   "d": 34,
+   "e": 91
+  },
+  "data/save": {
+   "b": 2,
+   "c": 23
+  },
+  "data/text": {
+   "a": 5,
+   "c": 12,
+   "d": 2,
+   "e": 1
+  },
+  "engine/anim": {
+   "c": 15,
+   "e": 13
+  },
+  "engine/math": {
+   "c": 23,
+   "d": 4,
+   "e": 1
+  },
+  "engine/object": {
+   "a": 2,
+   "b": 6,
+   "c": 601,
+   "d": 27,
+   "e": 66
+  },
+  "engine/physics": {
+   "c": 56,
+   "d": 1,
+   "e": 1
+  },
+  "engine/render": {
+   "c": 8
+  },
+  "engine/render/effects": {
+   "b": 2,
+   "c": 225,
+   "d": 5,
+   "e": 32
+  },
+  "engine/render/scene": {
+   "c": 50,
+   "d": 4,
+   "e": 1
+  },
+  "gameplay/inventory": {
+   "c": 3
+  },
+  "gameplay/modes": {
+   "c": 27,
+   "d": 2,
+   "e": 3
+  },
+  "gameplay/modes/multiplayer": {
+   "c": 20
+  },
+  "gameplay/player": {
+   "b": 2,
+   "c": 123,
+   "e": 2
+  },
+  "gameplay/vehicles": {
+   "c": 11
+  },
+  "gameplay/weapons": {
+   "b": 1,
+   "c": 125,
+   "d": 1,
+   "e": 9
+  },
+  "mapmaker/content": {
+   "c": 1
+  },
+  "mapmaker/editor": {
+   "b": 2,
+   "c": 282,
+   "d": 39,
+   "e": 7
+  },
+  "mapmaker/modes": {
+   "c": 5
+  },
+  "mapmaker/storage": {
+   "c": 13,
+   "d": 2
+  },
+  "mapmaker/ui": {
+   "b": 1,
+   "c": 64,
+   "e": 1
+  },
+  "ui/framework": {
+   "b": 6,
+   "c": 93,
+   "d": 1,
+   "e": 5
+  },
+  "ui/hud": {
+   "b": 3,
+   "c": 223,
+   "d": 2,
+   "e": 3
+  },
+  "ui/menu": {
+   "a": 3,
+   "b": 187,
+   "c": 366,
+   "d": 14,
+   "e": 44
+  },
+  "ui/settings": {
+   "c": 14,
+   "d": 1
+  }
+ },
+ "class_b_kinds": {
+  "error-path": 16,
+  "network-peer": 84,
+  "online": 117,
+  "storage-fault": 1
+ },
+ "classes": {
+  "a MEASURED": 10,
+  "b INFERRED": 215,
+  "b MEASURED": 3,
+  "c INFERRED": 552,
+  "c MEASURED": 2455,
+  "d MEASURED": 144,
+  "e INFERRED": 287
+ },
+ "doc": "docs/t3793-tier2-reachability-audit.md",
+ "execution_sources": {
+  "capture corpus": 5461,
+  "recording census": 1871,
+  "tier 2 credit": 2965,
+  "weights": 4357
+ },
+ "graph": {
+  "data_objects": 12108,
+  "dead_functions": 70,
+  "functions": 14475,
+  "live_functions": 14405,
+  "nodes": 37071,
+  "roots": 2
+ },
+ "per_function_csv": "generated/t2reach/tier2_reachability.csv",
+ "pins": {
+  "function_table": "generated/retail/functions.csv + tools/data/function_overrides.csv + tools/data/function_additions.csv",
+  "function_table_sha256": "e363a42c36030fc44dc6f5483f2f340eedc3d4354a5db0a06ff196643c8bfea0",
+  "functions": "14475",
+  "xbe_sha256": "3cfd001a84fc3e08175d6c4b2e42ebf49577a089b5d0bd87ac724f61a41816bc"
+ },
+ "port_functions": 7681,
+ "rebuild": "python3 -m tools.t2reach audit --write",
+ "schema": 1,
+ "sessions": {
+  "S1": {
+   "INFERRED": 24,
+   "MEASURED": 63
+  },
+  "S10": {
+   "INFERRED": 47,
+   "MEASURED": 258
+  },
+  "S11": {
+   "INFERRED": 249,
+   "MEASURED": 183
+  },
+  "S12": {
+   "INFERRED": 20,
+   "MEASURED": 200
+  },
+  "S13": {
+   "INFERRED": 30,
+   "MEASURED": 368
+  },
+  "S14": {
+   "MEASURED": 452
+  },
+  "S2": {
+   "INFERRED": 7,
+   "MEASURED": 18
+  },
+  "S3": {
+   "INFERRED": 8,
+   "MEASURED": 36
+  },
+  "S4": {
+   "INFERRED": 12,
+   "MEASURED": 37
+  },
+  "S5": {
+   "INFERRED": 43,
+   "MEASURED": 50
+  },
+  "S6": {
+   "INFERRED": 43,
+   "MEASURED": 431
+  },
+  "S7": {
+   "INFERRED": 59,
+   "MEASURED": 257
+  },
+  "S8": {
+   "INFERRED": 10,
+   "MEASURED": 94
+  },
+  "S9": {
+   "MEASURED": 8
+  }
+ },
+ "soundness_executed_checked": 5564,
+ "task": "T3793",
+ "with_execution_evidence": 4015,
+ "without_execution_evidence": 3666
+}

@@ -1,0 +1,24 @@
+[package]
+name = "tsfp-kernel-object"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+[workspace]
+[features]
+default = []
+rust-kernel-object = []
+oracle-fixtures = []
+[[example]]
+name = "oracle"
+required-features = ["oracle-fixtures"]
+[lints.rust]
+unsafe_code = "forbid"
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

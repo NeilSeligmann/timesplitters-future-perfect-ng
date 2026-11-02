@@ -1,0 +1,115 @@
+{
+  "_doc": "T3763: supervised long-running loops (tools.agents.loops). alive: module:function(root) owned by the loop's module; module+args or start: how to restart; restart false = HEALTH only; stopped: module:function(root), True while the loop's own kill switch is set (no restart); switch: module:function(root) -> Path of that kill switch, set and cleared by a stale-code restart (T3830, tools.agents.loop_code; without one the supervisor writes tmp/loops/<key>.restart.json, honoured by loops.tick); restart_wait_s: how long a graceful stop may take (default max_silence_s). T3777: any supervisor in any container restarts a dead loop (liveness is the loop's flock). docs/decisions/robust-tooling.md",
+  "loops": [
+    {
+      "name": "ready-lander",
+      "alive": "tools.agents.ready_lander:loop_alive",
+      "module": "tools.agents.ready_lander",
+      "args": [
+        "--loop",
+        "--interval",
+        "180"
+      ],
+      "max_silence_s": 7800,
+      "restart_wait_s": 7800,
+      "log": "tmp/ready-lander/loop.out",
+      "stopped": "tools.agents.ready_lander:loop_stopped",
+      "switch": "tools.agents.ready_lander:kill_switch"
+    },
+    {
+      "name": "main-guard",
+      "alive": "tools.agents.main_guard:loop_alive",
+      "module": "tools.agents.main_guard",
+      "args": [
+        "--loop"
+      ],
+      "max_silence_s": 5400,
+      "log": "tmp/main-guard/loop.out"
+    },
+    {
+      "name": "fleet-balance",
+      "alive": "tools.fleet.balance:loop_alive",
+      "module": "tools.fleet.balance",
+      "args": [
+        "--loop",
+        "--interval",
+        "300"
+      ],
+      "max_silence_s": 1800,
+      "log": "tmp/fleet/balance-loop.out",
+      "stopped": "tools.fleet.balance:loop_stopped",
+      "switch": "tools.fleet.balance:kill_switch"
+    },
+    {
+      "name": "hygiene",
+      "alive": "tools.wt.hygiene:loop_alive",
+      "start": "tools.wt.hygiene:ensure_loop",
+      "max_silence_s": 7200,
+      "log": "tmp/hygiene-loop.log"
+    },
+    {
+      "name": "lease-watch",
+      "alive": "tools.wt.lease:loop_alive",
+      "start": "tools.wt.lease:ensure_watch_loop",
+      "max_silence_s": 1800,
+      "per_namespace": true
+    },
+    {
+      "name": "fleet-controller",
+      "alive": "tools.fleet.controller:loop_alive",
+      "module": "tools.fleet",
+      "args": [
+        "run",
+        "--live"
+      ],
+      "max_silence_s": 1800,
+      "log": "tmp/fleet/controller.out",
+      "stopped": "tools.fleet.controller:loop_stopped",
+      "switch": "tools.fleet.controller:kill_switch"
+    },
+    {
+      "name": "t2-continuous",
+      "alive": "tools.t2capture.continuous:loop_alive",
+      "module": "tools.t2capture.continuous",
+      "args": [
+        "loop"
+      ],
+      "max_silence_s": 2700,
+      "restart_wait_s": 5400,
+      "log": "tmp/t2continuous/loop.out",
+      "stopped": "tools.t2capture.continuous:loop_stopped",
+      "switch": "tools.t2capture.continuous:kill_switch"
+    },
+    {
+      "name": "prebuilt-prewarm",
+      "alive": "tools.wt.prewarm:loop_alive",
+      "module": "tools.wt.prewarm",
+      "args": [
+        "--loop",
+        "--interval",
+        "120"
+      ],
+      "max_silence_s": 7800,
+      "restart_wait_s": 7800,
+      "log": "tmp/prewarm/loop.out",
+      "stopped": "tools.wt.prewarm:loop_stopped",
+      "switch": "tools.wt.prewarm:kill_switch"
+    },
+    {
+      "name": "lane-supervisor",
+      "alive": "tools.agents.lane_supervisor:loop_alive",
+      "module": "tools.agents.lane_supervisor",
+      "args": [
+        "--loop",
+        "--interval",
+        "300",
+        "--spawn-fixers"
+      ],
+      "max_silence_s": 3600,
+      "restart_wait_s": 3600,
+      "log": "tmp/lane-supervisor/loop.out",
+      "stopped": "tools.agents.lane_supervisor:loop_stopped",
+      "switch": "tools.agents.lane_supervisor:kill_switch"
+    }
+  ]
+}

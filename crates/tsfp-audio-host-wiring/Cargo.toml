@@ -1,0 +1,20 @@
+[package]
+name = "tsfp-audio-host-wiring"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3916: the tsfp_audio_host_* entry points (DirectSound HLE host wiring) in Rust, Rust-owned wiring state"
+
+# Standalone and outside the root workspace like tsfp-audio-capi, which links it behind its rust-audio-host feature. The
+# crate calls the C dsound_* modules and xdk_thunk_* routes, which only the host executable provides, so it has no unit
+# tests of its own: the call set and order are pinned by tests/test_rust_audio_host_build_review.py.
+[workspace]
+
+[lib]
+test = false
+doctest = false
+
+[dependencies]
+tsfp-audio = { path = "../tsfp-audio" }
+tsfp-audio-stream-glue = { path = "../tsfp-audio-stream-glue" }

@@ -1,0 +1,12 @@
+[package]
+name = "tsfp-scene-compare"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tsfp-scene-model = { path = "../tsfp-scene-model" }
+
+[lints]
+workspace = true

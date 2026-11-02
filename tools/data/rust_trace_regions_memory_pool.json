@@ -1,0 +1,10 @@
+{
+  "_comment": "T3879 MEM-4: pool accounting/bounds and first/search block headers from game_pool_rust_bridge.c. Representative state comparison, not a complete heap traversal or payload proof; no masks.",
+  "regions": [
+    {"name": "pool_accounting_and_bounds", "spec": "0x6B83BC:0x1C"},
+    {"name": "pool_configured_size", "spec": "0x4C81B8:4"},
+    {"name": "pool_previous_size", "spec": "0x6B7AA8:4"},
+    {"name": "pool_first_header", "spec": "*0x6B83C8+0:0x20"},
+    {"name": "pool_search_header", "spec": "*0x6B83CC+0:0x20"}
+  ]
+}

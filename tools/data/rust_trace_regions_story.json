@@ -1,0 +1,37 @@
+{
+  "_comment": "T2431 rule-24 gate regions for the recorded Story menu-to-sequencer path and the entered Story mode. Sources: docs/t1832-rea-story-activation.md and docs/t2431-story-sequencer.md; selected global ranges are MEASURED from the documented callback/sequencer state contract. This checks state traces, not rendered UI pixels.",
+  "regions": [
+    {
+      "name": "story_menu_state",
+      "spec": "0x78AD2C:0x2C"
+    },
+    {
+      "name": "story_staged_mode_block",
+      "spec": "0x78AD58:0xA0"
+    },
+    {
+      "name": "story_page_scroll",
+      "spec": "0x76004C:0x4"
+    },
+    {
+      "name": "story_mode_record",
+      "spec": "0x508390:0x158"
+    },
+    {
+      "name": "story_mode_cells",
+      "spec": "0x6F32F0:0x10"
+    },
+    {
+      "name": "story_mode_select_flags",
+      "spec": "0x7DE490:0x10"
+    },
+    {
+      "name": "story_mode_flags",
+      "spec": "0x7DE400:0x80"
+    },
+    {
+      "name": "story_level_state",
+      "spec": "0x790940:0x20"
+    }
+  ]
+}

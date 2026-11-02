@@ -1,0 +1,15 @@
+[package]
+name = "tsfp-render-materials"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tsfp-scene-model = { path = "../tsfp-scene-model" }
+tsfp-state = { path = "../tsfp-state" }
+tsfp-format-xbt = { path = "../tsfp-format-xbt" }
+tsfp-engine-fileio = { path = "../tsfp-engine-fileio" }
+
+[lints]
+workspace = true

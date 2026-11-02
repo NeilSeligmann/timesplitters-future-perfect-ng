@@ -1,0 +1,24 @@
+[package]
+name = "tsfp-dispatch-capi"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3869 lane B: C ABI of tsfp-dispatch for the C host (TSFP_RUST_DISPATCH, default off)"
+[lib]
+# cdylib for the host (cmake/rust-dispatch.cmake), rlib so the C-oracle test crate calls the same entry points.
+crate-type = ["cdylib", "rlib"]
+[workspace]
+[dependencies]
+tsfp-dispatch = { path = "../tsfp-dispatch" }
+# The FFI boundary needs raw pointers; tsfp-dispatch itself stays unsafe-free.
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

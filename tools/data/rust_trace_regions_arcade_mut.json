@@ -1,0 +1,15 @@
+{
+ "_comment": "T2119b: the T2116 routes region set minus ui_pages (animation floats follow the wall clock) plus windows around what the Arcade memory mutants wrote: 0x1C6C00 (0x42F1B523, 0x42F1B923, 0x42F1DD23, 0x42F1E123) and 0x238610 (12 heap bytes in 0x4374579B..0x4374927B).",
+ "regions": [
+  {"name": "level_state", "spec": "0x79094C:0x4"},
+  {"name": "mode_bytes", "spec": "0x7DE455:0x4"},
+  {"name": "mode_cached_ptr", "spec": "0x6F32F0:0x4"},
+  {"name": "mode_bss_record", "spec": "0x78CC00:0x154"},
+  {"name": "mapedit_ptr", "spec": "0x7844A8:0x4"},
+  {"name": "mapedit_obj", "spec": "*0x7844A8+0:0x11950"},
+  {"name": "save_slot0", "spec": "0x7BEDC0:0x1F54"},
+  {"name": "mutw_1c6c00_a", "spec": "**0x72F700+0x4+0x1800:0x440"},
+  {"name": "mutw_1c6c00_b", "spec": "*0x70E5C0+0x1600:0x440"},
+  {"name": "mutw_238610", "spec": "*0x75CCC0+0x700:0x3F00"}
+ ]
+}

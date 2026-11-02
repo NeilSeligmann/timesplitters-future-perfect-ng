@@ -1,0 +1,23 @@
+[package]
+name = "tsfp-data-formats"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-types = { path = "../tsfp-types" }
+tsfp-format-core = { path = "../tsfp-format-core" }
+tsfp-format-pak = { path = "../tsfp-format-pak" }
+tsfp-format-xbr = { path = "../tsfp-format-xbr" }
+tsfp-format-xbt = { path = "../tsfp-format-xbt" }
+tsfp-format-bs = { path = "../tsfp-format-bs" }
+tsfp-format-csinfo = { path = "../tsfp-format-csinfo" }
+tsfp-format-igcs = { path = "../tsfp-format-igcs" }
+tsfp-format-profile = { path = "../tsfp-format-profile" }
+tsfp-format-script = { path = "../tsfp-format-script" }
+tsfp-format-anim = { path = "../tsfp-format-anim" }
+tsfp-engine-memory = { path = "../tsfp-engine-memory" }

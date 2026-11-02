@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-host-memory-capture"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+[lib]
+crate-type = ["rlib", "staticlib", "cdylib"]
+
+[workspace]
+
+[dev-dependencies]
+tsfp-engine-fileio = { path = "../tsfp-engine-fileio" }
+tsfp-engine-memory = { path = "../tsfp-engine-memory" }
+tsfp-kernel-object = { path = "../tsfp-kernel-object" }

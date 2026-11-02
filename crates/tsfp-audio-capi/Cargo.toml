@@ -1,0 +1,44 @@
+[package]
+name = "tsfp-audio-capi"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "T2046 audio compare mode: the Rust DirectSound lifecycle/setters/frames of tsfp-audio as a read-only twin of the C host"
+publish = false
+
+# Standalone and outside the root workspace (like tsfp-kmem-capi): the C ABI needs `unsafe`. The model logic stays in
+# tsfp-audio (which forbids unsafe). No dependency on tsfp-ports or wgpu, so none of the symbol clashes of
+# docs/t-rust-hosted-dispatcher.md apply.
+[workspace]
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+tsfp-audio = { path = "../tsfp-audio" }
+tsfp-audio-gpdsp = { path = "../tsfp-audio-gpdsp" }
+tsfp-audio-observe = { path = "../tsfp-audio-observe" }
+tsfp-audio-stream-status = { path = "../tsfp-audio-stream-status" }
+tsfp-audio-stream-snapshot = { path = "../tsfp-audio-stream-snapshot" }
+# T3916: the tsfp_audio_host_* entry points, re-exported below so this cdylib exports them.
+tsfp-audio-host-wiring = { path = "../tsfp-audio-host-wiring", optional = true }
+tsfp-audio-movie-host = { path = "../tsfp-audio-movie-host", optional = true }
+tsfp-audio-hle-core = { path = "../tsfp-audio-hle-core", optional = true }
+
+[features]
+# Detection-power check of the compare mode (T2046): the Rust twin deviates on purpose, see compare.rs. Never default.
+fault-inject = []
+# Movie-device Release HLE imports require the matching Rust-audio-host C ABI.
+rust-audio-host = ["dep:tsfp-audio-host-wiring", "dep:tsfp-audio-movie-host", "dep:tsfp-audio-hle-core"]
+# Use the Rust kernel-clock state directly for audio samples when the host links T2207.
+rust-kernel-clock = []
+# Call the Rust GuestRegions audio-heap ABI directly when Rust kmem is linked and active.
+rust-kmem = []
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

@@ -1,0 +1,32 @@
+[package]
+name = "tsfp-kmem-capi"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "T2048 slice K live binding: mmap Placement and C ABI over tsfp-engine-memory KernelMemory"
+publish = false
+
+# Standalone and outside the root workspace (like tsfp-fileio-capi): mmap and the C ABI need `unsafe`, which the
+# workspace forbids. The safe logic stays in tsfp-engine-memory. No dependency on tsfp-ports or wgpu, so none of the
+# symbol clashes of docs/t-rust-hosted-dispatcher.md apply (a new small cdylib, not tsfp-rt-host).
+[workspace]
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+tsfp-engine-memory = { path = "../tsfp-engine-memory" }
+
+tsfp-types = { path = "../tsfp-types" }
+
+[features]
+# Detection-power check of the compare mode (T2048): the model deviates on purpose, see ops.rs.
+fault-inject = []
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

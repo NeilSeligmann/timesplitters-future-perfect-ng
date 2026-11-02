@@ -1,0 +1,101 @@
+{
+ "_comment": "T1974 HUD trace regions (<=16). HUD roots write mostly through draw calls: vtx_cursor/vtx_state (the 0x2D7240 vertex stream cursor at 0x55F974), dev_pb_head/dev_pb_fence (pushbuffer cursor, limit and fence words of the D3D8 device behind the pointer slot 0x3E3F58, docs/d3d8-usage.md and d3d8-draw-cascade.md) act as the draw-call capture: the cursor advances by the size of every packet the HUD emits, so a missing, extra or resized draw shows as a different cursor at the same sample. Packet CONTENT behind the cursor is not reachable with the dump grammar (no negative offsets): evidence limit, see docs/t1974-hud-tier2.md. hud_vars/hud_scale_block = HUD mode and scale floats 0x7E7260.. (MEASURED in the T1909 disassembly). T1987: hud_palette_blend = the bytes 0xFC9F0 writes (memory mutant MUTWRITE 0x73AE8F, 0x73B067, 0x73B23F); hud_player_slots/hud_local_slot_flags/hud_popup_counter/hud_string_mask = state the predicates 0x12CB40, 0x12CBB0, 0x42F90 and the string-row root feed (names from the c2r ui_hud translations). T1990/T2017 follow-up mask (ignore_ranges, only these words): device+0x2C and +0x34 (dev_pb_head +0x2C/+0x34, the same words as dev_pb_fence +0xC/+0x14) are GPU-timing counters: in 3 runs off/off2 agree on them but off vs a Rust run differs in 22 and 11 deterministic samples at random polls (first 402, then 456), the count varies run to run, and bisect cannot reproduce it. The pushbuffer cursor words (+0x0/+0x4/+0x24/+0x28/+0x30, fence +0x4/+0x8/+0x10) are already global-noise masked by the off/off control, so after this mask the proxy sees draw COUNT only through whatever the control leaves unmasked: effectively no draw-call evidence (see docs/t1974-hud-tier2.md).",
+ "regions": [
+  {
+   "name": "level_state",
+   "spec": "0x79094C:4"
+  },
+  {
+   "name": "player_ptr",
+   "spec": "0x7B0C48:4"
+  },
+  {
+   "name": "mode_flags",
+   "spec": "0x7DE400:0x80"
+  },
+  {
+   "name": "hud_vars",
+   "spec": "0x7E7260:0x40",
+   "float_ranges": [
+    [
+     4,
+     12
+    ]
+   ]
+  },
+  {
+   "name": "vtx_cursor",
+   "spec": "0x55F974:4"
+  },
+  {
+   "name": "vtx_state",
+   "spec": "0x55F960:0x40"
+  },
+  {
+   "name": "popup_table",
+   "spec": "0x514710:0x140"
+  },
+  {
+   "name": "device_ptr",
+   "spec": "0x3E3F58:8"
+  },
+  {
+   "name": "dev_pb_head",
+   "spec": "*0x3E3F58+0:0x40",
+   "ignore_ranges": [
+    [
+     44,
+     4
+    ],
+    [
+     52,
+     4
+    ]
+   ]
+  },
+  {
+   "name": "dev_pb_fence",
+   "spec": "*0x3E3F58+0x20:0x20",
+   "ignore_ranges": [
+    [
+     12,
+     4
+    ],
+    [
+     20,
+     4
+    ]
+   ]
+  },
+  {
+   "name": "hud_scale_block",
+   "spec": "0x7E7270:0x20",
+   "float_ranges": [
+    [
+     0,
+     8
+    ]
+   ]
+  },
+  {
+   "name": "hud_palette_blend",
+   "spec": "0x73AE80:0x3E0"
+  },
+  {
+   "name": "hud_player_slots",
+   "spec": "0x7A6160:0x80"
+  },
+  {
+   "name": "hud_local_slot_flags",
+   "spec": "0x761C48:8"
+  },
+  {
+   "name": "hud_popup_counter",
+   "spec": "0x75AF00:4"
+  },
+  {
+   "name": "hud_string_mask",
+   "spec": "0x7E7240:4"
+  }
+ ]
+}

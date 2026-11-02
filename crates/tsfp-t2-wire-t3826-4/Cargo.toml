@@ -1,0 +1,13 @@
+[package]
+name = "tsfp-t2-wire-t3826-4"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+tsfp-engine-object = { path = "../tsfp-engine-object" }
+tsfp-port-engine-object-4 = { path = "../tsfp-port-engine-object-4" }
+tsfp-port-engine-object-5 = { path = "../tsfp-port-engine-object-5" }
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+
+[workspace]

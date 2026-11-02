@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-memory-abi"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+[lib]
+crate-type = ["rlib"]
+
+[features]
+# T3906: report MappedGuest stores to the host capture witness (needs the host symbols in guest_mem.c).
+direct-witness = []
+
+[dependencies]
+tsfp-engine-memory = { path = "../tsfp-engine-memory" }

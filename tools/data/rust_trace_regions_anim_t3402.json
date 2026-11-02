@@ -1,0 +1,15 @@
+{
+  "_comment": "T3402 Rule 24 animation behavior window: the first two live NPC animation bodies, matching the measured body pointers/width and float lanes in rust_trace_regions_npc.json. The engine-anim gate starts story-level1 at boot to include the 0x60B30 shadow root and sample live body state later in the route. This checks downstream animation state only; it does not measure archive ownership or shared-slot release.",
+  "regions": [
+    {
+      "name": "npc_body0",
+      "spec": "***0x7A3580+0+4+0:0x1C0",
+      "float_ranges": [[220, 2], [264, 1], [308, 2], [352, 1], [408, 1]]
+    },
+    {
+      "name": "npc_body1",
+      "spec": "***0x7A3584+0+4+0:0x1C0",
+      "float_ranges": [[220, 2], [264, 1], [308, 2], [352, 1], [408, 1]]
+    }
+  ]
+}

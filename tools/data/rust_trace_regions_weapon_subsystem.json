@@ -1,0 +1,9 @@
+{
+  "_comment": "T2411 core owner-state projection. The reserved host-only address serializes inventory flags/selections, reserve/ammo, two owned hand records, and the source-backed fire-mode pair; it never maps into or writes guest memory. Compare only this varying Rust-owned state: level_state is an unrelated route phase and diagnostics are constant on r5. Presentation-controller transitions, payload and interaction remain separate slices.",
+  "regions": [
+    {
+      "name": "weapon_inventory_owner",
+      "spec": "=0xFFFF3000:0x5E8"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+ "_comment": "T2142 mapmaker/ui Tier 2 regions: level and mode cells, the Map Maker editor object, the shared UI globals block 0x783C00 (hud panel slide, style table cells), the framework slots, the Map Maker BSS record and the 0x6B7ABB mutant byte window. ui_pages is excluded (animation floats follow the wall clock, T2116). Round 2 adds the 0x7BA17C and 0x7E7263 mutant bytes (roots 0x81480, 0x30AEA0).",
+ "regions": [
+  {
+   "name": "level_state",
+   "spec": "0x79094C:0x4"
+  },
+  {
+   "name": "mode_bytes",
+   "spec": "0x7DE455:0x4"
+  },
+  {
+   "name": "mode_bss_record",
+   "spec": "0x78CC00:0x154"
+  },
+  {
+   "name": "mapedit_ptr",
+   "spec": "0x7844A8:0x4"
+  },
+  {
+   "name": "mapedit_obj",
+   "spec": "*0x7844A8+0:0x11950"
+  },
+  {
+   "name": "ui_globals",
+   "spec": "0x783C00:0x400"
+  },
+  {
+   "name": "fw_slots2",
+   "spec": "0x7BB1E0:0x20"
+  },
+  {
+   "name": "mutw_6b7ab",
+   "spec": "0x6B7AA0:0x40"
+  },
+  {
+   "name": "fw_slots",
+   "spec": "0x7BA100:0xC0"
+  },
+  {
+   "name": "mutw_7e726",
+   "spec": "0x7E7200:0x100"
+  },
+  {
+   "name": "mutw_42dbc",
+   "spec": "*0x7844A8+0x11950:0x40"
+  }
+ ]
+}

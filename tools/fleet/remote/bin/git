@@ -1,0 +1,16 @@
+#!/bin/sh
+# Worker git guard (supervisor 2026-10-17): refs/stash and the index are shared across the real repo's worktrees.
+# Applies only inside /workspace (the real repo and its worktrees); disposable test repos elsewhere are unaffected.
+export GIT_NO_LAZY_FETCH=1  # blobless worker repo: a missing object must fail fast, never lazy-fetch (T3678)
+REAL=/usr/bin/git
+dir=.; prev=
+for a in "$@"; do [ "$prev" = "-C" ] && dir="$a"; prev="$a"; done
+top=$(cd "$dir" 2>/dev/null && $REAL rev-parse --show-toplevel 2>/dev/null)
+case "$top" in /workspace|/workspace/*) ;; *) exec $REAL "$@";; esac
+for a in "$@"; do case "$a" in -C|-c) skip=1; continue;; esac; [ -n "$skip" ] && { skip=; continue; }; sub="$a"; break; done
+case "$sub" in
+  stash) echo "git stash is forbidden for workers (shared refs/stash). Use a WIP commit or git diff > /tmp/<task>.patch." >&2; exit 2;;
+  reset) case " $* " in *" --hard "*) echo "git reset --hard is forbidden for workers." >&2; exit 2;; esac;;
+  worktree) case " $* " in *" remove "*"--force"*|*" remove "*" -f "*) echo "git worktree remove --force is forbidden; use python3 -m tools.wt remove." >&2; exit 2;; esac;;
+esac
+exec $REAL "$@"

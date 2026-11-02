@@ -1,0 +1,19 @@
+[package]
+name = "tsfp-ui-ext"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tsfp-ui-model = { path = "../tsfp-ui-model" }
+tsfp-ui-renderer = { path = "../tsfp-ui-renderer" }
+tsfp-ui-input = { path = "../tsfp-ui-input" }
+tsfp-text-field = { path = "../tsfp-text-field" }
+tsfp-input = { path = "../tsfp-input" }
+tsfp-format-profile = { path = "../tsfp-format-profile" }
+tsfp-settings = { path = "../tsfp-settings" }
+serde_json = "=1.0.145"
+
+[lints]
+workspace = true

@@ -1,0 +1,16 @@
+[package]
+name = "tsfp-ai"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-engine-object = { path = "../tsfp-engine-object" }
+tsfp-ai-spawn-binding = { path = "../tsfp-ai-spawn-binding" }
+
+[dev-dependencies]
+tsfp-ports = { path = "../tsfp-ports", features = ["std", "test-diagnostics"] }

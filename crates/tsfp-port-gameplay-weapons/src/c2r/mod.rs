@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// T2454: machine-translated code keeps the original shape (dead stores, unreachable arms); these lint classes are expected.
+#![allow(
+    clippy::all,
+    dead_code,
+    unused_assignments,
+    unused_mut,
+    unused_parens,
+    unused_variables,
+    unused_labels,
+    unused_comparisons,
+    unreachable_code,
+    unreachable_patterns
+)]
+#[path = "../../../tsfp-ports/src/c2r/rt.rs"]
+pub mod rt;
+#[rustfmt::skip]
+pub mod objchar_wired24;
+#[rustfmt::skip]
+pub mod player2_wired;
+#[rustfmt::skip]
+pub mod player3_wired;
+#[rustfmt::skip]
+pub mod t1925_weapons_split_002;
+#[rustfmt::skip]
+pub mod t1953_weapons;

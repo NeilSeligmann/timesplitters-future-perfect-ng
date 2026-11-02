@@ -1,0 +1,17 @@
+[package]
+name = "tsfp-audio-stretch-ffi"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+[workspace]
+
+[features]
+oracle-test = []
+
+[lib]
+crate-type = ["rlib", "staticlib"]
+
+[dependencies]
+tsfp-audio = { path = "../tsfp-audio" }

@@ -1,0 +1,57 @@
+{
+ "schema": 1,
+ "task": "T3738",
+ "rule": "compare v6 (docs/t3738-capture-design.md 'compare v6 (2026-10-26)'): a declared callee the port runs natively is dropped from the callee sequence check when the port does not call it; write-set, read-set and exit registers stay strict. INFERRED.",
+ "roots": {
+  "0x0010D070": {
+   "port_module": "tsfp-engine-render/emitter",
+   "callees": ["0x00153BD0"],
+   "reason": "emitter calls the RNG port particle::random_unit_float (0x153BD0) directly, rule 20"
+  },
+  "0x0010C550": {
+   "port_module": "tsfp-engine-render/particle",
+   "callees": ["0x003C848C", "0x0010C400"],
+   "reason": "particle_colour runs _ftol (0x3C848C) and the segment lerp 0x10C400 natively"
+  },
+  "0x0008F470": {
+   "port_module": "tsfp-engine-render/state",
+   "callees": ["0x00019640", "0x00019D50", "0x00019D60"],
+   "reason": "save_state_group_blend_mode_and_alpha reads state group, blend mode and alpha through native getters"
+  },
+  "0x000431F0": {
+   "port_module": "tsfp-gameplay/modes/setup",
+   "callees": ["0x00069E70"],
+   "reason": "transition_set computes the setup transition block through native setup_record_transition_block; original 0x431F0 calls helper 0x69E70 before tail dispatching to 0x42510"
+  },
+  "0x0008F5E0": {
+   "port_module": "tsfp-engine-render/scene",
+   "callees": ["0x00021440", "0x00021450", "0x0008F5E0"],
+   "reason": "draw_model_node_tree: native state-slot get/set and the recursion flattened by render_prep::model_commands (TEMPORARY-SHIM T2244)"
+  },
+  "0x00157440": {
+   "port_module": "tsfp-engine-render/scene_batch",
+   "callees": ["0x00047560", "0x001571C0"],
+   "reason": "native spatial walk (tsfp-ports scene_lane/spatial_adapter.rs, TEMPORARY-SHIM T2244) inlines the box overlap 0x47560 and the tree walk 0x1571C0"
+  },
+  "0x001571C0": {
+   "port_module": "tsfp-engine-render/scene_batch",
+   "callees": ["0x001571C0"],
+   "reason": "native spatial walk (TEMPORARY-SHIM T2244) flattens the 0x1571C0 recursion"
+  },
+  "0x0001D380": {
+   "port_module": "tsfp-engine-render/effect",
+   "callees": ["0x000459D0"],
+   "reason": "batch_cleanup makes the original no-op thunk call through the RenderHost address callback; the native host call is absent from Rust port call tracing"
+  },
+  "0x00060410": {
+   "port_module": "tsfp-data-formats/cutscenes",
+   "callees": ["0x00060390"],
+   "reason": "key_node resolves the frame through the native frame_pointer helper instead of making the guest call to 0x60390"
+  },
+  "0x0025D520": {
+   "port_module": "tsfp-port-gameplay-player/c2r/player_wired",
+   "callees": ["0x00258910", "0x00065270"],
+   "reason": "player_wired and its native child path dispatch Rust ports 0x258910 and 0x65270; the latter is a nested native child whose call is absent from the captured root's direct-call list (T2 capture recheck, INFERRED)"
+  }
+ }
+}

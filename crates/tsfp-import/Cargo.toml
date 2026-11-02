@@ -1,0 +1,24 @@
+[package]
+name = "tsfp-import"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "One-time asset importer: unpacks owner game images into plain open formats (T1821)"
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-format-core = { path = "../tsfp-format-core" }
+tsfp-format-pak = { path = "../tsfp-format-pak" }
+tsfp-format-xbt = { path = "../tsfp-format-xbt" }
+tsfp-format-bs = { path = "../tsfp-format-bs" }
+tsfp-format-script = { path = "../tsfp-format-script" }
+tsfp-format-csinfo = { path = "../tsfp-format-csinfo" }
+tsfp-format-igcs = { path = "../tsfp-format-igcs" }
+tsfp-audio = { path = "../tsfp-audio" }
+
+[[bin]]
+name = "tsfp-import"
+path = "src/main.rs"

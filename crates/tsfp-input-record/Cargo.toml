@@ -1,0 +1,10 @@
+[package]
+name = "tsfp-input-record"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "T3926: Rust reader for pad scripts and input records (src/input/xinput_source.c script parser, xinput_record.c replay loader)"
+
+[lints]
+workspace = true

@@ -1,0 +1,69 @@
+{
+ "_comment": "T1990 audio trace regions v2 (16, the host maximum). Sound state lives in globals and in a stream slot array 0x581988..0x64BC98 with stride 0x14094 (the loop bounds of 0x28760); the roots write status/volume fields at slot offset +0x1D6B..+0x1DEB (MEASURED from the memory mutant write log of 0x29F30, 0x29DD0, 0x28610), so stream_slot0..7 sample [slot+0x1D00, +0x140). Slots 8..10 and the per-stream heap records (0x43xxxxxx, written by 0x44AC0 and 0x29F30) are NOT sampled. Other regions: music fade block 0x4D1838..0x4D1850 (0x46350, 0x462F0), volume ramp globals 0x6B98B8..0x6B9930 (0x44AC0, 0x457B0, 0x45790), voice announcer table 0x74C3C8..0x74C3FC (0x164E00, 0x1651C0), stream volume 0x64BD90..0x64BDFB (0x29AF0, 0x28980), handle tables 0x6D5EB8..0x6D5F03 (0x46610), pool state 0x581988.. (0x28610), voice scheduler 0x4E7944..0x4E794C. Format: docs/t1974-hud-tier2.md. v1 (12 regions) result is in docs/t-audio-tier2.md.",
+ "regions": [
+  {
+   "name": "music_fade",
+   "spec": "0x4D1830:0x30"
+  },
+  {
+   "name": "volume_globals",
+   "spec": "0x6B98B0:0x80"
+  },
+  {
+   "name": "voice_table",
+   "spec": "0x74C3C0:0x48"
+  },
+  {
+   "name": "stream_vol_globals",
+   "spec": "0x64BD90:0x80"
+  },
+  {
+   "name": "handle_tables",
+   "spec": "0x6D5EB0:0x80"
+  },
+  {
+   "name": "sound_pool_state",
+   "spec": "0x581980:0x40"
+  },
+  {
+   "name": "voice_sched",
+   "spec": "0x4E7940:0x20"
+  },
+  {
+   "name": "sound_list_heads",
+   "spec": "0x5659F0:0x10"
+  },
+  {
+   "name": "stream_slot0",
+   "spec": "0x583688:0x140"
+  },
+  {
+   "name": "stream_slot1",
+   "spec": "0x59771C:0x140"
+  },
+  {
+   "name": "stream_slot2",
+   "spec": "0x5AB7B0:0x140"
+  },
+  {
+   "name": "stream_slot3",
+   "spec": "0x5BF844:0x140"
+  },
+  {
+   "name": "stream_slot4",
+   "spec": "0x5D38D8:0x140"
+  },
+  {
+   "name": "stream_slot5",
+   "spec": "0x5E796C:0x140"
+  },
+  {
+   "name": "stream_slot6",
+   "spec": "0x5FBA00:0x140"
+  },
+  {
+   "name": "stream_slot7",
+   "spec": "0x60FA94:0x140"
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+{
+  "_doc": "T3823 (incident class local-host-fanout): host-wide cap on local game-host launches (tsfp-bevy, tsfp_host) on the owner PC, enforced by tools/local_game_slots.py through flock slots <main checkout>/<lock_dir>/local-game-slot-<k>. Rule 26: the owner PC is never an overflow target; heavy runs go remote-first (python3 -m tools.wt replay submit). Interactive play.sh windows are exempt but counted. Offline Tier 2 runs (--t2-offline) start no game and are not counted.",
+  "owner_pc_limit": 1,
+  "lock_dir": "tmp/locks",
+  "log_every_s": 30,
+  "host_names": ["tsfp-bevy", "tsfp_host"],
+  "not_a_game_args": ["--t2-offline"]
+}

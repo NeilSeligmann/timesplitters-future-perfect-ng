@@ -1,0 +1,11 @@
+[package]
+name = "tsfp-object-pool-ledger"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tsfp-state = { path = "../tsfp-state" }
+
+[lints.rust]
+unsafe_code = "forbid"

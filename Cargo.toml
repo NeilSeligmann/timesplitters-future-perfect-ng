@@ -1,0 +1,267 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/tsfp-types",
+    "crates/tsfp-engine-core",
+    "crates/tsfp-engine-memory",
+    "crates/tsfp-memory-abi",
+    "crates/tsfp-direct-witness",
+    "crates/tsfp-port-runtime",
+    "crates/tsfp-port-audio-dispatch",
+    "crates/tsfp-engine-fileio",
+    "crates/tsfp-engine-object",
+    "crates/tsfp-engine-anim",
+    "crates/tsfp-engine-audio",
+    "crates/tsfp-engine-video",
+    "crates/tsfp-xmv-container",
+    "crates/tsfp-engine-render",
+    "crates/tsfp-render-prep",
+    "crates/tsfp-render-prep-wire",
+    "crates/tsfp-scene-model",
+    "crates/tsfp-render-materials",
+    "crates/tsfp-scene-compare",
+    "crates/tsfp-scene-oracle",
+    "crates/tsfp-scene-capture",
+    "crates/tsfp-engine-physics",
+    "crates/tsfp-port-engine-physics-ray",
+    "crates/tsfp-engine-input",
+    "crates/tsfp-input",
+    "crates/tsfp-input-slots",
+    "crates/tsfp-input-devices",
+    "crates/tsfp-input-record",
+    "crates/tsfp-input-sdl-provider",
+    "crates/tsfp-movie-overlay",
+    "crates/tsfp-ai",
+    "crates/tsfp-ai-spawn-binding",
+    "crates/tsfp-ai-selector-transition",
+    "crates/tsfp-gameplay",
+    "crates/tsfp-port-gameplay-modes-multiplayer-1",
+    "crates/tsfp-ui",
+    "crates/tsfp-ui-renderer",
+    "crates/tsfp-ui-input",
+    "crates/tsfp-ui-mapmaker-pointer",
+    "crates/tsfp-ui-row-input",
+    "crates/tsfp-ui-model",
+    "crates/tsfp-ui-ext",
+    "crates/tsfp-settings",
+    "crates/tsfp-text-field",
+    "crates/tsfp-data-formats",
+    "crates/tsfp-format-core",
+    "crates/tsfp-format-pak",
+    "crates/tsfp-format-xbr",
+    "crates/tsfp-format-xbt",
+    "crates/tsfp-format-bs",
+    "crates/tsfp-format-csinfo",
+    "crates/tsfp-format-igcs",
+    "crates/tsfp-format-anim",
+    "crates/tsfp-format-profile",
+    "crates/tsfp-format-script",
+
+    "crates/tsfp-import",
+    "crates/tsfp-launcher-core",
+    "crates/tsfp-audio",
+    "crates/tsfp-network",
+    "crates/tsfp-direct-ip",
+    "crates/tsfp-coop-net",
+    "crates/tsfp-mapmaker",
+    "crates/tsfp-host",
+    "crates/tsfp-character-route-state",
+    "crates/tsfp-story-flow-contracts",
+    "crates/tsfp-object-pool-ledger",
+    "crates/tsfp-c-diff",
+    "crates/tsfp-t2-offline",
+    "crates/tsfp-t2-construct",
+    "crates/tsfp-t2-offline-lifted",
+    "crates/tsfp-t2-mutation-5",
+    "crates/tsfp-game",
+    "crates/tsfp-port-engine-render-effects-live-return",
+    "crates/tsfp-port-scene-t2-div-scene-1",
+    "crates/tsfp-port-audio-offline",
+]
+exclude = ["crates/tsfp-launcher", "crates/tsfp-t2-lanes", "crates/tsfp-port-engine-anim-adapter", "crates/tsfp-port-data-cutscenes", "crates/tsfp-port-data-missions", "crates/tsfp-port-data-save", "crates/tsfp-port-gameplay-modes", "tmp", "crates/tsfp-kernel-services", "crates/tsfp-state", "crates/tsfp-ports", "crates/tsfp-ui-builders", "crates/tsfp-fileio-capi", "crates/tsfp-wgpu", "crates/tsfp-render-preview", "crates/tsfp-rt-host", "crates/tsfp-bevy", "crates/tsfp-input-intake", "crates/tsfp-port-mapmaker-storage", "crates/tsfp-port-mapmaker-ui", "crates/tsfp-port-gameplay-inventory", "crates/tsfp-port-ui-menu", "crates/tsfp-port-ui-settings", "crates/tsfp-port-ai-pathfinding", "crates/tsfp-port-data-text", "crates/tsfp-port-engine-object", "crates/tsfp-port-engine-physics", "crates/tsfp-port-ui-framework", "crates/tsfp-port-engine-render-effects", "crates/tsfp-port-engine-render-scene", "crates/tsfp-port-engine-render-d3d", "crates/tsfp-port-library-crt", "crates/tsfp-port-library-xdk", "crates/tsfp-port-mapmaker-editor", "crates/tsfp-port-mapmaker-modes", "crates/tsfp-port-network-live", "crates/tsfp-port-network-session", "crates/tsfp-port-ui-hud", "crates/tsfp-port-engine-object-2", "crates/tsfp-port-engine-object-3", "crates/tsfp-port-engine-object-4", "crates/tsfp-port-engine-object-5", "crates/tsfp-port-engine-object-6", "crates/tsfp-port-engine-render-effects-2", "crates/tsfp-port-library-xdk-2", "crates/tsfp-port-misc", "crates/tsfp-port-wire", "crates/tsfp-port-network-live-2", "crates/tsfp-port-network-syslink", "crates/tsfp-port-ai-behavior-2", "crates/tsfp-port-data-missions-2", "crates/tsfp-port-data-missions-3", "crates/tsfp-port-engine-input", "crates/tsfp-port-engine-math", "crates/tsfp-port-gameplay-player-2", "crates/tsfp-port-gameplay-weapons", "crates/tsfp-port-ui-framework-2", "crates/tsfp-port-ui-menu-2", "crates/tsfp-port-ui-menu-3", "crates/tsfp-port-engine-render-effects-3", "crates/tsfp-port-engine-render-effects-fix-engine-render-2", "crates/tsfp-port-gameplay-weapons-2", "crates/tsfp-port-ui-hud-2", "crates/tsfp-port-ui-hud-3", "crates/tsfp-port-ui-hud-4", "crates/tsfp-port-ui-hud-5", "crates/tsfp-port-ui-hud-6", "crates/tsfp-port-data-missions-4", "crates/tsfp-port-data-missions-5", "crates/tsfp-port-data-missions-6", "crates/tsfp-port-gameplay-weapons-3"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+# T1836: the c-diff harness runs 120,000 cases per root, so its test crate is optimised.
+[profile.dev.package.tsfp-c-diff]
+opt-level = 2
+[profile.dev.package.tsfp-engine-physics]
+opt-level = 2
+
+# T2396: favor fast release rebuilds for this repo's Rust crates. Registry deps
+# retain optimized, non-incremental release settings; local crates use the same
+# profile whether they are workspace members or path dependencies.
+[profile.release]
+debug = 0
+incremental = true
+codegen-units = 256
+
+[profile.release.package."*"]
+opt-level = 3
+debug = 0
+incremental = false
+codegen-units = 16
+
+[profile.release.package.tsfp-audio]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-anim]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-fileio]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-render]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-video]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-anim]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-bs]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-core]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-pak]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-profile]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-xbr]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-xbt]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-host]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-import]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-input]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-input-slots]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-movie-overlay]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-kernel-services]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-network]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ports]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-rt-host]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-state]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-text-field]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-types]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ui-ext]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ui-input]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ui-mapmaker-pointer]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ui-row-input]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ui-model]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ui-renderer]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ui-wgpu]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-wgpu]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ai]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-c-diff]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-coop-net]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-data-formats]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-audio]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-core]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-input]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-memory]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-object]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-engine-physics]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-csinfo]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-igcs]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-format-script]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-game]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-gameplay]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-mapmaker]
+incremental = true
+codegen-units = 256
+[profile.release.package.tsfp-ui]
+incremental = true
+codegen-units = 256
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+split-debuginfo = "unpacked"
+
+[profile.dev.package."*"]
+debug = false

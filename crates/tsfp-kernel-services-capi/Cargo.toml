@@ -1,0 +1,20 @@
+[package]
+name = "tsfp-kernel-services-capi"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+publish = false
+[workspace]
+[lib]
+crate-type = ["cdylib", "rlib"]
+[dependencies]
+tsfp-kernel-services = { path = "../tsfp-kernel-services" }
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

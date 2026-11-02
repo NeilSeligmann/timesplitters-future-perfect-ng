@@ -1,0 +1,827 @@
+{
+  "_comment": "T3607: per recording stem and sha256, the guest port-0 poll at which the replay reaches each F12 mark (`python3 -m tools.gate_marks measure --write`); route_end_poll is the final replay poll. Recorded mark polls are live host polls (about 2 per tick) and are not replay polls.",
+  "arcade-bots-20261024": {
+    "recording_sha256": "5a906a067355bdea05bbd8a2fcac498351755962e515e893868a3bf8ecd4bc37",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 3627,
+        "recorded_poll": 7867,
+        "guest_pad_poll": 4051
+      }
+    ],
+    "route_end_poll": 24050
+  },
+  "arcade-full-20261020": {
+    "recording_sha256": "d143c62f95a3e054e1060fd2b0ec3ab78af534c3c24ca39c64953ba6a339f103",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 5805,
+        "recorded_poll": 12808,
+        "guest_pad_poll": 6229
+      }
+    ]
+  },
+  "mapmaker-assault-20261020": {
+    "recording_sha256": "a0bf83e71313563238e2e4899c9b2cf62430657458a0217f953e98985b0da95b",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 3944,
+        "recorded_poll": 9168,
+        "guest_pad_poll": 4368
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 6696,
+        "recorded_poll": 14673,
+        "guest_pad_poll": 7120
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 8998,
+        "recorded_poll": 19689,
+        "guest_pad_poll": 9422
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 10269,
+        "recorded_poll": 22500,
+        "guest_pad_poll": 10693
+      }
+    ]
+  },
+  "mapmaker-editor-full-20261024": {
+    "recording_sha256": "d81cb65c3c58d9988e7644a84cf5787be4837dfeec7aa114e05b6104aef84e5b",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 2092,
+        "recorded_poll": 3540,
+        "guest_pad_poll": 2516
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 23679,
+        "recorded_poll": 35494,
+        "guest_pad_poll": 24103
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 23743,
+        "recorded_poll": 35620,
+        "guest_pad_poll": 24167
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 23811,
+        "recorded_poll": 35754,
+        "guest_pad_poll": 24235
+      },
+      {
+        "index": 5,
+        "label": "user",
+        "sim_tick": 23890,
+        "recorded_poll": 35912,
+        "guest_pad_poll": 24314
+      }
+    ],
+    "route_end_poll": 36683
+  },
+  "mapmaker-physics-20261021": {
+    "recording_sha256": "129dea7d7cebbda4f19b661ad5d0e941a59a3114e33cd71459fcc457ec0e0ef1",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 7547,
+        "recorded_poll": 15063,
+        "guest_pad_poll": 7971
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 8157,
+        "recorded_poll": 16294,
+        "guest_pad_poll": 8581
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 8594,
+        "recorded_poll": 17120,
+        "guest_pad_poll": 9018
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 9171,
+        "recorded_poll": 18193,
+        "guest_pad_poll": 9595
+      },
+      {
+        "index": 5,
+        "label": "user",
+        "sim_tick": 10794,
+        "recorded_poll": 21669,
+        "guest_pad_poll": 11218
+      },
+      {
+        "index": 6,
+        "label": "user",
+        "sim_tick": 11215,
+        "recorded_poll": 22417,
+        "guest_pad_poll": 11639
+      }
+    ]
+  },
+  "mapmaker-save-load-20261024": {
+    "recording_sha256": "145f8ef341c304adce58efc36b67e9ddcf2079972d769f24a019a7cd270b5d89",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 6823,
+        "recorded_poll": 13972,
+        "guest_pad_poll": 7247
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 7672,
+        "recorded_poll": 15115,
+        "guest_pad_poll": 8096
+      }
+    ],
+    "route_end_poll": 16736
+  },
+  "menu-tour-a-20261020": {
+    "recording_sha256": "5efc25cad09be60049cd8c92c6c50f3a4c856fc555c89d545a1681389d5271e0",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 581,
+        "recorded_poll": 2032,
+        "guest_pad_poll": 1005
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 1062,
+        "recorded_poll": 2988,
+        "guest_pad_poll": 1486
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 1403,
+        "recorded_poll": 3658,
+        "guest_pad_poll": 1827
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 1769,
+        "recorded_poll": 4377,
+        "guest_pad_poll": 2193
+      }
+    ]
+  },
+  "menu-tour-b-20261020": {
+    "recording_sha256": "95c2ba8bb0e178e1a2caacb03c52721f79a7e98511d104e50c3aa4e0a688ca4b",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 724,
+        "recorded_poll": 2343,
+        "guest_pad_poll": 1148
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 1131,
+        "recorded_poll": 3155,
+        "guest_pad_poll": 1555
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 1550,
+        "recorded_poll": 3984,
+        "guest_pad_poll": 1974
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 1835,
+        "recorded_poll": 4550,
+        "guest_pad_poll": 2259
+      }
+    ]
+  },
+  "menus-tour-20261024": {
+    "recording_sha256": "80204c94689165ffabe1aaab727cc66256610d31799c60054967f205ed6114d4",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 838,
+        "recorded_poll": 2005,
+        "guest_pad_poll": 1262
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 1959,
+        "recorded_poll": 3436,
+        "guest_pad_poll": 2383
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 2363,
+        "recorded_poll": 4072,
+        "guest_pad_poll": 2787
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 2758,
+        "recorded_poll": 4840,
+        "guest_pad_poll": 3182
+      },
+      {
+        "index": 5,
+        "label": "user",
+        "sim_tick": 3059,
+        "recorded_poll": 5357,
+        "guest_pad_poll": 3483
+      },
+      {
+        "index": 6,
+        "label": "user",
+        "sim_tick": 3403,
+        "recorded_poll": 5940,
+        "guest_pad_poll": 3827
+      },
+      {
+        "index": 7,
+        "label": "user",
+        "sim_tick": 3724,
+        "recorded_poll": 6511,
+        "guest_pad_poll": 4148
+      },
+      {
+        "index": 8,
+        "label": "user",
+        "sim_tick": 4054,
+        "recorded_poll": 7020,
+        "guest_pad_poll": 4478
+      },
+      {
+        "index": 9,
+        "label": "user",
+        "sim_tick": 4342,
+        "recorded_poll": 7360,
+        "guest_pad_poll": 4766
+      },
+      {
+        "index": 10,
+        "label": "user",
+        "sim_tick": 4669,
+        "recorded_poll": 7688,
+        "guest_pad_poll": 5093
+      },
+      {
+        "index": 11,
+        "label": "user",
+        "sim_tick": 4990,
+        "recorded_poll": 8016,
+        "guest_pad_poll": 5414
+      },
+      {
+        "index": 12,
+        "label": "user",
+        "sim_tick": 5335,
+        "recorded_poll": 8385,
+        "guest_pad_poll": 5759
+      },
+      {
+        "index": 13,
+        "label": "user",
+        "sim_tick": 5615,
+        "recorded_poll": 8684,
+        "guest_pad_poll": 6039
+      },
+      {
+        "index": 14,
+        "label": "user",
+        "sim_tick": 5897,
+        "recorded_poll": 8972,
+        "guest_pad_poll": 6321
+      },
+      {
+        "index": 15,
+        "label": "user",
+        "sim_tick": 6286,
+        "recorded_poll": 9367,
+        "guest_pad_poll": 6710
+      },
+      {
+        "index": 16,
+        "label": "user",
+        "sim_tick": 6420,
+        "recorded_poll": 9516,
+        "guest_pad_poll": 6844
+      },
+      {
+        "index": 17,
+        "label": "user",
+        "sim_tick": 7586,
+        "recorded_poll": 10862,
+        "guest_pad_poll": 8010
+      },
+      {
+        "index": 18,
+        "label": "user",
+        "sim_tick": 7994,
+        "recorded_poll": 11368,
+        "guest_pad_poll": 8418
+      },
+      {
+        "index": 19,
+        "label": "user",
+        "sim_tick": 8774,
+        "recorded_poll": 12519,
+        "guest_pad_poll": 9198
+      }
+    ],
+    "route_end_poll": 13210
+  },
+  "movement-falls-crouch-20261024": {
+    "recording_sha256": "776ab522fe53f46c6d8fc4a3c78470663d6a77ebd3c2ad8cb8a9a9ef051a1e8a",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 3276,
+        "recorded_poll": 7715,
+        "guest_pad_poll": 3700
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 3761,
+        "recorded_poll": 8669,
+        "guest_pad_poll": 4185
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 4376,
+        "recorded_poll": 9893,
+        "guest_pad_poll": 4800
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 4863,
+        "recorded_poll": 10863,
+        "guest_pad_poll": 5287
+      },
+      {
+        "index": 5,
+        "label": "user",
+        "sim_tick": 5593,
+        "recorded_poll": 12324,
+        "guest_pad_poll": 6017
+      }
+    ],
+    "route_end_poll": 21367
+  },
+  "r5-story-gameplay-20261016": {
+    "recording_sha256": "b2955a972fd30c375225b12f1f89a7a581c2e0c3434a5621f53a7022ce2fcdac",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 4156,
+        "recorded_poll": 6676,
+        "guest_pad_poll": 4580
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 4178,
+        "recorded_poll": 6717,
+        "guest_pad_poll": 4602
+      }
+    ]
+  },
+  "story-arcade-transitions-20261024": {
+    "recording_sha256": "193c652fb5377dde853587d801390777841d65a3c323ae54cce0a031787a634a",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 2161,
+        "recorded_poll": 4105,
+        "guest_pad_poll": 2585
+      }
+    ],
+    "route_end_poll": 7187
+  },
+  "story-autoaim-shots-20261024": {
+    "recording_sha256": "eb7b1b3d3324e7e7aba305b37adf721b21df4f2da104c6198ce7a749ea8a0307",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 6281,
+        "recorded_poll": 11142,
+        "guest_pad_poll": 6705
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 8177,
+        "recorded_poll": 13131,
+        "guest_pad_poll": 8601
+      }
+    ],
+    "route_end_poll": 13845
+  },
+  "story-hud-weapons-20261020": {
+    "recording_sha256": "6f6f0782d9c71e1b2aada80e2c02e7b9583b79e67b21c0ab1760af997236a281",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 1451,
+        "recorded_poll": 3780,
+        "guest_pad_poll": 1875
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 2332,
+        "recorded_poll": 4920,
+        "guest_pad_poll": 2756
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 2928,
+        "recorded_poll": 5939,
+        "guest_pad_poll": 3352
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 5058,
+        "recorded_poll": 9359,
+        "guest_pad_poll": 5482
+      },
+      {
+        "index": 5,
+        "label": "user",
+        "sim_tick": 5979,
+        "recorded_poll": 11411,
+        "guest_pad_poll": 6403
+      },
+      {
+        "index": 6,
+        "label": "user",
+        "sim_tick": 14181,
+        "recorded_poll": 28101,
+        "guest_pad_poll": 14605
+      }
+    ]
+  },
+  "story-l2-ai-marks-20261022": {
+    "recording_sha256": "bb35fcc00b8c1120f9cdf81f65c4aece34c18ba3e7852aeb3579924ae6172dfd",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 1741,
+        "recorded_poll": 4805,
+        "guest_pad_poll": 2165
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 1853,
+        "recorded_poll": 5028,
+        "guest_pad_poll": 2277
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 2513,
+        "recorded_poll": 6344,
+        "guest_pad_poll": 2937
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 4640,
+        "recorded_poll": 10754,
+        "guest_pad_poll": 5064
+      },
+      {
+        "index": 5,
+        "label": "user",
+        "sim_tick": 5517,
+        "recorded_poll": 12393,
+        "guest_pad_poll": 5941
+      },
+      {
+        "index": 6,
+        "label": "user",
+        "sim_tick": 5864,
+        "recorded_poll": 13151,
+        "guest_pad_poll": 6288
+      },
+      {
+        "index": 7,
+        "label": "user",
+        "sim_tick": 6126,
+        "recorded_poll": 13796,
+        "guest_pad_poll": 6550
+      }
+    ]
+  },
+  "story-l3-burn-glitch-20261021": {
+    "recording_sha256": "ff4434b5b0501871dd001a84e6181af0f76709db9c14c49a86b45b9e00bae54b",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 6154,
+        "recorded_poll": 11561,
+        "guest_pad_poll": 6578
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 6429,
+        "recorded_poll": 12014,
+        "guest_pad_poll": 6853
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 7143,
+        "recorded_poll": 13351,
+        "guest_pad_poll": 7567
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 7345,
+        "recorded_poll": 13624,
+        "guest_pad_poll": 7769
+      }
+    ]
+  },
+  "story-mission-checkpoint-20261024": {
+    "recording_sha256": "85b6f3bfc4c2b4792c79def92978a684307a29e3cd2e2c1c32f9c0e65e52460c",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 2571,
+        "recorded_poll": 5077,
+        "guest_pad_poll": 2995
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 5695,
+        "recorded_poll": 8227,
+        "guest_pad_poll": 6119
+      }
+    ],
+    "route_end_poll": 8394
+  },
+  "story-weapon-pickup-fire-20261021": {
+    "recording_sha256": "2e03b87a5cb716834c5b6d3f61de0115d8c1867f8ea383bd5d5db39b63a6f698",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 2478,
+        "recorded_poll": 6917,
+        "guest_pad_poll": 2902
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 2754,
+        "recorded_poll": 7411,
+        "guest_pad_poll": 3178
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 3294,
+        "recorded_poll": 8399,
+        "guest_pad_poll": 3718
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 3560,
+        "recorded_poll": 8878,
+        "guest_pad_poll": 3984
+      }
+    ]
+  },
+  "weapon-lifecycle-20261021": {
+    "recording_sha256": "5c19d8a6fb75bf91b76745cde3f4d074368841f2d22ca7eb0250f29fe7b08200",
+    "marks": [
+      {
+        "index": 0,
+        "label": "record-start",
+        "sim_tick": 0,
+        "recorded_poll": 0,
+        "guest_pad_poll": 0
+      },
+      {
+        "index": 1,
+        "label": "user",
+        "sim_tick": 5275,
+        "recorded_poll": 11237,
+        "guest_pad_poll": 5699
+      },
+      {
+        "index": 2,
+        "label": "user",
+        "sim_tick": 5781,
+        "recorded_poll": 12124,
+        "guest_pad_poll": 6205
+      },
+      {
+        "index": 3,
+        "label": "user",
+        "sim_tick": 6383,
+        "recorded_poll": 13083,
+        "guest_pad_poll": 6807
+      },
+      {
+        "index": 4,
+        "label": "user",
+        "sim_tick": 7923,
+        "recorded_poll": 15490,
+        "guest_pad_poll": 8347
+      },
+      {
+        "index": 5,
+        "label": "user",
+        "sim_tick": 8019,
+        "recorded_poll": 15638,
+        "guest_pad_poll": 8443
+      }
+    ]
+  }
+}

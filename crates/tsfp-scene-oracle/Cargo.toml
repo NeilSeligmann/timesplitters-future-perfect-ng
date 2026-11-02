@@ -1,0 +1,14 @@
+[package]
+name = "tsfp-scene-oracle"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-scene-compare = { path = "../tsfp-scene-compare" }
+tsfp-scene-model = { path = "../tsfp-scene-model" }
+tsfp-render-materials = { path = "../tsfp-render-materials" }

@@ -1,0 +1,20 @@
+[package]
+name = "native-text-diff"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+tsfp-format-bs = { path = "../../../tsfp-format-bs" }
+tsfp-ports = { path = "../..", features = ["std"] }
+tsfp-ui = { path = "../../../tsfp-ui" }
+
+[workspace]
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

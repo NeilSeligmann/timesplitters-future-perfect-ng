@@ -1,0 +1,23 @@
+[package]
+name = "tsfp-engine-fileio"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-input = { path = "../tsfp-input" }
+flate2 = "1"
+rustix = { version = "=1.1.5", features = ["fs"] }
+tsfp-format-core = { path = "../tsfp-format-core" }
+tsfp-format-pak = { path = "../tsfp-format-pak" }
+tsfp-format-profile = { path = "../tsfp-format-profile" }
+tsfp-format-xbr = { path = "../tsfp-format-xbr" }
+tsfp-format-xbt = { path = "../tsfp-format-xbt" }
+tsfp-kernel-services = { path = "../tsfp-kernel-services" }
+
+[dev-dependencies]
+tsfp-ports = { path = "../tsfp-ports", features = ["std"] }

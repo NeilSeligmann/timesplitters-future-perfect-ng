@@ -1,0 +1,12 @@
+[package]
+name = "tsfp-port-gameplay-modes-multiplayer-1"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tsfp-engine-object = { path = "../tsfp-engine-object" }

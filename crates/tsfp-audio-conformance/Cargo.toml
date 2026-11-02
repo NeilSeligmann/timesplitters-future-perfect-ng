@@ -1,0 +1,19 @@
+[package]
+name = "tsfp-audio-conformance"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T2046 AUD-1 offline sample-exact C/Rust SoundHost comparison"
+
+[workspace]
+
+[dependencies]
+tsfp-audio = { path = "../tsfp-audio" }
+
+[dev-dependencies]
+tsfp-audio-observe = { path = "../tsfp-audio-observe" }
+
+[profile.dev]
+debug = "line-tables-only"
+

@@ -1,0 +1,28 @@
+[package]
+name = "tsfp-kernel-sync"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+[workspace]
+[features]
+default = []
+rust-kernel-sync = []
+oracle-fixtures = ["tsfp-kernel-object/oracle-fixtures"]
+[lints.rust]
+unsafe_code = "forbid"
+
+[dependencies]
+tsfp-kernel-object = { path = "../tsfp-kernel-object" }
+
+[[example]]
+name = "thread_abi_oracle"
+required-features = ["oracle-fixtures"]
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false

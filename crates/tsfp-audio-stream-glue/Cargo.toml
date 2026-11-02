@@ -1,0 +1,17 @@
+[package]
+name = "tsfp-audio-stream-glue"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3879: the DirectSound stream handler glue of src/audio/dsound_stream.c in Rust (state, access policy, create and reset transactions)"
+
+# Standalone like tsfp-audio-host-wiring, which re-exports it so the tsfp-audio-capi cdylib exports its C symbols. The crate
+# calls the lease, routing, frequency and create models that tsfp-audio-capi exports, plus host services of the C host
+# (kernel guest access, device lease), so it has no unit tests of its own: the C oracle tests (tests/c/test_dsound_stream*.c)
+# and crates/tsfp-audio-conformance/oracle/dsound_stream.c are its verification.
+[workspace]
+
+[lib]
+test = false
+doctest = false

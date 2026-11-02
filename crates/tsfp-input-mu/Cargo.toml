@@ -1,0 +1,17 @@
+[package]
+name = "tsfp-input-mu"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T3975 slice 7: the memory-unit block device and XMountMUA/XUnmountMU (src/input/mu_device.c, mu_startup.c) in Rust with Rust-owned slot state, C ABI exports"
+
+# Standalone like tsfp-input-route-engine; linked into the host through tsfp-input-capi (feature rust-input-host).
+[workspace]
+
+[lib]
+crate-type = ["rlib"]
+doctest = false
+
+[dependencies]
+tsfp-input-devices = { path = "../tsfp-input-devices" }

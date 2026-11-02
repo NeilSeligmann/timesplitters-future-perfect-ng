@@ -1,0 +1,20 @@
+{
+ "_doc": "T3745 disk budget (rule 36 hard limits, owner-tunable). docs/t3745-disk-safety.md. Every big writer calls tools.datadisk.check before it starts; the capture runtime enforces the capture_* values itself.",
+ "project_max_gb": 700,
+ "project_areas": [
+  "tmp"
+ ],
+ "usage_max_age_hours": 6,
+ "root_min_free_gb": 100,
+ "data_min_free_gb": 60,
+ "capture_run_max_gb": 4,
+ "capture_segment_mb": 256,
+ "capture_compact_interval_s": 20,
+ "profiles": {
+  "_doc": "T3740: TSFP_DISK_PROFILE=<name> overrides the keys above. remote_worker (set by tools.wt.remote_replay on replay workers): the root only must not fill (3 GB); data_min_free_gb is the worker's disk_floor_gb in tools/data/remote_hosts.json (TSFP_DISK_HOST names it), checked on the data volume the capture writes to. The owner-PC floors (100 GB root, 60 GB data) refused every remote capture.",
+  "remote_worker": {
+   "root_min_free_gb": 3,
+   "project_max_gb": 100000
+  }
+ }
+}

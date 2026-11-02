@@ -1,0 +1,15 @@
+[package]
+name = "tsfp-audio-observe"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+description = "T2046 bounded, sealed SoundHost command observations"
+
+[workspace]
+
+[dependencies]
+tsfp-audio = { path = "../tsfp-audio" }
+
+[profile.dev]
+debug = "line-tables-only"

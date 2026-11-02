@@ -1,0 +1,53 @@
+{
+ "_comment": "T1976 render state regions for tools.rust_trace --regions (render slice Tier 2): persistent state tables of docs/t-render-slice.md (map.rs). At most 16. The frame transient tables (dirty list 0x563010, vertex ring 0x54F128 and its cursor/index words 0x55F960, batch 0x4B85C8, texture cache 0x563118, constant block 0x563030) are NOT listed: MEASURED, they differ between plain off and off pinned to two CPUs (taskset) in the same 22 samples from poll 402 with the same values as the Rust run, so they depend on the frame phase of the dump, not on the ports.",
+ "regions": [
+  {
+   "name": "render_slots",
+   "spec": "0x4B8D20:0x360"
+  },
+  {
+   "name": "render_state",
+   "spec": "0x55FAC0:0x120"
+  },
+  {
+   "name": "render_saved",
+   "spec": "0x4D9700:0x20"
+  },
+  {
+   "name": "render_device_dirty",
+   "spec": "0x3E3AB0:0x20"
+  },
+  {
+   "name": "render_device_shadow",
+   "spec": "0x3E3CC0:0x2C0"
+  },
+  {
+   "name": "render_effect",
+   "spec": "0x4B9170:0x20"
+  },
+  {
+   "name": "render_effect_row",
+   "spec": "0x665470:0x10"
+  },
+  {
+   "name": "render_filters",
+   "spec": "0x4B9070:0x30"
+  },
+  {
+   "name": "render_scissor",
+   "spec": "0x55FAD0:0x20"
+  },
+  {
+   "name": "render_ids",
+   "spec": "0x55FC90:0x40"
+  },
+  {
+   "name": "render_streams",
+   "spec": "0x55F9B0:0x50"
+  },
+  {
+   "name": "render_pending_restore",
+   "spec": "0x70AAE0:0x10"
+  }
+ ]
+}

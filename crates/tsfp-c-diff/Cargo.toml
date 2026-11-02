@@ -1,0 +1,41 @@
+[package]
+name = "tsfp-c-diff"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "T1836 test-only differential: Rust wave 3 ports against the unmodified src/game C replacements"
+
+# The harness needs raw mmap and FFI, so it opts out of the workspace unsafe ban. It holds no
+# production code and is never a dependency of another crate.
+[lints.rust]
+unsafe_code = "allow"
+
+[dependencies]
+tsfp-gameplay = { path = "../tsfp-gameplay" }
+tsfp-mapmaker = { path = "../tsfp-mapmaker" }
+tsfp-ui = { path = "../tsfp-ui" }
+tsfp-ai = { path = "../tsfp-ai" }
+tsfp-engine-anim = { path = "../tsfp-engine-anim" }
+tsfp-engine-object = { path = "../tsfp-engine-object" }
+tsfp-engine-core = { path = "../tsfp-engine-core" }
+tsfp-engine-memory = { path = "../tsfp-engine-memory", features = ["native-owner-lifecycle"] }
+tsfp-data-formats = { path = "../tsfp-data-formats" }
+tsfp-types = { path = "../tsfp-types" }
+tsfp-engine-audio = { path = "../tsfp-engine-audio" }
+tsfp-engine-input = { path = "../tsfp-engine-input" }
+tsfp-engine-render = { path = "../tsfp-engine-render" }
+tsfp-network = { path = "../tsfp-network" }
+tsfp-engine-fileio = { path = "../tsfp-engine-fileio" }
+tsfp-format-profile = { path = "../tsfp-format-profile" }
+tsfp-format-csinfo = { path = "../tsfp-format-csinfo" }
+tsfp-format-igcs = { path = "../tsfp-format-igcs" }
+tsfp-engine-physics = { path = "../tsfp-engine-physics" }
+
+[dev-dependencies]
+# T2377's Tier 1 tests compare the readable native boundary to the mechanically lifted bodies.
+tsfp-ports = { path = "../tsfp-ports" }
+tsfp-state = { path = "../tsfp-state" }
+tsfp-ui-input = { path = "../tsfp-ui-input" }
+tsfp-ui-model = { path = "../tsfp-ui-model" }

@@ -1,0 +1,26 @@
+[package]
+name = "tsfp-port-data-save"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+tsfp-port-runtime = { path = "../tsfp-port-runtime" }
+tsfp-port-wire = { path = "../tsfp-port-wire" }
+
+[dev-dependencies]
+tsfp-port-wire = { path = "../tsfp-port-wire", features = ["thread-retire"] }
+
+[workspace]
+
+[profile.dev]
+debug = "line-tables-only"
+debug-assertions = true
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false
+
+# T2454: cfgs set only by tools (coverage and MMX harnesses, lane mutation); declared so rustc does not warn at every use.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tsfp_cover)", "cfg(rust_lane_mutation)", "cfg(tsfp_mmx_harness)", "cfg(s3_missions_owned_differential)"] }

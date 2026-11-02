@@ -1,0 +1,15 @@
+[package]
+name = "tsfp-audio-hle-core"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Rust owner of the DirectSound HLE entry table, codec readiness, DSP ack and log hook (replaces dsound_hle.c)"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["rlib"]
+# Imports host and capi C symbols that exist only in the final cdylib; verified by the Rust audio host suites.
+test = false
+doctest = false

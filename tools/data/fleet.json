@@ -1,0 +1,260 @@
+{
+  "_doc": "T3626 fleet policy for tools/fleet. Hosts (address, port, user) come from tools/data/remote_hosts.json by name; this file holds only the worker-fleet policy: scaling bounds, launch gates, capguard, memguard, probes, scheduled jobs. The controller reloads it (and remote_hosts.json) on every tick when the mtime changes; an invalid file is ignored and reported as the fleet-config-invalid finding. Values migrated from tmp/codexapi/autoscale.py, sup-loop.sh and server-provision.sh on 2026-10-23.",
+  "paths": {
+    "codexapi_dir": "tmp/codexapi",
+    "state_dir": "tmp/fleet",
+    "status_file": "tmp/fleet/status.txt"
+  },
+  "tick_seconds": 60,
+  "queue": {
+    "low_water": 15,
+    "inv_low_water": 10,
+    "feed_batch": 60,
+    "inv_batch": 30,
+    "inv_repeat_hours": 24,
+    "retry_idle_hours": 6
+  },
+  "hosts": {},
+  "provision": {
+    "repo_url": "ssh://git@<private>/neil/tsfp-decomp.git",
+    "python": "3.15",
+    "rust_toolchain": "1.99.1",
+    "codex_login_files": [
+      "auth.json",
+      "config.toml",
+      "AGENTS.md"
+    ],
+    "runner": {
+      "rotate": 250000,
+      "hosts": {}
+    },
+    "payload_from_codexapi": [
+      "runwt.sh",
+      "runner-facts.md",
+      "light-template.md"
+    ]
+  },
+  "jobs": [
+    {
+      "name": "probe",
+      "every_min": 1,
+      "builtin": "probe"
+    },
+    {
+      "name": "autoscale",
+      "every_min": 10,
+      "builtin": "autoscale",
+      "needs_fresh_status_min": 6
+    },
+    {
+      "name": "queue-feed",
+      "every_min": 1,
+      "builtin": "queue_feed"
+    },
+    {
+      "name": "tier2-feed",
+      "every_min": 2,
+      "builtin": "tier2_feed"
+    },
+    {
+      "name": "refill",
+      "every_min": 1,
+      "builtin": "refill"
+    },
+    {
+      "name": "health",
+      "every_min": 10,
+      "builtin": "health"
+    },
+    {
+      "name": "beat",
+      "every_min": 5,
+      "builtin": "beat"
+    },
+    {
+      "name": "coord-reap",
+      "every_min": 10,
+      "command": [
+        "python3",
+        "-m",
+        "tools.agents.coord",
+        "reap"
+      ],
+      "cwd": "repo",
+      "timeout": 60
+    },
+    {
+      "name": "renice",
+      "every_min": 1,
+      "builtin": "renice"
+    },
+    {
+      "name": "provision",
+      "every_min": 5,
+      "builtin": "provision_due"
+    },
+    {
+      "name": "capguard",
+      "every_min": 5,
+      "builtin": "capguard_due"
+    },
+    {
+      "name": "codex-sessions",
+      "every_min": 1440,
+      "builtin": "codex_sessions_due"
+    },
+    {
+      "name": "integrity",
+      "every_min": 10,
+      "builtin": "integrity_due"
+    },
+    {
+      "name": "lclean",
+      "every_min": 15,
+      "builtin": "lclean"
+    },
+    {
+      "name": "sync-git",
+      "every_min": 5,
+      "builtin": "sync_git"
+    },
+    {
+      "name": "prebuilt",
+      "every_min": 2,
+      "builtin": "prebuilt"
+    },
+    {
+      "name": "queue-health",
+      "every_min": 10,
+      "command": [
+        "python3",
+        "-m",
+        "tools.agents.queue_health",
+        "--apply",
+        "--queue",
+        "tmp/codexapi/p3queue.txt"
+      ],
+      "cwd": "repo",
+      "timeout": 300,
+      "when_repo_file": "tools/agents/queue_health.py"
+    },
+    {
+      "name": "planners",
+      "every_min": 5,
+      "builtin": "planners"
+    },
+    {
+      "name": "hygiene-cargo",
+      "every_min": 60,
+      "command": [
+        "python3",
+        "-m",
+        "tools.wt",
+        "hygiene-cargo",
+        "--cargo-cap-gb",
+        "150",
+        "--apply"
+      ],
+      "cwd": "repo",
+      "timeout": 1800,
+      "background": true
+    },
+    {
+      "name": "hygiene-cache",
+      "every_min": 60,
+      "command": [
+        "python3",
+        "-m",
+        "tools.wt",
+        "hygiene-cache",
+        "--apply"
+      ],
+      "cwd": "repo",
+      "timeout": 1800,
+      "background": true
+    },
+    {
+      "name": "cargo-cap",
+      "every_min": 60,
+      "command": [
+        "python3",
+        "-m",
+        "tools.wt",
+        "hygiene-cargo",
+        "--cargo-idle-hours",
+        "2",
+        "--cargo-cap-gb",
+        "100",
+        "--apply"
+      ],
+      "cwd": "repo",
+      "timeout": 900,
+      "background": true
+    },
+    {
+      "name": "replay-retention",
+      "every_min": 30,
+      "command": [
+        "nice",
+        "python3",
+        "-m",
+        "tools.wt",
+        "replay-retention",
+        "--apply"
+      ],
+      "cwd": "repo",
+      "timeout": 1500,
+      "background": true
+    },
+    {
+      "name": "integrate-remote",
+      "every_min": 10,
+      "command": [
+        "nice",
+        "python3",
+        "-m",
+        "tools.agents.integrate_remote",
+        "run",
+        "--batches",
+        "6",
+        "--batch-size",
+        "150"
+      ],
+      "cwd": "repo",
+      "timeout": 3000,
+      "background": true
+    },
+    {
+      "name": "legacy-heavy",
+      "every_min": 5,
+      "legacy": "sup-heavy.sh",
+      "timeout": 300
+    },
+    {
+      "name": "legacy-done",
+      "every_min": 1,
+      "legacy": "sup-done.sh",
+      "timeout": 300
+    },
+    {
+      "name": "legacy-harvest",
+      "every_min": 1,
+      "legacy": "sup-harvest.sh",
+      "timeout": 300
+    },
+    {
+      "name": "legacy-regress",
+      "every_min": 10,
+      "legacy": "regress-loop.sh",
+      "timeout": 120
+    },
+    {
+      "name": "legacy-codex-renewal",
+      "every_min": 180,
+      "legacy": "codex-renewal.sh",
+      "timeout": 300,
+      "when_file": "codex-limit.until",
+      "background": true
+    }
+  ]
+}

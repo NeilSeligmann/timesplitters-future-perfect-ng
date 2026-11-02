@@ -1,0 +1,21 @@
+{
+  "_comment": "T3418 Rule 24 weapon gate: T2148 gameplay/weapons state plus the typed Rust-owned weapon owner projection. Kept to the 16-region trace limit by omitting hit_scratch_7330. Compare against the Story level1 recording from its gameplay-start snapshot; the owner projection is a host-only serialization and never writes guest memory.",
+  "regions": [
+    {"name": "level_state", "spec": "0x79094C:4"},
+    {"name": "weapon_entries", "spec": "0x4FA128:0x1068"},
+    {"name": "ext_block", "spec": "*0x7356D8+0:0xEA0"},
+    {"name": "weapon_order", "spec": "0x4FC888:0x118"},
+    {"name": "group_count", "spec": "0x75A020:0x8"},
+    {"name": "player_ptrs", "spec": "0x7356C0:0x40"},
+    {"name": "player_globals", "spec": "0x7B0C00:0x100"},
+    {"name": "player_record", "spec": "*0x7B0C7C+0:0x2000"},
+    {"name": "controlled_object", "spec": "*0x7B0C48+0:0x1584"},
+    {"name": "pool_counts", "spec": "0x7B54E0:0x360"},
+    {"name": "npc_obj0", "spec": "**0x7A3580+0+0:0xEA0"},
+    {"name": "npc_obj1", "spec": "**0x7A3584+0+0:0xEA0"},
+    {"name": "hud_vars", "spec": "0x7E7260:0x40"},
+    {"name": "npc_obj2", "spec": "**0x7A3588+0+0:0xEA0"},
+    {"name": "mode_cells", "spec": "0x7DE440:0x40"},
+    {"name": "weapon_inventory_owner", "spec": "=0xFFFF3000:0x5E8"}
+  ]
+}
