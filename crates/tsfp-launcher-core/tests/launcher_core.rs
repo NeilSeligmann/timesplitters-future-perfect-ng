@@ -173,3 +173,127 @@ fn default_game_dir_is_not_under_config_dir() {
         );
     }
 }
+
+mod update_check {
+    use tsfp_launcher_core::config::Channel;
+    use tsfp_launcher_core::update::{Version, newest};
+
+    fn rel(tag: &str, pre: bool, draft: bool, signed: bool) -> String {
+        let sig = if signed {
+            format!(r#",{{"name":"a.minisig","browser_download_url":"https://x/{tag}/a.minisig"}}"#)
+        } else {
+            String::new()
+        };
+        format!(
+            r#"{{"tag_name":"{tag}","prerelease":{pre},"draft":{draft},"body":"n{tag}","assets":[{{"name":"a","browser_download_url":"https://x/{tag}/a"}}{sig}]}}"#
+        )
+    }
+
+    #[test]
+    fn versions_order_prereleases_first() {
+        let v = |s| Version::parse(s).unwrap();
+        assert!(v("v1.2.0-nightly.3") < v("1.2.0"));
+        assert!(v("1.2.0") < v("1.10.0"));
+        assert!(Version::parse("1.2").is_none() && Version::parse("1.2.3.4").is_none());
+    }
+
+    #[test]
+    fn channel_signature_and_draft_rules() {
+        let json = format!(
+            "[{},{},{},{},{}]",
+            rel("v0.3.0", false, true, true),
+            rel("v0.2.1-nightly.1", true, false, true),
+            rel("v0.2.0", false, false, true),
+            rel("v0.2.5", false, false, false),
+            rel("v0.0.9", false, false, true),
+        );
+        let stable = newest(&json, Channel::Stable, "0.1.0", "a")
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            (stable.version.as_str(), stable.notes.as_str()),
+            ("v0.2.0", "nv0.2.0")
+        );
+        assert_eq!(stable.signature_url, "https://x/v0.2.0/a.minisig");
+        let nightly = newest(&json, Channel::Nightly, "0.1.0", "a")
+            .unwrap()
+            .unwrap();
+        assert_eq!(nightly.version, "v0.2.1-nightly.1");
+        assert_eq!(newest(&json, Channel::Stable, "0.2.0", "a").unwrap(), None);
+        assert!(newest("{}", Channel::Stable, "0.1.0", "a").is_err());
+    }
+}
+
+#[test]
+fn mod_install_from_wrapped_folder_replace_and_uninstall() {
+    let d = scratch("modinstall");
+    let src = d.join("download");
+    make_mod(&src, "gamma", &["textures/x.ktx2"], r#","name":"Gamma""#);
+    let mods_dir = d.join("game/mods");
+    // Archive layout with one wrapping folder: download/gamma/mod.json.
+    let m = mods::install_dir(&src, &mods_dir).unwrap();
+    assert_eq!((m.id.as_str(), m.files.len()), ("gamma", 1));
+    make_mod(&src, "gamma", &["textures/x.ktx2", "audio/y.flac"], "");
+    assert_eq!(
+        mods::install_dir(&src.join("gamma"), &mods_dir)
+            .unwrap()
+            .files
+            .len(),
+        2
+    );
+    let (ok, bad) = mods::scan(&mods_dir);
+    assert_eq!((ok.len(), bad.len()), (1, 0));
+    mods::uninstall(&mods_dir, "gamma").unwrap();
+    assert!(mods::scan(&mods_dir).0.is_empty());
+    assert!(mods::uninstall(&mods_dir, "../x").is_err());
+}
+
+#[test]
+fn mod_install_rejects_bad_id_and_keeps_existing() {
+    let d = scratch("modbad");
+    let mods_dir = d.join("mods");
+    make_mod(&d.join("src"), "keep", &["a/b"], "");
+    mods::install_dir(&d.join("src/keep"), &mods_dir).unwrap();
+    write(
+        &d.join("bad/mod.json"),
+        br#"{"schema":1,"id":"keep","version":"2"}"#,
+    );
+    write(
+        &d.join("bad2/mod.json"),
+        br#"{"schema":2,"id":"keep","version":"2"}"#,
+    );
+    // Missing files/ is allowed, wrong schema is not: the old install must survive.
+    assert!(mods::install_dir(&d.join("bad2"), &mods_dir).is_err());
+    assert_eq!(mods::scan(&mods_dir).0[0].version, "1.0");
+    write(
+        &d.join("evil/mod.json"),
+        br#"{"schema":1,"id":"../evil","version":"1"}"#,
+    );
+    assert!(mods::install_dir(&d.join("evil"), &mods_dir).is_err());
+}
+
+#[test]
+fn load_order_moves_and_active_json_lists_winners() {
+    let mut order: Vec<String> = ["a", "b", "c"].map(String::from).to_vec();
+    mods::move_in_order(&mut order, "c", -1);
+    mods::move_in_order(&mut order, "a", -1);
+    mods::move_in_order(&mut order, "b", 1);
+    // c moved up; a at the top and b at the bottom cannot move further.
+    assert_eq!(order, ["a", "c", "b"].map(String::from).to_vec());
+    mods::move_in_order(&mut order, "a", 1);
+    assert_eq!(order, ["c", "a", "b"].map(String::from).to_vec());
+
+    let d = scratch("active");
+    let m = d.join("mods");
+    make_mod(&m, "base", &["t/a", "t/b"], "");
+    make_mod(&m, "over", &["t/a"], r#","affects_gameplay":true"#);
+    let (mods, _) = mods::scan(&m);
+    let order = vec!["base".to_string(), "over".to_string()];
+    mods::write_active(&m, &mods, &order).unwrap();
+    let v: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(m.join("active.json")).unwrap()).unwrap();
+    assert_eq!(v["files"]["t/a"], "over");
+    assert_eq!(v["files"]["t/b"], "base");
+    assert_eq!(v["affects_gameplay"], true);
+    assert!(mods::write_active(&m, &mods, &["nope".to_string()]).is_err());
+}

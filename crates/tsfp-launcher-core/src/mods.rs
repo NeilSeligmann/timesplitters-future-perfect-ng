@@ -99,7 +99,8 @@ pub fn scan(mods_dir: &Path) -> (Vec<ModInfo>, Vec<String>) {
     let Ok(rd) = std::fs::read_dir(mods_dir) else {
         return (ok, bad);
     };
-    for e in rd.flatten().filter(|e| e.path().is_dir()) {
+    let visible = |e: &std::fs::DirEntry| !e.file_name().to_string_lossy().starts_with('.');
+    for e in rd.flatten().filter(|e| e.path().is_dir() && visible(e)) {
         let manifest = e.path().join("mod.json");
         match std::fs::read_to_string(&manifest) {
             Ok(t) => match parse(&t, &e.path()) {
@@ -146,4 +147,120 @@ pub fn resolve(mods: &[ModInfo], load_order: &[String]) -> Result<Vec<Conflict>>
             }
         })
         .collect())
+}
+
+/// Install a mod from an unpacked folder (the folder holding `mod.json`, or its only subfolder) into
+/// `mods_dir/<id>/`. Replaces an existing install of the same id. Returns the installed mod.
+pub fn install_dir(src: &Path, mods_dir: &Path) -> Result<ModInfo> {
+    let root = if src.join("mod.json").is_file() {
+        src.to_path_buf()
+    } else {
+        let subdirs: Vec<PathBuf> = std::fs::read_dir(src)
+            .map_err(|e| format!("{}: {e}", src.display()))?
+            .flatten()
+            .map(|e| e.path())
+            .filter(|p| p.is_dir())
+            .collect();
+        match &subdirs[..] {
+            [only] if only.join("mod.json").is_file() => only.clone(),
+            _ => return Err(format!("{}: no mod.json found", src.display())),
+        }
+    };
+    let text = std::fs::read_to_string(root.join("mod.json"))
+        .map_err(|e| format!("{}: {e}", root.display()))?;
+    let v: Value = serde_json::from_str(&text).map_err(|e| format!("mod.json: {e}"))?;
+    let id = v
+        .get("id")
+        .and_then(Value::as_str)
+        .ok_or("mod.json: missing id")?
+        .to_string();
+    if !valid_id(&id) {
+        return Err(format!("mod.json: id {id:?} must be 1-64 of [a-z0-9_-]"));
+    }
+    let dest = mods_dir.join(&id);
+    let staging = mods_dir.join(format!(".{id}.installing"));
+    let _ = std::fs::remove_dir_all(&staging);
+    copy_tree(&root, &staging)?;
+    // Validate the staged copy under its final name before replacing anything.
+    let staged = parse(&text, &dest).map(|mut m| {
+        m.files = list_files(&staging.join("files")).unwrap_or_default();
+        m
+    });
+    if let Err(e) = staged {
+        let _ = std::fs::remove_dir_all(&staging);
+        return Err(e);
+    }
+    let _ = std::fs::remove_dir_all(&dest);
+    std::fs::rename(&staging, &dest).map_err(|e| format!("{}: {e}", dest.display()))?;
+    parse(&text, &dest)
+}
+
+fn copy_tree(src: &Path, dst: &Path) -> Result<()> {
+    std::fs::create_dir_all(dst).map_err(|e| format!("{}: {e}", dst.display()))?;
+    for e in std::fs::read_dir(src)
+        .map_err(|e| format!("{}: {e}", src.display()))?
+        .flatten()
+    {
+        let (from, to) = (e.path(), dst.join(e.file_name()));
+        let kind = e.file_type().map_err(|e| e.to_string())?;
+        if kind.is_symlink() {
+            return Err(format!(
+                "{}: symlinks are not allowed in mods",
+                from.display()
+            ));
+        } else if kind.is_dir() {
+            copy_tree(&from, &to)?;
+        } else {
+            std::fs::copy(&from, &to).map_err(|e| format!("{}: {e}", from.display()))?;
+        }
+    }
+    Ok(())
+}
+
+pub fn uninstall(mods_dir: &Path, id: &str) -> Result<()> {
+    if !valid_id(id) {
+        return Err(format!("bad mod id {id:?}"));
+    }
+    std::fs::remove_dir_all(mods_dir.join(id)).map_err(|e| format!("{id}: {e}"))
+}
+
+/// Move `id` one place earlier (`-1`) or later (`+1`) in the load order. Later entries win conflicts.
+pub fn move_in_order(order: &mut [String], id: &str, delta: isize) {
+    if let Some(i) = order.iter().position(|m| m == id) {
+        let j = i as isize + delta;
+        if j >= 0 && (j as usize) < order.len() {
+            order.swap(i, j as usize);
+        }
+    }
+}
+
+/// Write `<game dir>/mods/active.json`: enabled mods in load order and the winning mod for every
+/// overridden file. The game runtime reads this to build its overlay; it never rescans mod folders.
+pub fn write_active(mods_dir: &Path, mods: &[ModInfo], load_order: &[String]) -> Result<()> {
+    resolve(mods, load_order)?;
+    let mut winners: BTreeMap<&str, &str> = BTreeMap::new();
+    let mut gameplay = false;
+    for id in load_order {
+        if let Some(m) = mods.iter().find(|m| &m.id == id) {
+            gameplay |= m.affects_gameplay;
+            for f in &m.files {
+                winners.insert(f, &m.id);
+            }
+        }
+    }
+    let v = serde_json::json!({
+        "schema": SCHEMA,
+        "load_order": load_order,
+        "affects_gameplay": gameplay,
+        "files": winners,
+    });
+    std::fs::create_dir_all(mods_dir).map_err(|e| format!("{}: {e}", mods_dir.display()))?;
+    let path = mods_dir.join("active.json");
+    let tmp = mods_dir.join("active.json.tmp");
+    std::fs::write(
+        &tmp,
+        serde_json::to_string_pretty(&v).unwrap_or_default() + "\n",
+    )
+    .map_err(|e| format!("{}: {e}", tmp.display()))?;
+    std::fs::rename(&tmp, &path).map_err(|e| format!("{}: {e}", path.display()))
 }

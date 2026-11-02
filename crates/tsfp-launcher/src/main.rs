@@ -2,7 +2,9 @@
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
 mod app;
+mod mod_archive;
 mod settings_view;
+mod updater;
 
 fn main() -> iced::Result {
     iced::application(app::App::boot, app::App::update, app::App::view)

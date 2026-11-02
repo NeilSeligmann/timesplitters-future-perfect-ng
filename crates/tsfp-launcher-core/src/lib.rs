@@ -5,5 +5,6 @@ pub mod identify;
 pub mod install;
 pub mod mods;
 pub mod packs;
+pub mod update;
 
 pub type Result<T> = std::result::Result<T, String>;

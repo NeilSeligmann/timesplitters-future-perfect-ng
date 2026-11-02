@@ -51,7 +51,53 @@ jobs:
           mkdir -p "$out"
           cp crates/tsfp-launcher/target/${{ matrix.target }}/release/tsfp-launcher${{ runner.os == 'Windows' && '.exe' || '' }} "$out/"
           cp LICENSE "$out/"
+          # Release asset name the updater looks for (tsfp_launcher_core::update::platform_asset).
+          mkdir -p release
+          cp crates/tsfp-launcher/target/${{ matrix.target }}/release/tsfp-launcher${{ runner.os == 'Windows' && '.exe' || '' }} \
+            release/tsfp-launcher-${{ matrix.name }}${{ runner.os == 'Windows' && '.exe' || '' }}
       - uses: actions/upload-artifact@v5
         with:
           name: tsfp-launcher-${{ matrix.name }}
           path: dist/
+      - uses: actions/upload-artifact@v5
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: release-${{ matrix.name }}
+          path: release/
+
+  # Tags v* publish a signed GitHub Release; tags with a `-` suffix are pre-releases (Nightly channel).
+  # The updater installs only assets whose .minisig verifies against the key embedded in the launcher.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: release
+      - name: Sign
+        env:
+          MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY }}
+        run: |
+          # Without the secret the release still ships binaries; the updater ignores unsigned releases.
+          if [ -z "$MINISIGN_SECRET_KEY" ]; then
+            echo "::warning::MINISIGN_SECRET_KEY is not set: publishing unsigned binaries (auto-update skips them)"
+            exit 0
+          fi
+          sudo apt-get update && sudo apt-get install -y minisign
+          umask 077
+          printf '%s\n' "$MINISIGN_SECRET_KEY" > "$RUNNER_TEMP/minisign.key"
+          for f in release/*; do
+            minisign -S -s "$RUNNER_TEMP/minisign.key" -m "$f" -t "tsfp-launcher ${GITHUB_REF_NAME}"
+          done
+          rm -f "$RUNNER_TEMP/minisign.key"
+          ls -l release
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true

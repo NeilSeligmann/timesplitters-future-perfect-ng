@@ -1,6 +1,8 @@
 //! Launcher state, messages and view. Long work (identify, install, verify) runs on a worker thread and
 //! streams messages back, so the window never blocks.
+use crate::mod_archive;
 use crate::settings_view::{self, Edit};
+use crate::updater;
 use iced::futures::channel::mpsc;
 use iced::widget::{
     Space, button, checkbox, column, container, pick_list, row, scrollable, text, text_input,
@@ -11,6 +13,7 @@ use std::path::PathBuf;
 use tsfp_launcher_core::config::{self, Channel, Config};
 use tsfp_launcher_core::identify::{self, Identity};
 use tsfp_launcher_core::install::{self, Status, Step};
+use tsfp_launcher_core::update::Offer;
 use tsfp_launcher_core::{mods, packs};
 use tsfp_settings::Settings;
 
@@ -63,7 +66,16 @@ pub enum Msg {
     GameDir(String),
     Channel(ChannelChoice),
     CheckUpdates(bool),
+    UpdateCheck,
+    UpdateFound(Result<Option<Offer>, String>),
+    UpdateApply,
+    UpdateApplied(Result<String, String>),
     ToggleMod(String, bool),
+    MoveMod(String, isize),
+    RemoveMod(String),
+    BrowseMod,
+    PickedMod(Option<PathBuf>),
+    ModInstalled(Result<String, String>),
     Setting(Edit),
     Save,
     Play,
@@ -95,6 +107,7 @@ pub struct App {
     pub log: Vec<String>,
     pub status: Vec<Status>,
     pub notice: String,
+    pub update: Option<Offer>,
 }
 
 /// Game executable shipped beside the launcher; absent on platforms the port does not run on yet.
@@ -155,15 +168,22 @@ impl App {
             log: Vec::new(),
             status,
             notice,
+            update: None,
         }
     }
 
-    pub fn boot() -> Self {
+    pub fn boot() -> (Self, Task<Msg>) {
         let dir = config::default_config_dir();
-        Self::new(
+        let app = Self::new(
             dir.as_ref().map(|d| d.join("launcher.json")),
             tsfp_settings::user_settings_path(),
-        )
+        );
+        let task = if app.config.check_updates {
+            Task::done(Msg::UpdateCheck)
+        } else {
+            Task::none()
+        };
+        (app, task)
     }
 
     pub fn theme(&self) -> Theme {
@@ -267,11 +287,78 @@ impl App {
             }
             Msg::Channel(c) => self.config.channel = c.0,
             Msg::CheckUpdates(v) => self.config.check_updates = v,
+            Msg::UpdateCheck => {
+                let channel = self.config.channel;
+                return background(move |send| send(Msg::UpdateFound(updater::check(channel))));
+            }
+            Msg::UpdateFound(Ok(offer)) => {
+                if offer.is_none() {
+                    self.notice = "Launcher is up to date.".into();
+                }
+                self.update = offer;
+            }
+            Msg::UpdateFound(Err(e)) => self.notice = format!("Update check failed: {e}"),
+            Msg::UpdateApply if !self.busy => {
+                if let Some(offer) = self.update.clone() {
+                    self.busy = true;
+                    self.notice = format!("Downloading {}...", offer.version);
+                    return background(move |send| {
+                        send(Msg::UpdateApplied(updater::apply(&offer)))
+                    });
+                }
+            }
+            Msg::UpdateApply => {}
+            Msg::UpdateApplied(r) => {
+                self.busy = false;
+                match r {
+                    Ok(m) => {
+                        self.notice = m;
+                        self.update = None;
+                    }
+                    Err(e) => self.notice = format!("Update failed: {e}"),
+                }
+            }
             Msg::ToggleMod(id, on) => {
                 self.config.enabled_mods.retain(|m| m != &id);
                 if on {
                     self.config.enabled_mods.push(id);
                 }
+            }
+            Msg::MoveMod(id, delta) => {
+                mods::move_in_order(&mut self.config.enabled_mods, &id, delta)
+            }
+            Msg::RemoveMod(id) => {
+                self.config.enabled_mods.retain(|m| m != &id);
+                self.notice = match mods::uninstall(&self.config.game_dir.join("mods"), &id) {
+                    Ok(()) => format!("Removed {id}."),
+                    Err(e) => e,
+                };
+            }
+            Msg::BrowseMod => {
+                return Task::perform(
+                    async {
+                        rfd::AsyncFileDialog::new()
+                            .set_title("Choose a mod archive")
+                            .add_filter("Mod archive", &["zip"])
+                            .pick_file()
+                            .await
+                            .map(|h| h.path().to_path_buf())
+                    },
+                    Msg::PickedMod,
+                );
+            }
+            Msg::PickedMod(Some(p)) => {
+                let dir = self.config.game_dir.join("mods");
+                return background(move |send| {
+                    send(Msg::ModInstalled(
+                        mod_archive::install(&p, &dir)
+                            .map(|m| format!("Installed {} {}.", m.name, m.version)),
+                    ))
+                });
+            }
+            Msg::PickedMod(None) => {}
+            Msg::ModInstalled(r) => {
+                self.notice = r.unwrap_or_else(|e| format!("Mod install failed: {e}"))
             }
             Msg::Setting(e) => settings_view::apply(&mut self.settings, &mut self.drafts, e),
             Msg::Save => self.notice = self.save_all(),
@@ -303,6 +390,21 @@ impl App {
             && let Err(e) = self.settings.save(p)
         {
             errs.push(format!("{}: {e}", p.display()));
+        }
+        // The game reads only active.json; mods enabled in the config but no longer installed are left out.
+        let mods_dir = self.config.game_dir.join("mods");
+        let (installed, _) = mods::scan(&mods_dir);
+        let order: Vec<String> = self
+            .config
+            .enabled_mods
+            .iter()
+            .filter(|id| installed.iter().any(|m| &m.id == *id))
+            .cloned()
+            .collect();
+        if (!order.is_empty() || mods_dir.join("active.json").exists())
+            && let Err(e) = mods::write_active(&mods_dir, &installed, &order)
+        {
+            errs.push(e);
         }
         if errs.is_empty() {
             "Saved.".into()
@@ -351,7 +453,18 @@ impl App {
         } else {
             ""
         };
+        let banner: Element<'_, Msg> = match &self.update {
+            Some(o) => row![
+                text(format!("Launcher {} is available.", o.version)),
+                button("Update").on_press_maybe((!self.busy).then_some(Msg::UpdateApply)),
+            ]
+            .spacing(12)
+            .align_y(iced::Alignment::Center)
+            .into(),
+            None => Space::new().height(0).into(),
+        };
         column![
+            banner,
             text("TimeSplitters: Future Perfect NG").size(28),
             text(format!("Launcher {}", env!("CARGO_PKG_VERSION"))).size(13),
             status_list(&self.status),
@@ -437,6 +550,7 @@ impl App {
             row![
                 text("Check for updates").width(Length::Fixed(240.0)),
                 toggler(self.config.check_updates).on_toggle(Msg::CheckUpdates),
+                button("Check now").on_press(Msg::UpdateCheck),
             ]
             .spacing(12),
             text("Game (shared with the in-game menu)").size(20),
@@ -469,9 +583,23 @@ impl App {
     }
 
     fn mods(&self) -> Element<'_, Msg> {
-        let (found, broken) = mods::scan(&self.config.game_dir.join("mods"));
+        let (mut found, broken) = mods::scan(&self.config.game_dir.join("mods"));
+        // Enabled mods in load order first, then the rest by id.
+        let rank = |id: &str| {
+            self.config
+                .enabled_mods
+                .iter()
+                .position(|x| x == id)
+                .unwrap_or(usize::MAX)
+        };
+        found.sort_by(|a, b| rank(&a.id).cmp(&rank(&b.id)).then_with(|| a.id.cmp(&b.id)));
         let mut c = column![
-            text("Mods").size(20),
+            row![
+                text("Mods").size(20).width(Length::Fill),
+                button("Install mod...").on_press(Msg::BrowseMod),
+            ]
+            .align_y(iced::Alignment::Center),
+            text("Later mods in the load order win when two mods replace the same file.").size(12),
             text(format!(
                 "Folder: {}",
                 self.config.game_dir.join("mods").display()
@@ -490,10 +618,29 @@ impl App {
                 ""
             };
             let id = m.id.clone();
+            let position = self
+                .config
+                .enabled_mods
+                .iter()
+                .position(|x| x == &m.id)
+                .map_or(String::new(), |i| format!("#{} ", i + 1));
             c = c.push(
-                checkbox(on)
-                    .label(format!("{} {}{tag}: {}", m.name, m.version, m.description))
-                    .on_toggle(move |v| Msg::ToggleMod(id.clone(), v)),
+                row![
+                    checkbox(on)
+                        .label(format!(
+                            "{position}{} {}{tag}: {}",
+                            m.name, m.version, m.description
+                        ))
+                        .on_toggle(move |v| Msg::ToggleMod(id.clone(), v))
+                        .width(Length::Fill),
+                    button("Up").on_press_maybe(on.then(|| Msg::MoveMod(m.id.clone(), -1))),
+                    button("Down").on_press_maybe(on.then(|| Msg::MoveMod(m.id.clone(), 1))),
+                    button("Remove")
+                        .style(button::danger)
+                        .on_press(Msg::RemoveMod(m.id.clone())),
+                ]
+                .spacing(6)
+                .align_y(iced::Alignment::Center),
             );
         }
         for b in broken {
