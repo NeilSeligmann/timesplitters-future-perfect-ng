@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="56" viewBox="0 0 280 56" role="img" aria-label="Download for Linux (x64 · AppImage)">
+  <rect width="280" height="56" rx="10" fill="#b45309"/>
+  <rect x="1" y="1" width="278" height="54" rx="9" fill="none" stroke="#ffffff" stroke-opacity="0.18"/>
+  <g fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 16v18M20 27l8 8 8-8M18 40h20"/>
+  </g>
+  <text x="52" y="25" fill="#ffffff" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="700">Download for Linux</text>
+  <text x="52" y="43" fill="#ffffff" fill-opacity="0.8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">x64 · AppImage</text>
+</svg>

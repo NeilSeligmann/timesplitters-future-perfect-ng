@@ -6,16 +6,16 @@ name: launcher
 # Builds for release tags (owner 2026-11-02: no CI minutes on ordinary main pushes or PRs). Manual runs stay
 # available from the Actions tab.
 # Build cache: GitHub lets a run restore caches from its own ref or the default branch only, so a cache saved by one
-# tag is invisible to the next. The cache is therefore saved on main, and main runs only when the launcher's
-# dependencies, toolchain or this workflow change; tag runs restore it and only recompile the launcher crates.
+# tag is invisible to the next. The cache is saved on main: automatically when the toolchain changes, and by a manual
+# run on main after a dependency upgrade. Every release bumps Cargo.lock, so the lockfile is not a trigger (it would
+# start a full main build next to every release). Tag runs restore the newest cache; with changed dependencies the
+# restore falls back to the closest older cache and only the changed crates compile.
 on:
   push:
     tags: ["v*"]
     branches: [main]
     paths:
-      - crates/tsfp-launcher/Cargo.lock
       - rust-toolchain.toml
-      - .github/workflows/launcher.yml
   workflow_dispatch:
 
 permissions:
@@ -35,6 +35,8 @@ jobs:
           - { name: windows-arm64, os: windows-11-arm, target: aarch64-pc-windows-msvc }
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
       - name: Tag matches launcher version
@@ -89,55 +91,45 @@ jobs:
         with:
           name: tsfp-launcher-${{ matrix.name }}
           path: dist/
-      - uses: actions/upload-artifact@v7
+      # Each platform signs and attaches its own assets as soon as it is built (owner 2026-11-02), so early
+      # platforms are downloadable while slower runners are still queued. Tags with a `-` suffix are pre-releases
+      # (Nightly channel). The updater installs only assets whose .minisig verifies against the embedded key.
+      - name: Sign and attach to the release
         if: startsWith(github.ref, 'refs/tags/v')
-        with:
-          name: release-${{ matrix.name }}
-          path: release/
+        shell: bash
+        env:
+          MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sh tools/release/package/sign.sh release/*
+          pre=""; case "$GITHUB_REF_NAME" in *-*) pre=--prerelease ;; esac
+          # The first platform to finish creates the release; the others find it.
+          for attempt in 1 2 3 4 5; do
+            gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 && break
+            gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes $pre >/dev/null 2>&1 && break
+            sleep $((attempt * 3))
+          done
+          gh release upload "$GITHUB_REF_NAME" release/* --clobber
 
-  # Tags v* publish a signed GitHub Release; tags with a `-` suffix are pre-releases (Nightly channel).
-  # The updater installs only assets whose .minisig verifies against the key embedded in the launcher.
-  release:
-    if: startsWith(github.ref, 'refs/tags/v')
+  # SHA256SUMS over every asset once all platforms are in (each asset also has its own .sha256 immediately).
+  # Check: sha256sum --ignore-missing -c SHA256SUMS
+  checksums:
+    if: always() && startsWith(github.ref, 'refs/tags/v')
     needs: build
     runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v8
-        with:
-          pattern: release-*
-          merge-multiple: true
-          path: release
-      - name: Checksums
-        # SHA256SUMS covers every asset; it is signed below with the binaries. Check: sha256sum -c SHA256SUMS
-        run: |
-          cd release
-          sha256sum -- * > SHA256SUMS
-          cat SHA256SUMS
-      - name: Sign
+      - uses: actions/checkout@v7
+      - name: Assemble, sign and attach SHA256SUMS
         env:
           MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # Without the secret the release still ships binaries; the updater ignores unsigned releases.
-          if [ -z "$MINISIGN_SECRET_KEY" ]; then
-            echo "::warning::MINISIGN_SECRET_KEY is not set: publishing unsigned binaries (auto-update skips them)"
-            exit 0
-          fi
-          sudo apt-get update && sudo apt-get install -y minisign
-          umask 077
-          # minisign needs the comment line; accept a secret holding only the key line too.
-          case "$MINISIGN_SECRET_KEY" in
-            "untrusted comment:"*) printf '%s\n' "$MINISIGN_SECRET_KEY" > "$RUNNER_TEMP/minisign.key" ;;
-            *) printf 'untrusted comment: minisign secret key\n%s\n' "$MINISIGN_SECRET_KEY" > "$RUNNER_TEMP/minisign.key" ;;
-          esac
-          for f in release/*; do
-            minisign -S -s "$RUNNER_TEMP/minisign.key" -m "$f" -t "tsfp-launcher ${GITHUB_REF_NAME}"
-          done
-          rm -f "$RUNNER_TEMP/minisign.key"
-          ls -l release
-      - uses: softprops/action-gh-release@v3
-        with:
-          files: release/*
-          prerelease: ${{ contains(github.ref_name, '-') }}
-          generate_release_notes: true
+          mkdir sums
+          gh release download "$GITHUB_REF_NAME" --pattern '*.sha256' --dir sums
+          cat sums/*.sha256 | sed 's/ \*/  /' | sort -k2 > SHA256SUMS
+          cat SHA256SUMS
+          sh tools/release/package/sign.sh SHA256SUMS
+          files=SHA256SUMS; [ -f SHA256SUMS.minisig ] && files="$files SHA256SUMS.minisig"
+          gh release upload "$GITHUB_REF_NAME" $files --clobber
