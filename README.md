@@ -11,16 +11,12 @@ with a launcher that sets everything up from your own copy of the game.
 ![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-555)
 
 <p>
-<a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest/download/tsfp-launcher-windows-x64.exe"><img src="docs/assets/download-windows-x64.svg" alt="Download for Windows (x64)" width="280" height="56"></a>
-<a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest/download/tsfp-launcher-macos-arm64.dmg"><img src="docs/assets/download-macos-arm64.svg" alt="Download for macOS (Apple Silicon)" width="280" height="56"></a>
-<a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest/download/tsfp-launcher-linux-x64.AppImage"><img src="docs/assets/download-linux-x64.svg" alt="Download for Linux (x64)" width="280" height="56"></a>
-</p>
-<p>
-<a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest/download/tsfp-launcher-windows-arm64.exe"><img src="docs/assets/download-windows-arm64.svg" alt="Download for Windows ARM" width="220" height="44"></a>
-<a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest/download/tsfp-launcher-linux-arm64.AppImage"><img src="docs/assets/download-linux-arm64.svg" alt="Download for Linux ARM" width="220" height="44"></a>
+<a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest/download/tsfp-launcher-windows-x64.exe"><img src="docs/assets/download-windows-x64.svg" alt="Download for Windows (x64)" width="250" height="50"></a>
+<a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest/download/tsfp-launcher-macos-arm64.dmg"><img src="docs/assets/download-macos-arm64.svg" alt="Download for macOS (Apple Silicon)" width="250" height="50"></a>
+<a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest/download/tsfp-launcher-linux-x64.AppImage"><img src="docs/assets/download-linux-x64.svg" alt="Download for Linux (x64)" width="250" height="50"></a>
 </p>
 
-<sub><a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest">All downloads, release notes, checksums and signatures</a> · <a href="docs/players/verifying-downloads.md">How to verify a download</a></sub>
+<sub><a href="https://github.com/NeilSeligmann/timesplitters-future-perfect-ng/releases/latest">More downloads on the releases page</a>: Windows and Linux on ARM, release notes, checksums and signatures · <a href="docs/players/verifying-downloads.md">How to verify a download</a></sub>
 
 **[Get started](#get-started)** · [Launcher guide](docs/players/launcher.md) · [Modding](docs/modding.md) · [Roadmap](docs/GOALS.md) · [Build from source](docs/development/building.md)
 
